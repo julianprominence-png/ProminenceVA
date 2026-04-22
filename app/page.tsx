@@ -22,6 +22,10 @@ import {
   Video,
   Layers,
   Cloud,
+  Camera as Instagram,
+  Briefcase as Linkedin,
+  Hash as Twitter,
+  Globe,
 } from "lucide-react";
 
 /*
@@ -53,12 +57,69 @@ const projects = [
 ];
 
 const team = [
-  { _id: "tm-1", name: "Vien Abache", role: "CEO & Founder"         },
-  { _id: "tm-2", name: "Gian",        role: "Video Editor"          },
-  { _id: "tm-3", name: "Russel",      role: "Video Editor"          },
-  { _id: "tm-4", name: "Vinz",        role: "Full-Stack Developer"  },
-  { _id: "tm-5", name: "Giervan",     role: "Back-End Developer"    },
-  { _id: "tm-6", name: "Julian",      role: "Front-End Developer"   },
+  { 
+    _id: "tm-1", 
+    name: "Vien Abache", 
+    role: "CEO & Founder",
+    photo: "/images/video.png",
+    bio: "Visionary leader driving Prominence VA's growth and ensuring top-tier service delivery.",
+    socials: [
+      { platform: "LinkedIn", url: "#", Icon: Linkedin },
+      { platform: "Twitter", url: "#", Icon: Twitter }
+    ]
+  },
+  { 
+    _id: "tm-2", 
+    name: "Gian", 
+    role: "Video Editor",
+    photo: "/images/video.png",
+    bio: "Expert in narrative pacing and creating highly engaging visual content.",
+    socials: [
+      { platform: "Instagram", url: "#", Icon: Instagram }
+    ]
+  },
+  { 
+    _id: "tm-3", 
+    name: "Russel", 
+    role: "Video Editor",
+    photo: "/images/video.png",
+    bio: "Specializes in motion graphics, color grading, and dynamic short-form edits.",
+    socials: [
+      { platform: "Instagram", url: "#", Icon: Instagram }
+    ]
+  },
+  { 
+    _id: "tm-4", 
+    name: "Vinz", 
+    role: "Full-Stack Developer",
+    photo: "/images/dashboard.png",
+    bio: "Architects scalable systems and smooth user experiences from front to back.",
+    socials: [
+      { platform: "LinkedIn", url: "#", Icon: Linkedin },
+      { platform: "Website", url: "#", Icon: Globe }
+    ]
+  },
+  { 
+    _id: "tm-5", 
+    name: "Giervan", 
+    role: "Back-End Developer",
+    photo: "/images/dashboard.png",
+    bio: "Database logic and API wizard ensuring performance and robust security.",
+    socials: [
+      { platform: "LinkedIn", url: "#", Icon: Linkedin }
+    ]
+  },
+  { 
+    _id: "tm-6", 
+    name: "Julian", 
+    role: "Front-End Developer",
+    photo: "/images/dashboard.png",
+    bio: "Crafts beautiful, GSAP-powered cinematic interfaces and responsive layouts.",
+    socials: [
+      { platform: "LinkedIn", url: "#", Icon: Linkedin },
+      { platform: "Twitter", url: "#", Icon: Twitter }
+    ]
+  },
 ];
 
 const processSteps = [
@@ -268,6 +329,8 @@ export default function HomePage() {
   const mainRef = useRef<HTMLElement>(null);
   const servicesPinRef = useRef<HTMLElement>(null);
   const servicesScrollRef = useRef<HTMLDivElement>(null);
+  const projectsPinRef = useRef<HTMLElement>(null);
+  const teamPinRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger);
