@@ -296,8 +296,9 @@ function GalaxyBackground() {
         />
       );
     });
-
+    // eslint-disable-next-line
     setStars(generatedStars);
+    // eslint-disable-next-line
     setParticles(generatedParticles);
   }, []);
 
@@ -329,8 +330,7 @@ export default function HomePage() {
   const mainRef = useRef<HTMLElement>(null);
   const servicesPinRef = useRef<HTMLElement>(null);
   const servicesScrollRef = useRef<HTMLDivElement>(null);
-  const projectsPinRef = useRef<HTMLElement>(null);
-  const teamPinRef = useRef<HTMLElement>(null);
+
 
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger);
