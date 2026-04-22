@@ -1,892 +1,487 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from 'react';
-import { motion, AnimatePresence, Variants, useScroll, useTransform } from 'framer-motion';
-import gsap from 'gsap';
+import { useEffect, useState } from "react";
+import { AnimatePresence, motion, useScroll, useTransform } from "framer-motion";
 import {
-  Code2, Video, Palette, Mail, ChevronDown, Star,
-  Menu, X, Terminal, MonitorPlay, PenTool, LayoutTemplate,
-  Zap, Layout, MessageSquare, ArrowRight, Layers, Sparkles,
-  Globe, Database, Server, Smartphone, Box,
-  Film, Camera, Wand2, Paintbrush, MousePointerClick,
-  Scissors, Image, Type, ExternalLink, Layers2,
-  Phone, MapPin, Clock, Send, BookOpen, Sun, Moon
-} from 'lucide-react';
+  ArrowRight,
+  BookOpen,
+  Briefcase,
+  Clapperboard,
+  Clock3,
+  Code2,
+  ExternalLink,
+  Layers,
+  Mail,
+  ShieldCheck,
+  Sparkles,
+  Users,
+  Wrench,
+} from "lucide-react";
 
-/* ─── scripture verses ─── */
-const SCRIPTURES = [
+const services = [
   {
-    text: "But remember the Lord your God, for it is he who gives you the ability to produce wealth, and so confirms his covenant, which he swore to your ancestors, as it is today.",
-    ref: "Deuteronomy 8:18"
+    title: "Video Editing",
+    description: "Story-driven edits for reels, ads, and branded content with fast turnarounds.",
+    icon: Clapperboard,
   },
   {
+    title: "Web Development",
+    description: "Modern sites and landing pages built for speed, clarity, and conversion.",
+    icon: Code2,
+  },
+  {
+    title: "Virtual Assistance",
+    description: "Reliable admin support, communication workflows, and business organization.",
+    icon: Briefcase,
+  },
+  {
+    title: "Creative Support",
+    description: "Design support for content systems, brand assets, and social media kits.",
+    icon: Sparkles,
+  },
+];
+
+const team = [
+  { name: "Vien Abache", role: "CEO" },
+  { name: "Gian", role: "Video Editor" },
+  { name: "Russel", role: "Video Editor" },
+  { name: "Vinz", role: "Developer" },
+  { name: "Giervan", role: "Developer" },
+  { name: "Julian", role: "Developer" },
+];
+
+const projects = [
+  {
+    title: "Creator Launch Campaign",
+    type: "Editing",
+    summary: "Multi-format short-form package for social launch week.",
+    gradient: "from-purple-500/30 via-fuchsia-500/20 to-transparent",
+  },
+  {
+    title: "Service Booking Website",
+    type: "Coding",
+    summary: "Clean booking flow and polished mobile-first landing page.",
+    gradient: "from-indigo-500/30 via-purple-500/20 to-transparent",
+  },
+  {
+    title: "Operations Dashboard",
+    type: "Virtual Assistance",
+    summary: "Task system and reporting setup to streamline daily operations.",
+    gradient: "from-violet-500/30 via-pink-500/15 to-transparent",
+  },
+  {
+    title: "Brand Kit Sprint",
+    type: "Creative",
+    summary: "Quick-turn visual assets, templates, and campaign directions.",
+    gradient: "from-fuchsia-500/25 via-purple-500/20 to-transparent",
+  },
+];
+
+const stack = [
+  "Next.js",
+  "Tailwind CSS",
+  "Premiere Pro",
+  "After Effects",
+  "VS Code",
+  "TypeScript",
+  "Figma",
+  "Notion",
+];
+
+const scriptures = [
+  {
     text: "Commit your work to the Lord, and your plans will be established.",
-    ref: "Proverbs 16:3"
+    ref: "Proverbs 16:3",
   },
   {
     text: "Whatever you do, work heartily, as for the Lord and not for men.",
-    ref: "Colossians 3:23"
+    ref: "Colossians 3:23",
   },
   {
     text: "For God gave us a spirit not of fear but of power and love and self-control.",
-    ref: "2 Timothy 1:7"
-  }
-];
-
-/* ─── project data ─── */
-const projects = [
-  { title: "E-Commerce Architecture", category: "Web Development", tech: ["Next.js", "TypeScript", "Stripe"], image: "/images/ecommerce.png" },
-  { title: "Cinematic Reel Suite", category: "Video Production", tech: ["After Effects", "DaVinci Resolve"], image: "/images/video.png" },
-  { title: "Brand Identity System", category: "Visual Design", tech: ["Illustrator", "Figma"], image: "/images/brand.png" },
-  { title: "Fitness App UI", category: "Mobile Design", tech: ["React Native", "Expo"], image: "/images/mobile.png" },
-  { title: "SaaS Analytics Dashboard", category: "Web Application", tech: ["Next.js", "D3.js", "Supabase"], image: "/images/dashboard.png" },
-];
-
-/* ─── tools data ─── */
-const toolCategories = [
-  {
-    title: "Development", icon: Terminal, accent: "from-purple-500/40 to-violet-600/20",
-    tools: [
-      { name: "Next.js / React", icon: Globe }, { name: "TypeScript", icon: Code2 }, { name: "Node.js", icon: Server },
-      { name: "Firebase / Supabase", icon: Database }, { name: "Vercel Deployment", icon: Zap }, { name: "VS Code", icon: MonitorPlay },
-    ],
+    ref: "2 Timothy 1:7",
   },
   {
-    title: "Video & Editing", icon: Video, accent: "from-pink-500/40 to-purple-600/20",
-    tools: [
-      { name: "CapCut Pro", icon: Film }, { name: "DaVinci Resolve", icon: Camera }, { name: "After Effects", icon: Wand2 }, { name: "Motion Graphics", icon: Sparkles },
-    ],
-  },
-  {
-    title: "Visual Design", icon: Palette, accent: "from-indigo-500/40 to-purple-600/20",
-    tools: [
-      { name: "Adobe Photoshop", icon: Image }, { name: "Adobe Illustrator", icon: PenTool }, { name: "Figma", icon: Box },
-      { name: "Canva Professional", icon: Paintbrush }, { name: "UI/UX Prototyping", icon: MousePointerClick },
-    ],
+    text: "But remember the Lord your God, for it is he who gives you the ability to produce wealth.",
+    ref: "Deuteronomy 8:18",
   },
 ];
 
-/* ═══════════════════════════════════
-   SCRIPTURE ROTATOR COMPONENT
-   ═══════════════════════════════════ */
-function ScriptureFooter() {
-  const [index, setIndex] = useState(0);
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setIndex((prev) => (prev + 1) % SCRIPTURES.length);
-    }, 8000);
-    return () => clearInterval(timer);
-  }, []);
-
-  return (
-    <div className="scripture-banner py-10 relative z-50">
-      <div className="max-w-5xl mx-auto px-6 flex justify-center">
-        <div className="scripture-glass min-h-[140px] md:min-h-[110px] flex items-center justify-center w-full max-w-3xl">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, y: 10, filter: 'blur(4px)' }}
-              animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-              exit={{ opacity: 0, y: -10, filter: 'blur(4px)' }}
-              transition={{ duration: 0.8, ease: "easeOut" }}
-              className="flex flex-col items-center gap-3 text-center"
-            >
-              <div className="flex items-center gap-4">
-                <BookOpen size={16} className="text-purple-500/70 flex-shrink-0 hidden sm:block" />
-                <p className="text-xs md:text-sm leading-relaxed font-medium italic opacity-80">
-                  &ldquo;{SCRIPTURES[index].text}&rdquo;
-                </p>
-                <BookOpen size={16} className="text-purple-500/70 flex-shrink-0 hidden sm:block" />
-              </div>
-              <span className="text-[10px] md:text-[11px] uppercase tracking-[0.4em] text-purple-500/90 font-bold">
-                — {SCRIPTURES[index].ref}
-              </span>
-            </motion.div>
-          </AnimatePresence>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-/* ═══════════════════════════════════
-   LOADING COMPONENT
-   ═══════════════════════════════════ */
-function InitialLoader() {
+function FadeIn({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) {
   return (
     <motion.div
-      initial={{ opacity: 1 }}
-      exit={{ opacity: 0, filter: 'blur(10px)' }}
-      transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
-      className="fixed inset-0 z-[9999] flex flex-col items-center justify-center pointer-events-none"
-      style={{ background: 'var(--background)' }}
+      initial={{ opacity: 0, y: 24 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-60px" }}
+      transition={{ duration: 0.65, delay, ease: [0.22, 1, 0.36, 1] }}
     >
-      {/* Background Logo Removed */}
-
-      <div className="relative z-10 flex flex-col items-center">
-        <motion.div
-          className="magazine-font text-5xl md:text-7xl font-black tracking-widest mb-4 flex gap-1"
-          initial={{ opacity: 0, y: 20, letterSpacing: '0.1em' }}
-          animate={{ opacity: 1, y: 0, letterSpacing: '0.25em' }}
-          transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
-        >
-          <span className="gradient-text font-black">PROMI</span>
-          <span className="text-[var(--foreground)] font-black">NENCE</span>
-        </motion.div>
-
-        <motion.div
-          className="text-xs md:text-sm uppercase tracking-[0.4em] font-bold text-[var(--foreground)] opacity-50"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 1, delay: 0.6 }}
-        >
-          Business Services
-        </motion.div>
-      </div>
+      {children}
     </motion.div>
   );
 }
 
-/* ═══════════════════════════════════
-   AUDIO LOGIC (Bubbly Clicks)
-   ═══════════════════════════════════ */
-const playBloop = () => {
-  try {
-    const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
-    if (!AudioContext) return;
-    const ctx = new AudioContext();
-    const osc = ctx.createOscillator();
-    const gainNode = ctx.createGain();
+function ScriptureBanner() {
+  const [scriptureIndex, setScriptureIndex] = useState(0);
 
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(400, ctx.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(800, ctx.currentTime + 0.1);
-    
-    gainNode.gain.setValueAtTime(0, ctx.currentTime);
-    gainNode.gain.linearRampToValueAtTime(0.3, ctx.currentTime + 0.02);
-    gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.15);
-    
-    osc.connect(gainNode);
-    gainNode.connect(ctx.destination);
-    osc.start();
-    osc.stop(ctx.currentTime + 0.15);
-  } catch(e) {}
-};
-
-/* ═══════════════════════════════════
-   MAIN COMPONENT
-   ═══════════════════════════════════ */
-export default function PortfolioPage() {
-  const [isNavOpen, setIsNavOpen] = useState(false);
-  const [isDarkMode, setIsDarkMode] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const [progress, setProgress] = useState(0);
-
-  const heroRef = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll();
-  const heroParallax = useTransform(scrollYProgress, [0, 0.3], [0, -80]);
-
-  // Loading Logic
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 2800); // Intro screen duration
+    const timer = setInterval(() => {
+      setScriptureIndex((prev) => (prev + 1) % scriptures.length);
+    }, 7000);
 
-    return () => clearTimeout(timer);
+    return () => clearInterval(timer);
   }, []);
-
-  // Theme Logic
-  useEffect(() => {
-    // Check locally or default to dark
-    const stored = localStorage.getItem('prominence-theme');
-    if (stored === 'light') {
-      setIsDarkMode(false);
-      document.documentElement.classList.remove('dark');
-    } else {
-      setIsDarkMode(true);
-      document.documentElement.classList.add('dark');
-    }
-  }, []);
-
-  const toggleTheme = () => {
-    const nextTheme = !isDarkMode;
-    setIsDarkMode(nextTheme);
-    if (nextTheme) {
-      document.documentElement.classList.add('dark');
-      localStorage.setItem('prominence-theme', 'dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-      localStorage.setItem('prominence-theme', 'light');
-    }
-  };
-
-  /* ── motion variants ── */
-  const fadeUp: Variants = {
-    hidden: { opacity: 0, y: 60 },
-    visible: { opacity: 1, y: 0, transition: { duration: 1, ease: [0.22, 1, 0.36, 1] } }
-  };
-  const fadeScale: Variants = {
-    hidden: { opacity: 0, scale: 0.88, y: 40 },
-    visible: { opacity: 1, scale: 1, y: 0, transition: { duration: 0.9, ease: [0.22, 1, 0.36, 1] } }
-  };
-  const slideLeft: Variants = {
-    hidden: { opacity: 0, x: -70, skewX: 2 },
-    visible: { opacity: 1, x: 0, skewX: 0, transition: { duration: 1, ease: [0.22, 1, 0.36, 1] } }
-  };
-  const slideRight: Variants = {
-    hidden: { opacity: 0, x: 70, skewX: -2 },
-    visible: { opacity: 1, x: 0, skewX: 0, transition: { duration: 1, ease: [0.22, 1, 0.36, 1] } }
-  };
-  const staggerContainer: Variants = {
-    hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { staggerChildren: 0.18, delayChildren: 0.2 } }
-  };
-  const staggerItem: Variants = {
-    hidden: { opacity: 0, y: 30 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] } }
-  };
-  const powerEntrance: Variants = {
-    hidden: { opacity: 0, scale: 0.8, y: 30, filter: 'blur(10px)' },
-    visible: { opacity: 1, scale: 1, y: 0, filter: 'blur(0px)', transition: { duration: 1.2, ease: [0.22, 1, 0.36, 1] } }
-  };
-
-  /* ── GSAP floating orbs ── */
-  useEffect(() => {
-    if (isLoading) return; // Wait for load to finish
-
-    const orbs = document.querySelectorAll('.depth-layer');
-    orbs.forEach((orb, i) => {
-      gsap.to(orb, {
-        y: `random(-40, 40)`,
-        x: `random(-30, 30)`,
-        scale: `random(0.85, 1.15)`,
-        duration: `random(4, 8)`,
-        repeat: -1,
-        yoyo: true,
-        ease: "sine.inOut",
-        delay: i * 0.5,
-      });
-    });
-
-    const title = document.querySelector('.hero-title');
-    if (title) {
-      gsap.to(title, {
-        textShadow: '0 0 30px rgba(168, 85, 247, 0.4), 0 0 70px rgba(168, 85, 247, 0.15)',
-        duration: 2.5,
-        repeat: -1,
-        yoyo: true,
-        ease: "sine.inOut",
-      });
-    }
-  }, [isLoading]);
 
   return (
-    <>
-      <AnimatePresence mode="wait">
-        {isLoading && <InitialLoader key="loader" />}
-      </AnimatePresence>
+    <section className="scripture-banner py-10">
+      <div className="mx-auto w-[94%] max-w-4xl">
+        <div className="scripture-glass w-full text-center">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={scriptureIndex}
+              initial={{ opacity: 0, y: 8, filter: "blur(4px)" }}
+              animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+              exit={{ opacity: 0, y: -8, filter: "blur(4px)" }}
+              transition={{ duration: 0.45 }}
+              className="flex flex-col items-center gap-3"
+            >
+              <div className="flex items-center gap-3 text-xs sm:text-sm">
+                <BookOpen size={14} className="text-purple-300/80" />
+                <p className="leading-relaxed opacity-85">{scriptures[scriptureIndex].text}</p>
+                <BookOpen size={14} className="text-purple-300/80" />
+              </div>
+              <p className="text-[10px] uppercase tracking-[0.25em] text-purple-200/80">
+                {scriptures[scriptureIndex].ref}
+              </p>
+            </motion.div>
+          </AnimatePresence>
+        </div>
+      </div>
+    </section>
+  );
+}
 
-      {!isLoading && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.8 }}
-          className="relative w-full min-h-screen text-[var(--foreground)] noise-overlay overflow-hidden"
-        >
+export default function HomePage() {
+  const { scrollY } = useScroll();
+  const orbSlow = useTransform(scrollY, [0, 1000], [0, 160]);
+  const orbMid = useTransform(scrollY, [0, 1000], [0, -100]);
+  const orbFast = useTransform(scrollY, [0, 1000], [0, 220]);
+  const heroCardFloat = useTransform(scrollY, [0, 500], [0, -35]);
 
-          {/* ═══ BACKGROUND DEPTH LAYERS ═══ */}
-          <div className="fixed inset-0 pointer-events-none z-0">
-            <div className="depth-layer w-[700px] h-[700px] bg-purple-500/10 top-[-15%] left-[-10%] animate-pulse-glow" />
-            <div className="depth-layer w-[550px] h-[550px] bg-pink-500/5 top-[25%] right-[-12%] animate-pulse-glow" style={{ animationDelay: '1.5s' }} />
-            <div className="depth-layer w-[450px] h-[450px] bg-fuchsia-500/5 bottom-[5%] left-[15%] animate-pulse-glow" style={{ animationDelay: '3s' }} />
-            <div className="depth-layer w-[350px] h-[350px] bg-indigo-500/10 top-[55%] right-[25%] animate-pulse-glow" style={{ animationDelay: '0.5s' }} />
-            <div className="grid-pattern fixed inset-0 opacity-[0.25]" />
+  return (
+    <main className="noise-overlay relative overflow-hidden bg-[var(--background)] text-[var(--foreground)] scroll-smooth">
+      <div className="pointer-events-none fixed inset-0 -z-10">
+        <motion.div style={{ y: orbSlow }} className="depth-layer absolute -top-28 left-[-10%] h-72 w-72 bg-purple-400/18 blur-[110px]" />
+        <motion.div style={{ y: orbMid }} className="depth-layer absolute top-[18%] right-[-8%] h-80 w-80 bg-fuchsia-300/14 blur-[120px]" />
+        <motion.div style={{ y: orbFast }} className="depth-layer absolute bottom-[-6%] left-[20%] h-80 w-80 bg-amber-300/12 blur-[120px]" />
+        <div className="grid-pattern absolute inset-0 opacity-25" />
+      </div>
+
+      <header className="sticky top-4 z-40 mx-auto mt-4 flex w-[94%] max-w-5xl items-center justify-between rounded-2xl border border-white/10 bg-[var(--surface-1)]/85 px-5 py-3 backdrop-blur-md">
+        <a href="#home" className="text-sm font-semibold tracking-wide text-purple-200">
+          Prominence VA
+        </a>
+        <nav className="hidden items-center gap-5 text-xs font-medium opacity-80 sm:flex">
+          <a href="#about" className="transition-colors hover:text-purple-300">About</a>
+          <a href="#about-info" className="transition-colors hover:text-purple-300">About Info</a>
+          <a href="#services" className="transition-colors hover:text-purple-300">Services</a>
+          <a href="#projects" className="transition-colors hover:text-purple-300">Projects</a>
+          <a href="#contact" className="transition-colors hover:text-purple-300">Contact</a>
+        </nav>
+      </header>
+
+      <section id="home" className="mx-auto flex min-h-[96vh] w-[94%] max-w-5xl items-center py-20">
+        <FadeIn>
+          <div className="relative grid w-full gap-10 lg:grid-cols-2 lg:items-center">
+            <div className="relative z-10">
+              <p className="mb-4 inline-flex items-center gap-2 rounded-full border border-purple-300/20 bg-purple-300/10 px-3 py-1 text-[11px] uppercase tracking-[0.16em] text-purple-200">
+                <Layers size={14} /> Cozy Digital Operations
+              </p>
+              <h1 className="text-4xl font-black leading-tight sm:text-5xl lg:text-6xl">
+                Elevate Your Workflow with Prominence
+              </h1>
+              <p className="mt-5 max-w-xl text-sm leading-7 opacity-80 sm:text-base">
+                Prominence Virtual Assistance delivers high-quality virtual support, creative production, and technical execution for clients worldwide.
+              </p>
+              <div className="mt-8 flex flex-wrap gap-3">
+                <a
+                  href="#contact"
+                  className="inline-flex items-center gap-2 rounded-xl bg-purple-300 px-5 py-3 text-sm font-bold text-zinc-900 transition hover:scale-[1.03]"
+                >
+                  Work With Us <ArrowRight size={16} />
+                </a>
+                <a
+                  href="#services"
+                  className="inline-flex items-center rounded-xl border border-white/15 bg-white/5 px-5 py-3 text-sm font-semibold transition hover:bg-white/10"
+                >
+                  View Services
+                </a>
+              </div>
+            </div>
+
+            <motion.div
+              style={{ y: heroCardFloat }}
+              initial={{ opacity: 0, x: 20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+              className="glass-panel relative rounded-3xl p-6"
+            >
+              <div className="pointer-events-none absolute -right-8 -top-8 h-20 w-20 rounded-full bg-purple-300/20 blur-2xl" />
+              <div className="pointer-events-none absolute -bottom-8 -left-8 h-20 w-20 rounded-full bg-fuchsia-300/15 blur-2xl" />
+
+              <div className="relative mb-5 flex items-center justify-between">
+                <div>
+                  <p className="text-xs uppercase tracking-[0.2em] text-purple-200/80">About Prominence</p>
+                  <p className="mt-1 text-sm font-semibold">Your Digital Support Partner</p>
+                </div>
+                <Briefcase className="text-purple-200" size={20} />
+              </div>
+              <div className="relative rounded-xl bg-black/30 p-4">
+                <div className="mb-2 flex items-center justify-between text-xs opacity-70">
+                  <span>Global Service Coverage</span>
+                  <span>24/7 Collaboration</span>
+                </div>
+                <div className="h-1.5 rounded-full bg-white/15">
+                  <div className="h-1.5 w-4/5 rounded-full bg-purple-300" />
+                </div>
+              </div>
+              <p className="mt-4 text-xs leading-6 opacity-75">
+                Prominence helps founders and teams stay efficient with dependable virtual assistance, creative execution, and modern web support.
+              </p>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.15, duration: 0.6 }}
+              className="glass-accent absolute -bottom-8 left-0 hidden rounded-xl px-4 py-3 lg:block"
+            >
+              <p className="text-[10px] uppercase tracking-[0.18em] text-purple-200/80">Trusted by founders</p>
+              <p className="text-xs font-semibold">Reliable, creative, and efficient delivery</p>
+            </motion.div>
+          </div>
+        </FadeIn>
+      </section>
+
+      <section id="about" className="mx-auto w-[94%] max-w-5xl py-12">
+        <FadeIn>
+          <div className="glass-panel rounded-3xl p-7 sm:p-10">
+            <p className="text-xs uppercase tracking-[0.2em] text-purple-200/80">About Prominence</p>
+            <p className="mt-4 max-w-3xl text-sm leading-7 opacity-85 sm:text-base">
+              Prominence Virtual Assistance is a dynamic digital team dedicated to helping businesses scale through creative, technical, and administrative support.
+            </p>
+            <div className="mt-8 grid gap-3 sm:grid-cols-3">
+              {[
+                "Reliability in every deliverable",
+                "Creativity that feels on-brand",
+                "Efficiency through clear systems",
+              ].map((value, index) => (
+                <motion.div
+                  key={value}
+                  initial={{ opacity: 0, y: 16 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.08, duration: 0.45 }}
+                  className="rounded-xl border border-white/10 bg-white/5 p-4 text-sm font-medium"
+                >
+                  {value}
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </FadeIn>
+      </section>
+
+      <section id="about-info" className="mx-auto w-[94%] max-w-5xl py-12">
+        <FadeIn>
+          <div className="mb-6">
+            <p className="text-xs uppercase tracking-[0.2em] text-purple-200/80">About Info</p>
+            <h2 className="mt-2 text-2xl font-black sm:text-3xl">Inside the Prominence Process</h2>
+          </div>
+        </FadeIn>
+
+        <div className="grid gap-4 md:grid-cols-3">
+          {[
+            {
+              title: "Reliable Systems",
+              text: "Clear timelines, structured task tracking, and transparent communication from kickoff to delivery.",
+              icon: ShieldCheck,
+            },
+            {
+              title: "Creative Execution",
+              text: "Content, visuals, and technical outputs built with both audience impact and business goals in mind.",
+              icon: Sparkles,
+            },
+            {
+              title: "Fast Response",
+              text: "Responsive collaboration windows and practical updates to keep momentum high every week.",
+              icon: Clock3,
+            },
+          ].map((item, index) => {
+            const Icon = item.icon;
+            return (
+              <motion.article
+                key={item.title}
+                initial={{ opacity: 0, y: 18 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1, duration: 0.5 }}
+                className="glass-panel rounded-2xl p-6"
+              >
+                <div className="mb-4 inline-flex rounded-lg bg-purple-300/15 p-2 text-purple-200">
+                  <Icon size={18} />
+                </div>
+                <h3 className="text-lg font-bold">{item.title}</h3>
+                <p className="mt-2 text-sm leading-6 opacity-75">{item.text}</p>
+              </motion.article>
+            );
+          })}
+        </div>
+      </section>
+
+      <section id="services" className="mx-auto w-[94%] max-w-5xl py-14">
+        <FadeIn>
+          <h2 className="text-2xl font-black sm:text-3xl">Services</h2>
+        </FadeIn>
+        <div className="mt-6 grid gap-4 sm:grid-cols-2">
+          {services.map((service, index) => {
+            const Icon = service.icon;
+            return (
+              <motion.article
+                key={service.title}
+                initial={{ opacity: 0, y: 18 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-40px" }}
+                transition={{ delay: index * 0.08, duration: 0.5 }}
+                className="group rounded-2xl border border-white/10 bg-[var(--surface-2)]/60 p-6 transition hover:-translate-y-1 hover:border-purple-300/40 hover:shadow-lg hover:shadow-purple-300/10"
+              >
+                <div className="mb-4 inline-flex rounded-lg bg-purple-300/15 p-2 text-purple-200">
+                  <Icon size={18} />
+                </div>
+                <h3 className="text-lg font-bold">{service.title}</h3>
+                <p className="mt-2 text-sm leading-6 opacity-75">{service.description}</p>
+              </motion.article>
+            );
+          })}
+        </div>
+      </section>
+
+      <section id="projects" className="mx-auto w-[94%] max-w-5xl py-14">
+        <FadeIn>
+          <h2 className="text-2xl font-black sm:text-3xl">Projects and Work</h2>
+        </FadeIn>
+
+        <div className="mt-6 grid gap-6 md:grid-cols-2">
+          {projects.map((project, index) => (
+            <motion.article
+              key={project.title}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-60px" }}
+              transition={{ delay: index * 0.09, duration: 0.55 }}
+              className="project-card h-[240px]"
+            >
+              <div className={`absolute inset-0 bg-gradient-to-br ${project.gradient}`} />
+              <div className="card-content">
+                <div className="mb-3 inline-flex rounded-full border border-purple-300/30 bg-purple-300/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-purple-200">
+                  {project.type}
+                </div>
+                <h3 className="text-lg font-bold text-white">{project.title}</h3>
+                <p className="mt-2 text-sm leading-6 text-white/80">{project.summary}</p>
+              </div>
+            </motion.article>
+          ))}
+        </div>
+      </section>
+
+      <section id="team" className="mx-auto w-[94%] max-w-5xl py-14">
+        <FadeIn>
+          <div className="mb-6 flex items-center gap-2">
+            <Users size={18} className="text-purple-200" />
+            <h2 className="text-2xl font-black sm:text-3xl">Team</h2>
+          </div>
+        </FadeIn>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {team.map((member, index) => (
+            <motion.article
+              key={member.name}
+              initial={{ opacity: 0, y: 18 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: index * 0.08, duration: 0.45 }}
+              className="rounded-2xl border border-white/10 bg-[var(--surface-1)]/60 p-5 transition hover:scale-[1.01] hover:border-purple-200/35"
+            >
+              <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-purple-300/20 text-sm font-black text-purple-200">
+                {member.name.charAt(0)}
+              </div>
+              <h3 className="text-base font-bold">{member.name}</h3>
+              <p className="text-sm opacity-70">{member.role}</p>
+            </motion.article>
+          ))}
+        </div>
+      </section>
+
+      <section className="mx-auto w-[94%] max-w-5xl py-14">
+        <FadeIn>
+          <div className="mb-5 flex items-center gap-2">
+            <Wrench size={17} className="text-purple-200" />
+            <h2 className="text-2xl font-black sm:text-3xl">Tech Stack</h2>
+          </div>
+        </FadeIn>
+
+        <div className="overflow-hidden rounded-2xl border border-white/10 bg-[var(--surface-1)]/60 py-4">
+          <motion.div
+            animate={{ x: ["0%", "-50%"] }}
+            transition={{ duration: 18, repeat: Infinity, ease: "linear" }}
+            className="flex w-max gap-3 px-3"
+          >
+            {[...stack, ...stack].map((item, i) => (
+              <span
+                key={`${item}-${i}`}
+                className="rounded-full border border-white/12 bg-white/5 px-4 py-2 text-sm font-semibold whitespace-nowrap"
+              >
+                {item}
+              </span>
+            ))}
+          </motion.div>
+        </div>
+      </section>
+
+      <section id="contact" className="mx-auto w-[94%] max-w-5xl py-16">
+        <FadeIn>
+          <div className="rounded-3xl border border-purple-300/30 bg-gradient-to-br from-purple-300/20 via-transparent to-pink-300/10 p-8 sm:p-10">
+            <p className="text-xs uppercase tracking-[0.2em] text-purple-200/80">Call to Action</p>
+            <h2 className="mt-3 text-3xl font-black sm:text-4xl">Let&apos;s Build Something Great Together</h2>
+            <a
+              href="mailto:hello@prominenceva.com"
+              className="mt-6 inline-flex items-center gap-2 rounded-xl bg-purple-300 px-5 py-3 text-sm font-bold text-zinc-900 transition hover:scale-[1.03]"
+            >
+              Contact Us <Mail size={16} />
+            </a>
+          </div>
+        </FadeIn>
+      </section>
+
+      <ScriptureBanner />
+
+      <footer className="border-t border-white/10 bg-[var(--surface-1)]/80 py-8">
+        <div className="mx-auto flex w-[94%] max-w-5xl flex-col gap-5 text-sm sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="font-semibold text-purple-200">Prominence Virtual Assistance</p>
+            <p className="text-xs opacity-70">hello@prominenceva.com</p>
           </div>
 
-          {/* ═══ NAVIGATION ═══ */}
-          <motion.nav
-            initial={{ y: -100, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ duration: 0.8, ease: [0.34, 1.56, 0.64, 1] }} 
-            className="fixed top-6 left-1/2 -translate-x-1/2 z-50 w-[90%] max-w-3xl bg-[var(--surface-1)]/60 backdrop-blur-xl border border-purple-500/20 rounded-[2rem] shadow-xl shadow-purple-500/5 px-3 py-2.5 flex justify-between items-center"
-          >
-            <motion.div
-              className="flex items-center gap-3 cursor-pointer pl-2"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => { playBloop(); window.scrollTo(0,0); }}
-            >
-              <div className="skeuo-icon !w-9 !h-9 !rounded-[10px] overflow-hidden p-1.5 flex-shrink-0 relative group">
-                <img src="/images/Logo.svg" alt="Logo" className="w-full h-full object-contain grayscale dark:invert opacity-80 group-hover:opacity-100 transition-opacity" />
-              </div>
-            </motion.div>
-
-            <div className="flex items-center">
-              <div className="hidden md:flex items-center gap-1.5">
-                {['Projects', 'Tools', 'About', 'Contact'].map((item) => (
-                  <motion.a
-                    key={item}
-                    href={`#${item.toLowerCase()}`}
-                    onClick={() => playBloop()}
-                    className="px-5 py-2 text-[10px] uppercase tracking-[0.2em] font-bold opacity-70 rounded-full
-                      hover:text-purple-500 hover:bg-purple-500/10 transition-all duration-300"
-                    whileHover={{ scale: 1.05, y: -2 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    {item}
-                  </motion.a>
-                ))}
-              </div>
-
-              <div className="flex items-center gap-1 ml-4 pl-4 border-l border-purple-500/10">
-                <motion.button
-                  onClick={() => { playBloop(); toggleTheme(); }}
-                  className="p-2.5 rounded-full hover:bg-purple-500/10 text-purple-500 dark:text-purple-400 transition-colors"
-                  whileHover={{ scale: 1.15, rotate: 15 }}
-                  whileTap={{ scale: 0.9 }}
-                >
-                  <AnimatePresence mode="wait">
-                    {isDarkMode ? (
-                      <motion.div key="moon" initial={{ rotate: -90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 90, opacity: 0 }}>
-                        <Moon size={16} />
-                      </motion.div>
-                    ) : (
-                      <motion.div key="sun" initial={{ rotate: -90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 90, opacity: 0 }}>
-                        <Sun size={16} />
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </motion.button>
-
-                <motion.button 
-                  className="md:hidden p-2.5 rounded-full hover:bg-purple-500/10 text-purple-500 transition-colors" 
-                  onClick={() => { playBloop(); setIsNavOpen(!isNavOpen); }}
-                  whileHover={{ scale: 1.15 }}
-                  whileTap={{ scale: 0.9 }}
-                >
-                  {isNavOpen ? <X size={18} /> : <Menu size={18} />}
-                </motion.button>
-              </div>
-            </div>
-            
-            {/* Mobile menu dropdown */}
-            <AnimatePresence>
-              {isNavOpen && (
-                <motion.div
-                  initial={{ height: 0, opacity: 0, y: -10 }}
-                  animate={{ height: 'auto', opacity: 1, y: 0 }}
-                  exit={{ height: 0, opacity: 0, y: -10 }}
-                  transition={{ duration: 0.3 }}
-                  className="absolute top-[120%] left-0 right-0 bg-[var(--surface-1)]/95 backdrop-blur-2xl border border-purple-500/20 rounded-2xl overflow-hidden shadow-2xl md:hidden origin-top"
-                >
-                  <div className="p-2 flex flex-col">
-                    {['Projects', 'Tools', 'About', 'Contact'].map((item) => (
-                      <motion.a
-                        key={item}
-                        href={`#${item.toLowerCase()}`}
-                        onClick={() => { playBloop(); setIsNavOpen(false); }}
-                        className="px-6 py-4 text-xs uppercase tracking-[0.2em] font-bold opacity-80 text-center
-                          hover:text-purple-500 hover:bg-purple-500/10 rounded-xl transition-all"
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                      >
-                        {item}
-                      </motion.a>
-                    ))}
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </motion.nav>
-
-          {/* ═══ HERO SECTION ═══ */}
-          <section ref={heroRef} className="relative min-h-screen flex flex-col items-center justify-center pt-20 overflow-hidden px-6">
-            {/* Concentric rings & Background Layers */}
-            <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-50">
-              <div className="w-[400px] h-[400px] rounded-full border border-purple-500/10 animate-breathe" />
-              <div className="absolute w-[600px] h-[600px] rounded-full border border-pink-500/10 animate-breathe" style={{ animationDelay: '0.8s' }} />
-              <div className="absolute w-[800px] h-[800px] rounded-full border border-purple-500/5 animate-breathe" style={{ animationDelay: '1.6s' }} />
-            </div>
-
-            <motion.div
-              initial="hidden"
-              animate="visible"
-              variants={staggerContainer}
-              className="text-center z-10 max-w-4xl"
-              style={{ y: heroParallax }}
-            >
-              <motion.div variants={staggerItem} className="mb-6">
-                <motion.span
-                  className="glass-accent inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-[11px] md:text-xs uppercase tracking-[0.3em] font-bold text-purple-600 dark:text-purple-300"
-                  whileHover={{ scale: 1.05 }}
-                  transition={{ type: 'spring', stiffness: 400 }}
-                >
-                  <Sparkles size={14} className="animate-float" />
-                  Elevating Digital Presence
-                </motion.span>
-              </motion.div>
-
-              <motion.h1
-                variants={powerEntrance}
-                className="hero-title text-7xl md:text-[11rem] font-black magazine-font leading-[0.82] mb-8 tracking-tight"
-              >
-                <span className="gradient-text">PROMI</span>
-                <span>NENCE</span>
-              </motion.h1>
-
-              <motion.p variants={staggerItem} className="text-base md:text-lg opacity-80 max-w-xl mx-auto mb-12 leading-relaxed font-medium">
-                Crafting premium digital experiences at the intersection of code, design, and creative storytelling.
-              </motion.p>
-
-              <motion.div variants={staggerItem} className="flex flex-col sm:flex-row gap-4 justify-center mt-12">
-                <motion.a
-                  href="#projects"
-                  onClick={playBloop}
-                  className="neu-button px-10 py-4 font-black tracking-[0.15em] uppercase text-sm flex items-center justify-center gap-3 text-purple-600 dark:text-purple-400"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  transition={{ type: 'spring', stiffness: 400, damping: 10 }}
-                >
-                  View Work <ArrowRight size={18} />
-                </motion.a>
-                <motion.a
-                  href="#contact"
-                  onClick={playBloop}
-                  className="glass-panel px-10 py-4 rounded-2xl font-bold tracking-[0.1em] uppercase text-sm opacity-80
-                    flex items-center justify-center gap-3 hover:text-purple-500 hover:opacity-100 transition-colors duration-300 relative overflow-hidden group"
-                  whileHover={{ scale: 1.05, y: -2 }}
-                  whileTap={{ scale: 0.95 }}
-                  transition={{ type: 'spring', stiffness: 400, damping: 10 }}
-                >
-                  <Mail size={18} /> Get in Touch
-                  <motion.div className="absolute inset-0 bg-purple-500/10 scale-0 group-hover:scale-100 rounded-2xl transition-transform duration-300" />
-                </motion.a>
-              </motion.div>
-            </motion.div>
-
-            {/* Scroll indicator */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 2, duration: 1 }}
-              className="absolute bottom-10 flex flex-col items-center gap-2"
-            >
-              <span className="text-[10px] uppercase tracking-[0.3em] font-bold opacity-50">Scroll</span>
-              <motion.div
-                animate={{ y: [0, 10, 0] }}
-                transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-              >
-                <ChevronDown size={22} className="text-purple-500" />
-              </motion.div>
-            </motion.div>
-          </section>
-
-          <div className="section-divider" />
-
-          {/* ═══ PROJECTS SECTION ═══ */}
-          <section id="projects" className="py-28 px-6 max-w-7xl mx-auto relative z-10">
-            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-60px" }} variants={staggerContainer}>
-              <motion.div variants={slideLeft} className="mb-20">
-                <span className="text-[11px] uppercase tracking-[0.3em] text-purple-500 font-bold mb-4 block">Portfolio</span>
-                <h2 className="text-5xl md:text-7xl magazine-font font-black">
-                  Selected <span className="gradient-text italic">Works</span>
-                </h2>
-              </motion.div>
-
-              <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
-                {/* Project 1 */}
-                <motion.div 
-                  variants={fadeScale} 
-                  className="md:col-span-8 project-card cursor-pointer group h-[400px] md:h-[520px]"
-                  whileHover={{ scale: 1.02, y: -8 }}
-                  whileTap={{ scale: 0.98 }}
-                  transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-                  onClick={playBloop}
-                >
-                  <motion.img src={projects[0].image} className="w-full h-full object-cover origin-center" alt={projects[0].title} whileHover={{ scale: 1.05 }} transition={{ duration: 0.8, ease: "easeOut" }} />
-                  <div className="card-content">
-                    <div className="bg-[var(--background)] backdrop-blur-md inline-block px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-[0.2em] mb-3 text-purple-500 shadow-sm border border-purple-500/20 group-hover:bg-purple-500 group-hover:text-white transition-colors duration-300">
-                      {projects[0].category}
-                    </div>
-                    <h3 className="text-2xl md:text-3xl magazine-font font-bold mb-2 text-white drop-shadow-md group-hover:text-purple-300 transition-colors duration-300">{projects[0].title}</h3>
-                    <div className="flex gap-2 flex-wrap">
-                      {projects[0].tech.map(t => (
-                        <span key={t} className="text-[10px] font-bold text-white/90 bg-black/40 backdrop-blur-sm px-3 py-1 rounded-full shadow-sm">{t}</span>
-                      ))}
-                    </div>
-                  </div>
-                </motion.div>
-
-                {/* Project 2 & 3 */}
-                <div className="md:col-span-4 flex flex-col gap-8">
-                  <motion.div 
-                    variants={slideRight} 
-                    className="project-card cursor-pointer group h-[240px]"
-                    whileHover={{ scale: 1.02, y: -5 }}
-                    whileTap={{ scale: 0.98 }}
-                    transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-                    onClick={playBloop}
-                  >
-                    <motion.img src={projects[1].image} className="w-full h-full object-cover origin-center" alt={projects[1].title} whileHover={{ scale: 1.05 }} transition={{ duration: 0.8, ease: "easeOut" }} />
-                    <div className="card-content !p-6">
-                      <div className="bg-[var(--background)] backdrop-blur-md inline-block px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-[0.15em] mb-2 text-purple-500 shadow-sm border border-purple-500/20 group-hover:bg-purple-500 group-hover:text-white transition-colors duration-300">
-                        {projects[1].category}
-                      </div>
-                      <h3 className="text-lg magazine-font font-bold text-white drop-shadow-md">{projects[1].title}</h3>
-                    </div>
-                  </motion.div>
-                  <motion.div 
-                    variants={slideRight} 
-                    className="project-card cursor-pointer group h-[240px]"
-                    whileHover={{ scale: 1.02, y: -5 }}
-                    whileTap={{ scale: 0.98 }}
-                    transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-                    onClick={playBloop}
-                  >
-                    <motion.img src={projects[2].image} className="w-full h-full object-cover origin-center" alt={projects[2].title} whileHover={{ scale: 1.05 }} transition={{ duration: 0.8, ease: "easeOut" }} />
-                    <div className="card-content !p-6">
-                      <div className="bg-[var(--background)] backdrop-blur-md inline-block px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-[0.15em] mb-2 text-purple-500 shadow-sm border border-purple-500/20 group-hover:bg-purple-500 group-hover:text-white transition-colors duration-300">
-                        {projects[2].category}
-                      </div>
-                      <h3 className="text-lg magazine-font font-bold text-white drop-shadow-md">{projects[2].title}</h3>
-                    </div>
-                  </motion.div>
-                </div>
-
-                {/* Project 4 */}
-                <motion.div 
-                  variants={slideLeft} 
-                  className="md:col-span-5 project-card cursor-pointer group h-[360px]"
-                  whileHover={{ scale: 1.02, y: -5 }}
-                  whileTap={{ scale: 0.98 }}
-                  transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-                  onClick={playBloop}
-                >
-                  <motion.img src={projects[3].image} className="w-full h-full object-cover origin-center" alt={projects[3].title} whileHover={{ scale: 1.05 }} transition={{ duration: 0.8, ease: "easeOut" }} />
-                  <div className="card-content">
-                    <div className="bg-[var(--background)] backdrop-blur-md inline-block px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-[0.2em] mb-3 text-purple-500 shadow-sm border border-purple-500/20 group-hover:bg-purple-500 group-hover:text-white transition-colors duration-300">
-                      {projects[3].category}
-                    </div>
-                    <h3 className="text-xl md:text-2xl magazine-font font-bold mb-2 text-white drop-shadow-md">{projects[3].title}</h3>
-                    <div className="flex gap-2 flex-wrap">
-                      {projects[3].tech.map(t => (
-                        <span key={t} className="text-[10px] font-bold text-white/90 bg-black/40 backdrop-blur-sm px-3 py-1 rounded-full shadow-sm">{t}</span>
-                      ))}
-                    </div>
-                  </div>
-                </motion.div>
-
-                {/* Project 5 */}
-                <motion.div 
-                  variants={slideRight} 
-                  className="md:col-span-7 project-card cursor-pointer group h-[360px]"
-                  whileHover={{ scale: 1.02, y: -5 }}
-                  whileTap={{ scale: 0.98 }}
-                  transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-                  onClick={playBloop}
-                >
-                  <motion.img src={projects[4].image} className="w-full h-full object-cover origin-center" alt={projects[4].title} whileHover={{ scale: 1.05 }} transition={{ duration: 0.8, ease: "easeOut" }} />
-                  <div className="card-content">
-                    <div className="bg-[var(--background)] backdrop-blur-md inline-block px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-[0.2em] mb-3 text-purple-500 shadow-sm border border-purple-500/20 group-hover:bg-purple-500 group-hover:text-white transition-colors duration-300">
-                      {projects[4].category}
-                    </div>
-                    <h3 className="text-xl md:text-2xl magazine-font font-bold mb-2 text-white drop-shadow-md">{projects[4].title}</h3>
-                    <div className="flex gap-2 flex-wrap">
-                      {projects[4].tech.map(t => (
-                        <span key={t} className="text-[10px] font-bold text-white/90 bg-black/40 backdrop-blur-sm px-3 py-1 rounded-full shadow-sm">{t}</span>
-                      ))}
-                    </div>
-                  </div>
-                </motion.div>
-              </div>
-            </motion.div>
-          </section>
-
-          <div className="section-divider" />
-
-          {/* ═══ TOOLS SECTION ═══ */}
-          <section id="tools" className="py-32 px-6 relative">
-            <div className="max-w-7xl mx-auto relative z-10">
-              <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-60px" }} variants={staggerContainer}>
-                <motion.div variants={fadeUp} className="mb-20 text-center">
-                  <span className="text-[11px] uppercase tracking-[0.3em] text-purple-500 font-bold mb-4 block">Expertise</span>
-                  <h2 className="text-5xl md:text-7xl magazine-font font-black">
-                    Tools & <span className="gradient-text italic">Stack</span>
-                  </h2>
-                </motion.div>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                  {toolCategories.map((cat, ci) => (
-                    <motion.div
-                      key={cat.title}
-                      variants={fadeScale}
-                      whileHover={{ y: -6, transition: { duration: 0.4 } }}
-                      className="glass-panel rounded-3xl p-8 md:p-10 relative overflow-hidden group"
-                    >
-                      <div className={`absolute -top-20 -right-20 w-60 h-60 bg-gradient-to-br ${cat.accent} rounded-full blur-[60px] opacity-40
-                        group-hover:opacity-80 transition-opacity duration-700 pointer-events-none`} />
-
-                      <div className="flex items-center gap-4 mb-8 relative z-10">
-                        <motion.div
-                          className="skeuo-icon"
-                          whileHover={{ rotate: 8, scale: 1.1 }}
-                          transition={{ type: 'spring', stiffness: 300 }}
-                        >
-                          <cat.icon size={24} className="text-purple-500" />
-                        </motion.div>
-                        <h3 className="text-2xl magazine-font font-bold">{cat.title}</h3>
-                      </div>
-
-                      <div className="space-y-3 relative z-10">
-                        {cat.tools.map((tool, ti) => (
-                          <motion.div
-                            key={tool.name}
-                            initial={{ opacity: 0, x: -20 }}
-                            whileInView={{ opacity: 1, x: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ delay: ci * 0.12 + ti * 0.08, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-                            className="tool-item"
-                          >
-                            <div className="tool-icon">
-                              <tool.icon size={16} className="text-purple-500" />
-                            </div>
-                            {tool.name}
-                          </motion.div>
-                        ))}
-                      </div>
-                    </motion.div>
-                  ))}
-                </div>
-              </motion.div>
-            </div>
-          </section>
-
-          <div className="section-divider" />
-
-          {/* ═══ ABOUT & TESTIMONIALS ═══ */}
-          <section id="about" className="py-28 px-6 max-w-7xl mx-auto relative z-10">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
-
-              {/* Left — The Story */}
-              <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-60px" }} variants={staggerContainer}>
-                <motion.div variants={slideLeft}>
-                  <span className="text-[11px] uppercase tracking-[0.3em] text-purple-500 font-bold mb-4 block">About</span>
-                  <h2 className="text-5xl md:text-6xl magazine-font font-black mb-10">
-                    The <span className="gradient-text italic">Story</span>
-                  </h2>
-                </motion.div>
-
-                <motion.div variants={fadeScale} className="glass-panel p-10 md:p-12 rounded-3xl">
-                  <p className="leading-relaxed text-lg mb-6 font-medium opacity-90">
-                    Specializing in the intersection of code and aesthetics, I provide comprehensive virtual assistance and technical development for creators and founders who demand excellence.
-                  </p>
-                  <p className="leading-relaxed opacity-70">
-                    From architecting scalable web applications to producing cinematic visual content, every project is approached with meticulous attention to detail and a relentless pursuit of quality.
-                  </p>
-                  <div className="mt-8 flex gap-8">
-                    {[
-                      { num: "50+", label: "Projects" },
-                      { num: "3+", label: "Years" },
-                      { num: "100%", label: "Satisfaction" },
-                    ].map((stat, i) => (
-                      <React.Fragment key={stat.label}>
-                        {i > 0 && <div className="w-px bg-purple-500/20" />}
-                        <motion.div
-                          className="text-center"
-                          initial={{ opacity: 0, scale: 0.5 }}
-                          whileInView={{ opacity: 1, scale: 1 }}
-                          viewport={{ once: true }}
-                          transition={{ delay: 0.3 + i * 0.15, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-                        >
-                          <div className="text-3xl font-black gradient-text magazine-font">{stat.num}</div>
-                          <div className="text-[10px] uppercase tracking-[0.2em] mt-1 font-bold opacity-60">{stat.label}</div>
-                        </motion.div>
-                      </React.Fragment>
-                    ))}
-                  </div>
-                </motion.div>
-              </motion.div>
-
-              {/* Right — Testimonials */}
-              <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-60px" }} variants={staggerContainer} className="space-y-6">
-                <motion.div variants={slideRight}>
-                  <span className="text-[11px] uppercase tracking-[0.3em] text-purple-500 font-bold mb-4 block">Testimonials</span>
-                  <h2 className="text-3xl magazine-font font-black mb-8">
-                    Client <span className="gradient-text italic">Voices</span>
-                  </h2>
-                </motion.div>
-
-                {[
-                  { quote: "A true professional who understands both the technical and creative aspects of a project. Delivered beyond expectations.", name: "Sarah Chen", role: "Startup Founder" },
-                  { quote: "The attention to detail is unmatched. Our brand identity was transformed into something we're truly proud of.", name: "Marcus Rivera", role: "Creative Director" },
-                  { quote: "Fast, reliable, and incredibly talented. The e-commerce platform they built increased our conversion rate by 40%.", name: "Emily Tanaka", role: "E-Commerce Manager" },
-                ].map((testimonial, i) => (
-                  <motion.div
-                    key={i}
-                    variants={fadeScale}
-                    whileHover={{ scale: 1.02, y: -3 }}
-                    transition={{ type: 'spring', stiffness: 300 }}
-                    className="neu-pressed p-8 relative overflow-hidden cursor-default"
-                  >
-                    <MessageSquare className="absolute top-6 right-6 opacity-10" size={50} />
-                    <div className="flex text-purple-400 mb-4 gap-0.5">
-                      {[...Array(5)].map((_, si) => (
-                        <Star key={si} size={14} fill="currentColor" />
-                      ))}
-                    </div>
-                    <p className="italic mb-5 leading-relaxed font-medium opacity-80">&ldquo;{testimonial.quote}&rdquo;</p>
-                    <div className="flex items-center gap-3">
-                      <div className="skeuo-icon !w-10 !h-10 !rounded-xl">
-                        <span className="text-sm font-black text-purple-500">{testimonial.name[0]}</span>
-                      </div>
-                      <div>
-                        <div className="text-sm font-bold">{testimonial.name}</div>
-                        <div className="text-[11px] font-semibold opacity-60">{testimonial.role}</div>
-                      </div>
-                    </div>
-                  </motion.div>
-                ))}
-              </motion.div>
-            </div>
-          </section>
-
-          <div className="section-divider" />
-
-          {/* ═══ CONTACT SECTION ═══ */}
-          <section id="contact" className="py-32 px-6 relative">
-            <div className="absolute inset-0 bg-gradient-to-t from-[var(--surface-2)] to-transparent pointer-events-none" />
-
-            <div className="max-w-6xl mx-auto relative z-10">
-              <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-60px" }} variants={staggerContainer}>
-                <motion.div variants={fadeUp} className="text-center mb-16">
-                  <span className="text-[11px] uppercase tracking-[0.3em] text-purple-500 font-bold mb-4 block">Connect</span>
-                  <h2 className="text-5xl md:text-7xl magazine-font font-black mb-4">
-                    Let&apos;s <span className="gradient-text italic">Build</span>
-                  </h2>
-                  <p className="max-w-lg mx-auto font-medium opacity-80">
-                    Have a project in mind? Let&apos;s create something beautiful and extraordinary together.
-                  </p>
-                </motion.div>
-
-                <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
-                  {/* Contact Info Cards */}
-                  <motion.div variants={slideLeft} className="lg:col-span-2 space-y-6">
-                    {[
-                      { icon: Mail, label: "Email", value: "hello@prominence.dev", desc: "Drop a line anytime" },
-                      { icon: Phone, label: "Phone", value: "+1 (555) 000-0000", desc: "Mon–Fri, 9am–6pm" },
-                      { icon: MapPin, label: "Location", value: "Remote — Worldwide", desc: "Available globally" },
-                      { icon: Clock, label: "Response Time", value: "Within 24 hours", desc: "Guaranteed reply" },
-                    ].map((contact, i) => (
-                      <motion.div
-                        key={contact.label}
-                        variants={fadeScale}
-                        whileHover={{ x: 6, transition: { duration: 0.3 } }}
-                        className="glass-panel p-6 rounded-2xl flex items-center gap-5 group cursor-default"
-                      >
-                        <motion.div
-                          className="skeuo-icon !w-12 !h-12 !rounded-xl flex-shrink-0"
-                          whileHover={{ rotate: 10 }}
-                          transition={{ type: 'spring', stiffness: 300 }}
-                        >
-                          <contact.icon size={20} className="text-purple-500" />
-                        </motion.div>
-                        <div>
-                          <div className="text-[10px] uppercase tracking-[0.2em] text-purple-500 font-bold mb-0.5 opacity-80">{contact.label}</div>
-                          <div className="text-sm font-bold">{contact.value}</div>
-                          <div className="text-[11px] font-medium mt-0.5 opacity-60">{contact.desc}</div>
-                        </div>
-                      </motion.div>
-                    ))}
-                  </motion.div>
-
-                  {/* Contact Form */}
-                  <motion.div
-                    variants={slideRight}
-                    className="lg:col-span-3 glass-heavy p-10 md:p-12 rounded-[2rem] relative overflow-hidden"
-                  >
-                    {/* Decorative glow */}
-                    <div className="absolute -top-24 -right-24 w-56 h-56 bg-purple-500/10 rounded-full blur-[60px] pointer-events-none" />
-                    <div className="absolute -bottom-24 -left-24 w-48 h-48 bg-pink-500/10 rounded-full blur-[50px] pointer-events-none" />
-
-                    <div className="relative z-10">
-                      <div className="flex items-center gap-3 mb-8">
-                        <div className="skeuo-icon !w-12 !h-12 !rounded-xl">
-                          <Send size={20} className="text-purple-500" />
-                        </div>
-                        <div>
-                          <h3 className="text-xl magazine-font font-black">Send a Message</h3>
-                          <p className="text-[11px] font-bold opacity-60">Fill out the form below</p>
-                        </div>
-                      </div>
-
-                      <form className="space-y-5" onSubmit={e => e.preventDefault()}>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                          <input type="text" placeholder="Your Name" className="form-input" />
-                          <input type="email" placeholder="Email Address" className="form-input" />
-                        </div>
-                        <input type="text" placeholder="Subject" className="form-input" />
-                        <textarea placeholder="Tell me about your project, goals, and timeline..." rows={5} className="form-input resize-none" />
-
-                        <motion.button
-                          onClick={playBloop}
-                          className="neu-button w-full py-5 font-black tracking-[0.15em] uppercase text-sm flex items-center justify-center gap-3 relative overflow-hidden group"
-                          whileHover={{ scale: 1.02 }}
-                          whileTap={{ scale: 0.95 }}
-                          transition={{ type: 'spring', stiffness: 400, damping: 10 }}
-                        >
-                          <span className="text-purple-600 dark:text-purple-400 relative z-10 transition-colors group-hover:text-purple-300">Send Message</span>
-                          <motion.div
-                            className="relative z-10 text-purple-600 dark:text-purple-400 transition-colors group-hover:text-purple-300"
-                            animate={{ x: [0, 4, 0] }}
-                            transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-                          >
-                            <ArrowRight size={18} />
-                          </motion.div>
-                        </motion.button>
-                      </form>
-                    </div>
-                  </motion.div>
-                </div>
-              </motion.div>
-            </div>
-          </section>
-
-          <div className="section-divider" />
-
-          {/* ═══ SCRIPTURE FOOTER ═══ */}
-          <ScriptureFooter />
-
-          {/* ═══ FOOTER ═══ */}
-          <footer className="relative z-10 border-t border-purple-500/20 bg-[var(--surface-2)]">
-            <div className="max-w-7xl mx-auto px-6 py-10 flex flex-col md:flex-row justify-between items-center gap-6">
-              <div className="flex items-center gap-3">
-                <div className="skeuo-icon !w-8 !h-8 !rounded-lg overflow-hidden p-1.5 bg-[var(--surface-1)] shadow-sm">
-                  <img src="/images/Logo.svg" alt="Logo" className="w-full h-full object-contain grayscale dark:invert" />
-                </div>
-                <span className="text-xs tracking-[0.2em] uppercase font-bold opacity-60">
-                  © 2026 Prominence VA
-                </span>
-              </div>
-              <div className="flex gap-4">
-                {[Layers2, ExternalLink, Mail].map((Icon, i) => (
-                  <motion.a
-                    key={i}
-                    href="#"
-                    className="skeuo-icon !w-10 !h-10 !rounded-xl"
-                    whileHover={{ scale: 1.15, rotate: 5 }}
-                    whileTap={{ scale: 0.9 }}
-                    transition={{ type: 'spring', stiffness: 300 }}
-                  >
-                    <Icon size={16} className="opacity-80" />
-                  </motion.a>
-                ))}
-              </div>
-            </div>
-          </footer>
-
-        </motion.div>
-      )}
-    </>
+          <div className="flex items-center gap-4 text-xs opacity-80">
+            <a href="#home" className="transition-colors hover:text-purple-300">Home</a>
+            <a href="#services" className="transition-colors hover:text-purple-300">Services</a>
+            <a href="#projects" className="transition-colors hover:text-purple-300">Projects</a>
+            <a href="#" className="inline-flex items-center gap-1 transition-colors hover:text-purple-300">
+              Socials <ExternalLink size={13} />
+            </a>
+          </div>
+        </div>
+      </footer>
+    </main>
   );
 }
