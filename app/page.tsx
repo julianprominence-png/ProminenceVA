@@ -1,1163 +1,1132 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useMemo } from "react";
 import gsap from "gsap";
-import ScrollTrigger from "gsap/ScrollTrigger";
-import Image from "next/image";
-import EtherealCanvas from "../components/ui/EtherealCanvas";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { Canvas, useFrame } from "@react-three/fiber";
+import * as THREE from "three";
+import { db } from "@/lib/firebase";
+import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import {
-  ArrowRight,
-  BookOpen,
-  Clapperboard,
-  Code2,
-  ExternalLink,
-  Mail,
-  Rocket,
-  Search,
-  Sparkles,
-  Target,
-  Users,
-  Wrench,
-  Palette,
-  Terminal,
-  Video,
-  Layers,
-  Cloud,
-  Camera as Instagram,
-  Briefcase as Linkedin,
-  Hash as Twitter,
-  Globe,
-  TrendingUp,
-  Star,
-  Zap,
-} from "lucide-react";
+  Stack, TerminalWindow, Database, Cloud, FilmStrip, PlayCircle,
+  VideoCamera, ImageSquare, PenNib, Layout, Quotes, Cpu,
+  HardDrives, Code, Scissors, MagicWand
+} from "@phosphor-icons/react";
 
-/* ─── DATA ──────────────────────────────────────────────── */
+if (typeof window !== "undefined") {
+  gsap.registerPlugin(ScrollTrigger);
+  (window as any).globalScrollProgress = 0;
+}
 
-const HERO_WORD = "PROMINENCE";
-
-const services = [
-  {
-    _id: "svc-1",
-    title: "Video Editing",
-    description:
-      "Story-driven edits for reels, ads, and branded content that convert and captivate.",
-    sub: "Short-form · Long-form · Motion",
-    Icon: Clapperboard,
-  },
-  {
-    _id: "svc-2",
-    title: "Web Development",
-    description:
-      "Modern sites engineered for speed, clarity, and measurable conversion.",
-    sub: "Next.js · React · Tailwind",
-    Icon: Code2,
-  },
-  {
-    _id: "svc-3",
-    title: "Virtual Assistance",
-    description:
-      "Admin workflows, communications, and daily operations — handled seamlessly.",
-    sub: "Ops · Inbox · Scheduling",
-    Icon: Users,
-  },
-  {
-    _id: "svc-4",
-    title: "Creative Support",
-    description:
-      "Brand assets, content systems, and social media kits built to your vision.",
-    sub: "Branding · Social · Assets",
-    Icon: Sparkles,
-  },
-];
-
-const projects = [
-  {
-    _id: "prj-1",
-    title: "Creator Launch Campaign",
-    type: "Video",
-    summary:
-      "Multi-format short-form package for a 7-day social launch week.",
-    image: "/images/video.png",
-  },
-  {
-    _id: "prj-2",
-    title: "Service Booking Website",
-    type: "Web",
-    summary:
-      "Clean booking flow and polished mobile-first landing page.",
-    image: "/images/ecommerce.png",
-  },
-  {
-    _id: "prj-3",
-    title: "Operations Dashboard",
-    type: "VA",
-    summary: "Task system and reporting setup that cut response time by half.",
-    image: "/images/dashboard.png",
-  },
-  {
-    _id: "prj-4",
-    title: "Brand Sprint",
-    type: "Creative",
-    summary:
-      "Quick-turn visual assets, templates, and campaign direction.",
-    image: "/images/brand.png",
-  },
-];
-
-const team = [
-  {
-    _id: "tm-1",
-    name: "Vien Abache",
-    role: "CEO & Founder",
-    bio: "Visionary leader driving Prominence VA's growth and ensuring top-tier service delivery.",
-    photo: "/images/video.png",
-    socials: [
-      { platform: "LinkedIn", Icon: Linkedin },
-      { platform: "Twitter", Icon: Twitter },
-    ],
-  },
-  {
-    _id: "tm-2",
-    name: "Gian",
-    role: "Video Editor",
-    bio: "Expert in narrative pacing and creating highly engaging visual content.",
-    photo: "/images/video.png",
-    socials: [{ platform: "Instagram", Icon: Instagram }],
-  },
-  {
-    _id: "tm-3",
-    name: "Russel",
-    role: "Video Editor",
-    bio: "Specializes in motion graphics, color grading, and dynamic short-form edits.",
-    photo: "/images/video.png",
-    socials: [{ platform: "Instagram", Icon: Instagram }],
-  },
-  {
-    _id: "tm-4",
-    name: "Vinz",
-    role: "Full-Stack Developer",
-    bio: "Architects scalable systems and smooth user experiences from front to back.",
-    photo: "/images/dashboard.png",
-    socials: [
-      { platform: "LinkedIn", Icon: Linkedin },
-      { platform: "Website", Icon: Globe },
-    ],
-  },
-  {
-    _id: "tm-5",
-    name: "Giervan",
-    role: "Back-End Developer",
-    bio: "Database logic and API wizard ensuring performance and robust security.",
-    photo: "/images/dashboard.png",
-    socials: [{ platform: "LinkedIn", Icon: Linkedin }],
-  },
-  {
-    _id: "tm-6",
-    name: "Julian",
-    role: "Front-End Developer",
-    bio: "Crafts GSAP-powered cinematic interfaces and responsive, accessible layouts.",
-    photo: "/images/dashboard.png",
-    socials: [
-      { platform: "LinkedIn", Icon: Linkedin },
-      { platform: "Twitter", Icon: Twitter },
-    ],
-  },
-];
-
-const processSteps = [
-  {
-    _id: "ps-1",
-    step: "01",
-    title: "Discover",
-    description:
-      "We align on your goals, audience, and success metrics before a single pixel is moved.",
-    Icon: Search,
-  },
-  {
-    _id: "ps-2",
-    step: "02",
-    title: "Plan",
-    description:
-      "Scope, timeline, and deliverables are locked in writing before work begins — no surprises.",
-    Icon: Target,
-  },
-  {
-    _id: "ps-3",
-    step: "03",
-    title: "Execute",
-    description:
-      "Your project is built, edited, or managed with full transparency and daily updates.",
-    Icon: Rocket,
-  },
-  {
-    _id: "ps-4",
-    step: "04",
-    title: "Deliver",
-    description:
-      "Clean handoff with all assets, documentation, and follow-up support included.",
-    Icon: Wrench,
-  },
-];
-
-const toolsData = [
-  {
-    category: "Development",
-    items: [
-      { id: "t-1", name: "Next.js",      desc: "React Framework",    Icon: Code2    },
-      { id: "t-2", name: "Tailwind CSS", desc: "Utility Styling",    Icon: Palette  },
-      { id: "t-3", name: "VS Code",      desc: "Code Editor",        Icon: Terminal },
-    ],
-  },
-  {
-    category: "Creative",
-    items: [
-      { id: "t-4", name: "Premiere Pro",  desc: "Video Editing",      Icon: Video  },
-      { id: "t-5", name: "After Effects", desc: "Motion Graphics",    Icon: Layers },
-    ],
-  },
-  {
-    category: "Productivity",
-    items: [
-      { id: "t-6", name: "Notion",            desc: "Workspace & Docs",     Icon: BookOpen },
-      { id: "t-7", name: "Google Workspace",  desc: "Cloud Collaboration",  Icon: Cloud    },
-    ],
-  },
-];
-
+/* -------------------------------------------------------------------------- */
+/* DATA                                                                        */
+/* -------------------------------------------------------------------------- */
 const scriptures = [
+  `Matthew 20:26–28 — "Whoever wants to become great among you must be your servant…"`,
+  `Mark 10:45 — "For even the Son of Man did not come to be served, but to serve…"`,
+  `Proverbs 14:23 — "All hard work brings a profit, but mere talk leads only to poverty."`,
+  `Proverbs 13:4 — "The soul of the sluggard craves and gets nothing, while the soul of the diligent is richly supplied."`,
+  `Ecclesiastes 9:10 — "Whatever your hand finds to do, do it with all your might…"`,
+  `Proverbs 10:4 — "Lazy hands make for poverty, but diligent hands bring wealth."`,
+  `Deuteronomy 8:18 — "But remember the Lord your God, for it is He who gives you the ability to produce wealth..."`,
+];
+
+const techStack = [
   {
-    _id: "sc-1",
-    text: "Commit your work to the Lord, and your plans will be established.",
-    ref: "Proverbs 16:3",
+    title: "Development Stack",
+    tools: [
+      { name: "Next.js", icon: <Stack weight="duotone" /> },
+      { name: "VS Code", icon: <TerminalWindow weight="duotone" /> },
+      { name: "Firebase", icon: <Database weight="duotone" /> },
+      { name: "Vercel", icon: <Cloud weight="duotone" /> },
+    ],
   },
   {
-    _id: "sc-2",
-    text: "Whatever you do, work heartily, as for the Lord and not for men.",
-    ref: "Colossians 3:23",
+    title: "Post-Production",
+    tools: [
+      { name: "Premiere", icon: <VideoCamera weight="duotone" /> },
+      { name: "After Effects", icon: <FilmStrip weight="duotone" /> },
+      { name: "CapCut", icon: <PlayCircle weight="duotone" /> },
+    ],
   },
   {
-    _id: "sc-3",
-    text: "For God gave us a spirit not of fear but of power and love and self-control.",
-    ref: "2 Timothy 1:7",
-  },
-  {
-    _id: "sc-4",
-    text: "But remember the Lord your God, for it is He who gives you the ability to produce wealth.",
-    ref: "Deuteronomy 8:18",
+    title: "Creative Design",
+    tools: [
+      { name: "Photoshop", icon: <ImageSquare weight="duotone" /> },
+      { name: "Illustrator", icon: <PenNib weight="duotone" /> },
+      { name: "Figma", icon: <Layout weight="duotone" /> },
+    ],
   },
 ];
 
-const tickerItems = [
-  "Video Editing",
-  "Web Development",
-  "Virtual Assistance",
-  "Creative Direction",
-  "Motion Graphics",
-  "Brand Systems",
-  "Content Strategy",
-  "Operations",
-  "UI Design",
-  "Growth Support",
+const teamData = [
+  { name: "Vinz Ilagan", role: "Lead Architect", icon: <Cpu weight="duotone" /> },
+  { name: "Giervan Sabalbero", role: "Backend Specialist", icon: <HardDrives weight="duotone" /> },
+  { name: "Julian Tolentino", role: "Frontend Engineer", icon: <Code weight="duotone" /> },
+  { name: "Gian Dethan Adamos", role: "Lead Editor", icon: <Scissors weight="duotone" /> },
+  { name: "Russel Minimo", role: "VFX & Motion", icon: <MagicWand weight="duotone" /> },
 ];
 
-const barHeights = [40, 65, 50, 80, 55, 95, 70, 85];
-
-/* ─── Circular Stat Component ──────────────────────────── */
-function CircularStat({
-  value,
-  label,
-  size = 100,
-}: {
-  value: number;
-  label: string;
-  size?: number;
-}) {
-  const ref = useRef<SVGCircleElement>(null);
-  const r = 42;
-  const circumference = 2 * Math.PI * r;
-  const dashOffset = circumference - (value / 100) * circumference;
+/* -------------------------------------------------------------------------- */
+/* LOADER COMPONENT                                                            */
+/* -------------------------------------------------------------------------- */
+const ProminenceLoader = ({ onComplete }: { onComplete: () => void }) => {
+  const loaderRef = useRef<HTMLDivElement>(null);
+  const progressRef = useRef<HTMLDivElement>(null);
+  const statusRef = useRef<HTMLParagraphElement>(null);
+  const glowRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          gsap.to(el, {
-            strokeDashoffset: dashOffset,
-            duration: 2.5,
-            ease: "power2.out",
-            delay: 0.2,
-          });
-          observer.disconnect();
-        }
-      },
-      { threshold: 0.5 }
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [dashOffset]);
+    if (!loaderRef.current) return;
+    const letters = loaderRef.current.querySelectorAll<HTMLElement>(".ll");
 
-  return (
-    <div className="flex flex-col items-center gap-3">
-      <div className="relative" style={{ width: size, height: size }}>
-        <svg
-          width={size}
-          height={size}
-          viewBox="0 0 100 100"
-          style={{ transform: "rotate(-90deg)" }}
-        >
-          <circle cx="50" cy="50" r={r} fill="none" stroke="rgba(180,167,214,0.1)" strokeWidth="6" />
-          <circle
-            ref={ref}
-            cx="50"
-            cy="50"
-            r={r}
-            fill="none"
-            stroke="url(#ethereal-grad)"
-            strokeWidth="6"
-            strokeLinecap="round"
-            strokeDasharray={circumference}
-            strokeDashoffset={circumference}
-          />
-          <defs>
-            <linearGradient id="ethereal-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#b4a7d6" />
-              <stop offset="100%" stopColor="#a8c8e8" />
-            </linearGradient>
-          </defs>
-        </svg>
-        <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <span className="font-display text-2xl text-[var(--foreground)] leading-none">{value}+</span>
-        </div>
-      </div>
-      <p className="text-[10px] uppercase tracking-[0.22em] opacity-50">{label}</p>
-    </div>
-  );
-}
-
-/* ─── Scripture Banner ─────────────────────────────────── */
-function ScriptureBanner() {
-  const [idx, setIdx] = useState(0);
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      const el = containerRef.current;
-      if (!el) return;
-      gsap.to(el, {
-        opacity: 0,
-        y: -10,
-        filter: "blur(8px)",
-        duration: 0.8,
-        ease: "power2.inOut",
-        onComplete: () => {
-          setIdx((prev) => (prev + 1) % scriptures.length);
-          gsap.fromTo(
-            el,
-            { opacity: 0, y: 12, filter: "blur(8px)" },
-            { opacity: 1, y: 0, filter: "blur(0px)", duration: 1, ease: "power2.out" }
-          );
-        },
-      });
-    }, 8000);
-    return () => clearInterval(timer);
-  }, []);
-
-  return (
-    <section className="scripture-banner py-16 relative z-20">
-      <div className="mx-auto w-[94%] max-w-3xl text-center">
-        <div className="scripture-glass inline-block w-full">
-          <div ref={containerRef} className="flex flex-col items-center gap-4">
-            <div className="flex items-center gap-4 text-sm sm:text-base">
-              <BookOpen size={14} className="shrink-0 text-[var(--accent-lavender)] hidden sm:block opacity-60" />
-              <p className="leading-relaxed opacity-80 italic font-display tracking-wide text-lg">&ldquo;{scriptures[idx].text}&rdquo;</p>
-              <BookOpen size={14} className="shrink-0 text-[var(--accent-lavender)] hidden sm:block opacity-60" />
-            </div>
-            <p className="text-[10px] uppercase tracking-[0.28em] text-[var(--accent-blue)] mt-1 opacity-70">
-              — {scriptures[idx].ref}
-            </p>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* ─── Ticker / Marquee ─────────────────────────────────── */
-function Ticker() {
-  const doubled = [...tickerItems, ...tickerItems];
-  return (
-    <div className="relative overflow-hidden border-y border-[var(--glass-border)] py-5 z-20 glass-heavy rounded-none !border-x-0">
-      <div className="ticker-track flex">
-        {doubled.map((item, i) => (
-          <div key={i} className="ticker-item">
-            <span className="ticker-dot" />
-            {item}
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-/* ─── Animated Mini Bar Chart ──────────────────────────── */
-function MiniBarChart() {
-  const ref = useRef<HTMLDivElement>(null);
-  const [animated, setAnimated] = useState(false);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setAnimated(true);
-          observer.disconnect();
-        }
-      },
-      { threshold: 0.5 }
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, []);
-
-  return (
-    <div ref={ref} className="mini-bar-chart">
-      {barHeights.map((h, i) => (
-        <div
-          key={i}
-          className={`mini-bar ${animated ? "animated" : ""}`}
-          style={{
-            height: `${h}%`,
-            transitionDelay: `${i * 0.1}s`,
-          }}
-        />
-      ))}
-    </div>
-  );
-}
-
-/* ─── Main Page ─────────────────────────────────────────── */
-export default function HomePage() {
-  const mainRef           = useRef<HTMLElement>(null);
-  const servicesPinRef    = useRef<HTMLElement>(null);
-  const servicesScrollRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    gsap.registerPlugin(ScrollTrigger);
-
-    const ctx = gsap.context(() => {
-      /* ── Hero Entrance ── */
-      const heroTl = gsap.timeline({ delay: 0.2 });
-      heroTl
-        .from(".hero-badge",    { opacity: 0, y: 20, filter: "blur(10px)", duration: 0.8, ease: "power2.out" })
-        .from(".hero-letter",   { opacity: 0, y: 60, filter: "blur(10px)", stagger: { amount: 0.8 }, duration: 1.2, ease: "power3.out" }, "-=0.4")
-        .from(".hero-subtitle", { opacity: 0, y: 20, filter: "blur(10px)", duration: 0.8, ease: "power2.out" }, "-=0.6")
-        .from(".hero-desc",     { opacity: 0, y: 15, filter: "blur(10px)", duration: 0.8, ease: "power2.out" }, "-=0.6")
-        .from(".hero-cta",      { opacity: 0, y: 15, filter: "blur(10px)", stagger: 0.15, duration: 0.8, ease: "power2.out" }, "-=0.6")
-        .from(".hero-stat",     { opacity: 0, y: 20, filter: "blur(10px)", stagger: 0.15, duration: 0.8, ease: "power2.out" }, "-=0.5")
-        .from(".hero-float",    { opacity: 0, x: 30, filter: "blur(10px)", stagger: 0.2, duration: 1, ease: "power2.out" }, "-=0.8");
-
-      /* ── Hero Scroll Fade ── */
-      gsap.to(".hero-scroll-fade", {
-        opacity: 0,
-        y: -100,
-        filter: "blur(20px)",
-        ease: "none",
-        scrollTrigger: { trigger: "#home", start: "top top", end: "75% top", scrub: true },
-      });
-
-      /* ── Section Depth Reveals ── */
-      gsap.utils.toArray<HTMLElement>(".depth-section").forEach((sec) => {
-        gsap.from(sec, {
+    const tl = gsap.timeline({
+      delay: 0.3,
+      onComplete: () => {
+        gsap.to(loaderRef.current, {
           opacity: 0,
-          y: 60,
-          filter: "blur(12px)",
-          duration: 1.5,
-          ease: "power2.out",
-          scrollTrigger: { trigger: sec, start: "top 85%" },
+          scale: 1.04,
+          duration: 0.9,
+          ease: "power3.inOut",
+          onComplete,
+        });
+      },
+    });
+
+    // Letters reveal with stagger
+    tl.fromTo(
+      letters,
+      { opacity: 0, y: 20, filter: "blur(12px)" },
+      { opacity: 1, y: 0, filter: "blur(0px)", stagger: 0.055, duration: 0.55, ease: "power3.out" },
+      0
+    );
+
+    // Central glow blooms
+    tl.fromTo(
+      glowRef.current,
+      { scale: 0.3, opacity: 0 },
+      { scale: 1, opacity: 1, duration: 1.2, ease: "power2.out" },
+      0
+    );
+
+    // Progress bar fills
+    tl.fromTo(
+      progressRef.current,
+      { scaleX: 0 },
+      { scaleX: 1, duration: 1.7, ease: "power2.inOut", transformOrigin: "left center" },
+      0.2
+    );
+
+    // Status text swap
+    tl.to(statusRef.current, { opacity: 0, duration: 0.15 }, 1.55);
+    tl.call(
+      () => {
+        if (statusRef.current) {
+          statusRef.current.textContent = "SYSTEMS ONLINE";
+          statusRef.current.style.color = "rgba(134,239,172,0.65)";
+        }
+      },
+      [],
+      1.7
+    );
+    tl.to(statusRef.current, { opacity: 1, duration: 0.3 }, 1.7);
+    tl.to({}, { duration: 0.55 });
+  }, [onComplete]);
+
+  return (
+    <div ref={loaderRef} className="fixed inset-0 z-[200] bg-[#020104] flex flex-col items-center justify-center overflow-hidden">
+      {/* Deep purple ambient */}
+      <div
+        ref={glowRef}
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background:
+            "radial-gradient(ellipse 70% 55% at 50% 50%, rgba(88,28,135,0.28) 0%, rgba(49,10,101,0.12) 50%, transparent 80%)",
+        }}
+      />
+
+      {/* Fine grid */}
+      <div
+        className="absolute inset-0 opacity-[0.025]"
+        style={{
+          backgroundImage:
+            "linear-gradient(rgba(255,255,255,1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,1) 1px, transparent 1px)",
+          backgroundSize: "80px 80px",
+        }}
+      />
+
+      {/* Diagonal accent lines */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-[0.04]">
+        <div className="absolute top-0 left-[-20%] w-[140%] h-[1px] bg-gradient-to-r from-transparent via-purple-400 to-transparent rotate-[15deg] origin-center" style={{ top: "30%" }} />
+        <div className="absolute top-0 left-[-20%] w-[140%] h-[1px] bg-gradient-to-r from-transparent via-fuchsia-400 to-transparent rotate-[-12deg] origin-center" style={{ top: "65%" }} />
+      </div>
+
+      {/* Main branding */}
+      <div className="relative z-10 flex flex-col items-center gap-5">
+        {/* Dot trio */}
+        <div className="flex items-center gap-2 mb-1">
+          <div className="w-1 h-1 rounded-full bg-purple-600/60" />
+          <div className="w-[7px] h-[7px] rounded-full bg-fuchsia-400 shadow-[0_0_12px_rgba(217,70,239,1),0_0_24px_rgba(217,70,239,0.5)]" />
+          <div className="w-1 h-1 rounded-full bg-purple-600/60" />
+        </div>
+
+        {/* Letters */}
+        <h1 className="flex" style={{ letterSpacing: "0.38em" }}>
+          {"PROMINENCE".split("").map((ch, i) => (
+            <span
+              key={i}
+              className="ll font-black text-transparent select-none"
+              style={{
+                fontSize: "clamp(2.8rem, 9vw, 7.5rem)",
+                WebkitTextStroke: "1.5px rgba(255,255,255,0.28)",
+                textShadow: "0 0 50px rgba(168,85,247,0.35), 0 0 100px rgba(168,85,247,0.15)",
+              }}
+            >
+              {ch}
+            </span>
+          ))}
+        </h1>
+
+        <p className="text-[8px] tracking-[0.55em] text-white/22 uppercase font-semibold">
+          Invisible Architecture · Visible Results
+        </p>
+      </div>
+
+      {/* Bottom progress */}
+      <div className="absolute bottom-14 left-1/2 -translate-x-1/2 w-64 flex flex-col items-center gap-3">
+        <p ref={statusRef} className="text-[8px] tracking-[0.45em] text-purple-400/50 uppercase font-semibold">
+          INITIALIZING SYSTEMS
+        </p>
+        <div className="w-full h-[1px] bg-white/[0.05] overflow-hidden rounded-full relative">
+          <div
+            ref={progressRef}
+            className="absolute inset-y-0 left-0 right-0 bg-gradient-to-r from-indigo-700 via-fuchsia-500 to-purple-300"
+            style={{ transform: "scaleX(0)" }}
+          />
+        </div>
+      </div>
+    </div>
+  );
+};
+
+/* -------------------------------------------------------------------------- */
+/* HERO ENERGY ARCS (SVG Overlay)                                             */
+/* -------------------------------------------------------------------------- */
+const HeroEnergyArcs = () => (
+  <div className="absolute inset-0 z-[5] pointer-events-none overflow-hidden">
+    <svg
+      className="w-full h-full"
+      viewBox="0 0 1440 900"
+      preserveAspectRatio="xMidYMid slice"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <defs>
+        <filter id="arcGlow" x="-40%" y="-40%" width="180%" height="180%">
+          <feGaussianBlur stdDeviation="2" result="blur" />
+          <feMerge>
+            <feMergeNode in="blur" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
+        <style>{`
+          @keyframes travel1 {
+            0%   { stroke-dashoffset: 1400; opacity: 0; }
+            4%   { opacity: 1; }
+            96%  { opacity: 0.75; }
+            100% { stroke-dashoffset: -180; opacity: 0; }
+          }
+          @keyframes travel2 {
+            0%   { stroke-dashoffset: 1100; opacity: 0; }
+            4%   { opacity: 0.85; }
+            96%  { opacity: 0.5; }
+            100% { stroke-dashoffset: -150; opacity: 0; }
+          }
+          @keyframes travel3 {
+            0%   { stroke-dashoffset: 1250; opacity: 0; }
+            4%   { opacity: 0.6; }
+            96%  { opacity: 0.35; }
+            100% { stroke-dashoffset: -160; opacity: 0; }
+          }
+          @keyframes nodePing {
+            0%   { transform: scale(1); opacity: 0.8; }
+            60%  { transform: scale(4); opacity: 0; }
+            100% { transform: scale(1); opacity: 0; }
+          }
+          @keyframes nodeBeat {
+            0%,100% { opacity: 0.45; }
+            50%     { opacity: 1; }
+          }
+        `}</style>
+      </defs>
+
+      {/* ── Base arcs (subtle static) ── */}
+      <path d="M 70,220 C 330,90 680,190 990,330 C 1195,430 1370,370 1445,285" fill="none" stroke="rgba(168,85,247,0.08)" strokeWidth="1" />
+      <path d="M 0,530 C 250,445 570,565 855,495 C 1090,430 1275,555 1445,600" fill="none" stroke="rgba(217,70,239,0.06)" strokeWidth="1" />
+      <path d="M 1445,135 C 1155,65 850,210 555,155 C 295,100 95,250 0,315" fill="none" stroke="rgba(139,92,246,0.07)" strokeWidth="1" />
+
+      {/* ── Traveling pulses ── */}
+      {/* Arc 1 — fast fuchsia */}
+      <path d="M 70,220 C 330,90 680,190 990,330 C 1195,430 1370,370 1445,285" fill="none" stroke="rgba(217,70,239,0.9)" strokeWidth="1.5" strokeDasharray="75 2000" filter="url(#arcGlow)" style={{ animation: "travel1 4.2s linear infinite" }} />
+      <path d="M 70,220 C 330,90 680,190 990,330 C 1195,430 1370,370 1445,285" fill="none" stroke="rgba(168,85,247,0.5)" strokeWidth="1" strokeDasharray="38 2000" filter="url(#arcGlow)" style={{ animation: "travel1 4.2s linear infinite", animationDelay: "2.1s" }} />
+
+      {/* Arc 2 — mid fuchsia */}
+      <path d="M 0,530 C 250,445 570,565 855,495 C 1090,430 1275,555 1445,600" fill="none" stroke="rgba(192,38,211,0.75)" strokeWidth="1.5" strokeDasharray="58 2000" filter="url(#arcGlow)" style={{ animation: "travel2 5.4s linear infinite", animationDelay: "1.1s" }} />
+
+      {/* Arc 3 — slower violet */}
+      <path d="M 1445,135 C 1155,65 850,210 555,155 C 295,100 95,250 0,315" fill="none" stroke="rgba(139,92,246,0.6)" strokeWidth="1" strokeDasharray="48 2000" filter="url(#arcGlow)" style={{ animation: "travel3 6.1s linear infinite", animationDelay: "0.6s" }} />
+
+      {/* ── Nodes ── */}
+      {([[70, 220], [990, 330], [1445, 285], [855, 495], [555, 155]] as [number, number][]).map(([cx, cy], i) => (
+        <g key={i}>
+          <circle cx={cx} cy={cy} r="6" fill="none" stroke="rgba(217,70,239,0.45)" strokeWidth="0.8"
+            style={{ transformOrigin: `${cx}px ${cy}px`, animation: `nodePing 2.8s ease-out infinite`, animationDelay: `${i * 0.55}s` }}
+          />
+          <circle cx={cx} cy={cy} r="2.2" fill="rgba(224,90,245,0.95)" filter="url(#arcGlow)"
+            style={{ animation: `nodeBeat 3s ease-in-out infinite`, animationDelay: `${i * 0.42}s` }}
+          />
+        </g>
+      ))}
+    </svg>
+  </div>
+);
+
+/* -------------------------------------------------------------------------- */
+/* THREE.JS SHADER — Deep Root / Vine System                                  */
+/* -------------------------------------------------------------------------- */
+const ElectricVine = () => {
+  const materialRef = useRef<THREE.ShaderMaterial>(null);
+  const numBranches = 100;
+  const segmentsPerBranch = 1000;
+  const particleCount = numBranches * segmentsPerBranch;
+  const vineLength = 120.0;
+
+  const [positions, randoms] = useMemo(() => {
+    const pos = new Float32Array(particleCount * 3);
+    const rnd = new Float32Array(particleCount);
+    for (let b = 0; b < numBranches; b++) {
+      const baseX = (Math.random() - 0.5) * 6.0;
+      const baseZ = (Math.random() - 0.5) * 6.0;
+      const bRandom = Math.random();
+      for (let s = 0; s < segmentsPerBranch; s++) {
+        const i = b * segmentsPerBranch + s;
+        const normalizedY = s / segmentsPerBranch;
+        pos[i * 3] = baseX;
+        pos[i * 3 + 1] = 2.0 - normalizedY * vineLength;
+        pos[i * 3 + 2] = baseZ;
+        rnd[i] = bRandom;
+      }
+    }
+    return [pos, rnd];
+  }, []);
+
+  useFrame((state) => {
+    const scrollP = (window as any).globalScrollProgress || 0;
+    state.camera.position.y = -scrollP * vineLength;
+    if (materialRef.current) {
+      materialRef.current.uniforms.uTime.value = state.clock.elapsedTime;
+      materialRef.current.uniforms.uHeadY.value = 1.0 - scrollP * vineLength;
+    }
+  });
+
+  const vertexShader = `
+    uniform float uTime;
+    uniform float uHeadY;
+    attribute float aRandom;
+    varying vec3 vColor;
+    varying float vAlphaMask;
+
+    vec3 mod289(vec3 x){return x-floor(x*(1.0/289.0))*289.0;}
+    vec4 mod289(vec4 x){return x-floor(x*(1.0/289.0))*289.0;}
+    vec4 permute(vec4 x){return mod289(((x*34.0)+1.0)*x);}
+    vec4 taylorInvSqrt(vec4 r){return 1.79284291400159-0.85373472095314*r;}
+
+    float snoise(vec3 v){
+      const vec2 C=vec2(1.0/6.0,1.0/3.0);
+      const vec4 D=vec4(0.0,0.5,1.0,2.0);
+      vec3 i=floor(v+dot(v,C.yyy));
+      vec3 x0=v-i+dot(i,C.xxx);
+      vec3 g=step(x0.yzx,x0.xyz);
+      vec3 l=1.0-g;
+      vec3 i1=min(g.xyz,l.zxy);
+      vec3 i2=max(g.xyz,l.zxy);
+      vec3 x1=x0-i1+C.xxx;
+      vec3 x2=x0-i2+C.yyy;
+      vec3 x3=x0-D.yyy;
+      i=mod289(i);
+      vec4 p=permute(permute(permute(i.z+vec4(0.0,i1.z,i2.z,1.0))+i.y+vec4(0.0,i1.y,i2.y,1.0))+i.x+vec4(0.0,i1.x,i2.x,1.0));
+      float n_=0.142857142857;
+      vec3 ns=n_*D.wyz-D.xzx;
+      vec4 j=p-49.0*floor(p*ns.z*ns.z);
+      vec4 x_=floor(j*ns.z);
+      vec4 y_=floor(j-7.0*x_);
+      vec4 x=x_*ns.x+ns.yyyy;
+      vec4 y=y_*ns.x+ns.yyyy;
+      vec4 h=1.0-abs(x)-abs(y);
+      vec4 b0=vec4(x.xy,y.xy);
+      vec4 b1=vec4(x.zw,y.zw);
+      vec4 s0=floor(b0)*2.0+1.0;
+      vec4 s1=floor(b1)*2.0+1.0;
+      vec4 sh=-step(h,vec4(0.0));
+      vec4 a0=b0.xzyw+s0.xzyw*sh.xxyy;
+      vec4 a1=b1.xzyw+s1.xzyw*sh.zzww;
+      vec3 p0=vec3(a0.xy,h.x);
+      vec3 p1=vec3(a0.zw,h.y);
+      vec3 p2=vec3(a1.xy,h.z);
+      vec3 p3=vec3(a1.zw,h.w);
+      vec4 norm=taylorInvSqrt(vec4(dot(p0,p0),dot(p1,p1),dot(p2,p2),dot(p3,p3)));
+      p0*=norm.x; p1*=norm.y; p2*=norm.z; p3*=norm.w;
+      vec4 m=max(0.6-vec4(dot(x0,x0),dot(x1,x1),dot(x2,x2),dot(x3,x3)),0.0);
+      m=m*m;
+      return 42.0*dot(m*m,vec4(dot(p0,x0),dot(p1,x1),dot(p2,x2),dot(p3,x3)));
+    }
+
+    vec3 snoiseVec3(vec3 x){
+      return vec3(
+        snoise(vec3(x)),
+        snoise(vec3(x.y-19.1,x.z+33.4,x.x+47.2)),
+        snoise(vec3(x.z+74.2,x.x-124.5,x.y+99.4))
+      );
+    }
+
+    vec3 curlNoise(vec3 p){
+      const float e=0.1;
+      vec3 dx=vec3(e,0.0,0.0);
+      vec3 dy=vec3(0.0,e,0.0);
+      vec3 dz=vec3(0.0,0.0,e);
+      vec3 px0=snoiseVec3(p-dx),px1=snoiseVec3(p+dx);
+      vec3 py0=snoiseVec3(p-dy),py1=snoiseVec3(p+dy);
+      vec3 pz0=snoiseVec3(p-dz),pz1=snoiseVec3(p+dz);
+      float x=py1.z-py0.z-pz1.y+pz0.y;
+      float y=pz1.x-pz0.x-px1.z+px0.z;
+      float z=px1.y-px0.y-py1.x+py0.x;
+      return normalize(vec3(x,y,z)*(1.0/(2.0*e)));
+    }
+
+    void main(){
+      vec3 pos=position;
+      float distToHead=pos.y-uHeadY;
+      vAlphaMask=smoothstep(-2.0,2.0,distToHead);
+      if(vAlphaMask==0.0){gl_PointSize=0.0;gl_Position=vec4(0.0);return;}
+      float depthProgress=(2.0-pos.y)/120.0;
+      float expansion=pow(depthProgress,1.2)*20.0*aRandom;
+      vec2 dir=normalize(pos.xz+vec2(0.001));
+      pos.xz+=dir*expansion;
+      float noiseFreq=0.15;
+      float timeScale=0.2;
+      vec3 noisePos=vec3(pos.x,pos.y*0.5,pos.z)*noiseFreq+(aRandom*100.0);
+      vec3 curl=curlNoise(noisePos-vec3(0.0,uTime*timeScale,0.0));
+      pos+=curl*(2.0+depthProgress*6.0);
+      vec3 colorTail=vec3(0.2,0.0,0.6);
+      vec3 colorHead=vec3(0.9,0.4,1.0);
+      float colorMix=smoothstep(0.0,15.0,distToHead);
+      vColor=mix(colorHead,colorTail,colorMix);
+      vec4 mvPosition=modelViewMatrix*vec4(pos,1.0);
+      gl_PointSize=(4.0*vAlphaMask)*(15.0/-mvPosition.z);
+      gl_Position=projectionMatrix*mvPosition;
+    }
+  `;
+
+  const fragmentShader = `
+    varying vec3 vColor;
+    varying float vAlphaMask;
+    void main(){
+      if(vAlphaMask==0.0)discard;
+      vec2 uv=gl_PointCoord.xy-0.5;
+      float dist=length(uv);
+      if(dist>0.5)discard;
+      float alpha=(0.5-dist)*2.0;
+      gl_FragColor=vec4(vColor,alpha*0.08*vAlphaMask);
+    }
+  `;
+
+  return (
+    <points>
+      <bufferGeometry>
+        <bufferAttribute attach="attributes-position" args={[positions, 3]} />
+        <bufferAttribute attach="attributes-aRandom" args={[randoms, 1]} />
+      </bufferGeometry>
+      <shaderMaterial
+        ref={materialRef}
+        uniforms={{ uTime: { value: 0 }, uHeadY: { value: 2.0 } }}
+        vertexShader={vertexShader}
+        fragmentShader={fragmentShader}
+        transparent
+        depthWrite={false}
+        blending={THREE.AdditiveBlending}
+      />
+    </points>
+  );
+};
+
+/* -------------------------------------------------------------------------- */
+/* MAIN LANDING PAGE COMPONENT                                                */
+/* -------------------------------------------------------------------------- */
+export default function ProminenceLanding() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const heroBgRef = useRef<HTMLDivElement>(null);
+  const prominenceBrandRef = useRef<HTMLDivElement>(null);
+  const marqueeRef = useRef<HTMLDivElement>(null);
+
+  const revealRefs = useRef<HTMLDivElement[]>([]);
+  const fluidBlobsRef = useRef<HTMLDivElement[]>([]);
+  const parallaxRefs = useRef<HTMLDivElement[]>([]);
+
+  const [mounted, setMounted] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [formData, setFormData] = useState({ name: "", email: "", message: "" });
+  const [formStatus, setFormStatus] = useState<"idle" | "sending" | "success" | "error">("idle");
+
+  useEffect(() => { setMounted(true); }, []);
+
+  const handleContactSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!formData.name || !formData.email || !formData.message) return;
+    setFormStatus("sending");
+    try {
+      await addDoc(collection(db, "contacts"), {
+        name: formData.name,
+        email: formData.email,
+        message: formData.message,
+        createdAt: serverTimestamp(),
+      });
+      setFormStatus("success");
+      setFormData({ name: "", email: "", message: "" });
+      setTimeout(() => setFormStatus("idle"), 4000);
+    } catch {
+      setFormStatus("error");
+      setTimeout(() => setFormStatus("idle"), 4000);
+    }
+  };
+
+  useEffect(() => {
+    if (!mounted) return;
+    const ctx = gsap.context(() => {
+      ScrollTrigger.create({
+        trigger: containerRef.current,
+        start: "top top",
+        end: "bottom bottom",
+        onUpdate: (self) => { (window as any).globalScrollProgress = self.progress; },
+      });
+
+      fluidBlobsRef.current.forEach((blob) => {
+        gsap.to(blob, {
+          x: "random(-400, 400)",
+          y: "random(-400, 400)",
+          rotation: "random(-180, 180)",
+          scale: "random(1.1, 2.2)",
+          duration: "random(20, 38)",
+          ease: "sine.inOut",
+          repeat: -1,
+          yoyo: true,
         });
       });
 
-      /* ── Services Horizontal Pin ── */
-      if (servicesScrollRef.current && servicesPinRef.current) {
-        gsap.to(servicesScrollRef.current, {
-          x: () => -(servicesScrollRef.current!.scrollWidth - window.innerWidth),
+      parallaxRefs.current.forEach((el) => {
+        const speed = el.dataset.speed || "1";
+        gsap.to(el, {
+          y: () => -200 * parseFloat(speed),
           ease: "none",
           scrollTrigger: {
-            trigger: servicesPinRef.current,
-            start: "top top",
-            end: () => `+=${servicesScrollRef.current!.scrollWidth}`,
-            scrub: 1,
-            pin: true,
-            anticipatePin: 1,
+            trigger: el.parentElement,
+            start: "top bottom",
+            end: "bottom top",
+            scrub: true,
           },
         });
+      });
+
+      gsap.to(heroBgRef.current, {
+        y: "20%", opacity: 0, scale: 1.05, ease: "none",
+        scrollTrigger: { trigger: containerRef.current, start: "top top", end: "bottom top", scrub: true },
+      });
+
+      gsap.to(prominenceBrandRef.current, {
+        y: "-18%", opacity: 0, scale: 0.88, rotationX: 12,
+        scrollTrigger: { trigger: containerRef.current, start: "top top", end: "bottom top", scrub: 1 },
+      });
+
+      revealRefs.current.forEach((el) => {
+        gsap.fromTo(
+          el,
+          { opacity: 0, y: 45, scale: 0.96, rotationX: 5 },
+          {
+            opacity: 1, y: 0, scale: 1, rotationX: 0,
+            duration: 1.4, ease: "power3.out",
+            scrollTrigger: { trigger: el, start: "top 86%" },
+          }
+        );
+      });
+
+      if (marqueeRef.current) {
+        gsap.to(marqueeRef.current, { xPercent: -50, ease: "none", duration: 40, repeat: -1 });
       }
-
-      /* ── Project Cards ── */
-      gsap.utils.toArray<HTMLElement>(".project-card").forEach((card, i) => {
-        gsap.from(card, {
-          opacity: 0,
-          y: 80,
-          scale: 0.95,
-          filter: "blur(10px)",
-          duration: 1.5,
-          ease: "power2.out",
-          scrollTrigger: { trigger: card, start: "top 90%" },
-        });
-      });
-
-      /* ── Team Cards ── */
-      gsap.utils.toArray<HTMLElement>(".team-card").forEach((card, i) => {
-        gsap.from(card, {
-          opacity: 0,
-          y: 40,
-          filter: "blur(10px)",
-          delay: i * 0.1,
-          duration: 1.2,
-          ease: "power2.out",
-          scrollTrigger: { trigger: card, start: "top 90%" },
-        });
-      });
-
-      /* ── Timeline Steps ── */
-      gsap.utils.toArray<HTMLElement>(".timeline-step").forEach((el, i) => {
-        gsap.from(el, {
-          opacity: 0,
-          x: -40,
-          filter: "blur(10px)",
-          duration: 1.2,
-          delay: i * 0.15,
-          ease: "power2.out",
-          scrollTrigger: { trigger: el, start: "top 88%" },
-        });
-      });
-
-      /* ── Tool Cards ── */
-      gsap.utils.toArray<HTMLElement>(".tool-card").forEach((card, i) => {
-        gsap.from(card, {
-          opacity: 0,
-          y: 20,
-          filter: "blur(5px)",
-          delay: (i % 3) * 0.1,
-          duration: 1,
-          ease: "power2.out",
-          scrollTrigger: { trigger: card, start: "top 92%" },
-        });
-      });
-
-      /* ── About values ── */
-      gsap.utils.toArray<HTMLElement>(".about-value").forEach((el, i) => {
-        gsap.from(el, {
-          opacity: 0,
-          x: 20,
-          filter: "blur(5px)",
-          delay: i * 0.15,
-          duration: 1,
-          ease: "power2.out",
-          scrollTrigger: { trigger: el, start: "top 90%" },
-        });
-      });
-
-    }, mainRef);
+    }, containerRef);
 
     return () => ctx.revert();
-  }, []);
+  }, [mounted]);
+
+  const handleHeroMouseMove = (e: React.MouseEvent) => {
+    if (!prominenceBrandRef.current) return;
+    const xPos = (e.clientX / window.innerWidth - 0.5) * 40;
+    const yPos = (e.clientY / window.innerHeight - 0.5) * 40;
+    gsap.to(prominenceBrandRef.current, {
+      x: xPos, y: yPos, rotationX: -yPos / 3, rotationY: xPos / 3,
+      duration: 1.0, ease: "power2.out",
+    });
+  };
+
+  const handleHeroMouseLeave = () => {
+    gsap.to(prominenceBrandRef.current, {
+      x: 0, y: 0, rotationX: 0, rotationY: 0,
+      duration: 1.2, ease: "power2.out",
+    });
+  };
+
+  const addToRefs = (el: HTMLDivElement | null) => {
+    if (el && !revealRefs.current.includes(el)) revealRefs.current.push(el);
+  };
+  const addFluidRef = (el: HTMLDivElement | null) => {
+    if (el && !fluidBlobsRef.current.includes(el)) fluidBlobsRef.current.push(el);
+  };
+  const addParallaxRef = (el: HTMLDivElement | null) => {
+    if (el && !parallaxRefs.current.includes(el)) parallaxRefs.current.push(el);
+  };
+
+  /* --- Design tokens --- */
+  const skeuoGlassCard =
+    "relative overflow-hidden bg-gradient-to-b from-white/[0.04] to-[#020104]/80 backdrop-blur-[80px] border border-white/10 border-b-black/80 border-r-black/50 shadow-[0_30px_60px_rgba(0,0,0,0.9),inset_0_1px_1px_rgba(255,255,255,0.15),inset_0_-1px_1px_rgba(0,0,0,0.5)] rounded-3xl p-8 hover:-translate-y-1.5 hover:shadow-[0_40px_80px_rgba(168,85,247,0.25),inset_0_1px_2px_rgba(255,255,255,0.25)] transition-all duration-500 group";
+  const skeuoButton =
+    "bg-gradient-to-b from-white to-gray-300 text-black font-bold rounded-full px-8 py-3 text-[10px] uppercase tracking-widest shadow-[0_10px_20px_rgba(0,0,0,0.5),inset_0_1px_2px_rgba(255,255,255,0.9),inset_0_-2px_2px_rgba(0,0,0,0.15)] active:shadow-[inset_0_3px_6px_rgba(0,0,0,0.4)] active:translate-y-1 hover:from-white hover:to-gray-100 transition-all";
+  const recessedWell =
+    "bg-[#010002]/80 border border-white/5 shadow-[inset_0_4px_10px_rgba(0,0,0,0.8),0_1px_1px_rgba(255,255,255,0.05)]";
+  const raisedTactileBox =
+    "bg-gradient-to-b from-white/[0.08] to-transparent border border-white/10 border-b-black/60 shadow-[0_4px_10px_rgba(0,0,0,0.5),inset_0_1px_1px_rgba(255,255,255,0.3)]";
+  const sectionLabel = (color: string) =>
+    `text-[9px] font-bold tracking-[0.3em] uppercase mb-6 flex items-center gap-4 text-${color}-400`;
 
   return (
-    <main
-      ref={mainRef}
-      className="noise-overlay relative overflow-hidden bg-transparent text-[var(--foreground)]"
-    >
-      <EtherealCanvas />
+    <>
+      {/* ================================================================ */}
+      {/* LOADER                                                            */}
+      {/* ================================================================ */}
+      {isLoading && <ProminenceLoader onComplete={() => setIsLoading(false)} />}
 
-      {/* ── Sticky Nav ── */}
-      <header className="sticky top-6 z-40 mx-auto mt-6 flex w-[94%] max-w-5xl items-center justify-between glass-accent px-6 py-4 shadow-2xl">
-        <a href="#home" className="font-display text-lg tracking-[0.2em] ethereal-text">
-          PROMINENCE
-        </a>
-        <nav className="hidden items-center gap-1 sm:flex">
-          {["about", "services", "projects", "team", "process"].map((id) => (
-            <a
-              key={id}
-              href={`#${id}`}
-              className="rounded-full px-4 py-2 text-[10.5px] font-medium uppercase tracking-[0.15em] opacity-60 transition hover:bg-[var(--accent-lavender)]/10 hover:opacity-100 hover:text-[var(--accent-lavender)] capitalize"
-            >
-              {id}
-            </a>
-          ))}
-          <a href="#contact" className="pill-btn-solid ml-4 !py-[8px] !px-[20px] !text-[10px]">
-            Contact
-          </a>
-        </nav>
-      </header>
-
-      {/* ══════════════════════════════════════════
-          HERO
-          ══════════════════════════════════════════ */}
-      <section
-        id="home"
-        className="relative flex min-h-screen flex-col justify-center overflow-hidden px-[5vw] py-32 lg:py-0"
+      <main
+        ref={containerRef}
+        className="relative bg-[#020104] text-white font-sans overflow-hidden selection:bg-fuchsia-500/40 selection:text-white"
       >
-        {/* Ghost background word */}
-        <span
-          className="mag-bg-type absolute top-1/2 -left-[2vw] -translate-y-[48%] select-none pointer-events-none -z-10"
-          aria-hidden
-        >
-          PROM<br />INENCE
-        </span>
+        {/* ── VINE ROOT SYSTEM (Three.js) ── */}
+        {mounted && (
+          <div className="fixed inset-0 w-full max-w-[800px] left-[-100px] z-10 pointer-events-none hidden md:block opacity-80 mix-blend-screen">
+            <Canvas camera={{ position: [0, 0, 5], fov: 45 }} gl={{ alpha: true, antialias: true }}>
+              <ElectricVine />
+            </Canvas>
+          </div>
+        )}
 
-        {/* Hero asymm grid */}
-        <div className="hero-scroll-fade relative z-10 w-full max-w-5xl mx-auto">
-          <div className="asymm-hero-grid">
-            {/* Left: editorial content */}
-            <div>
-              <span className="hero-badge pill-tag mb-10">
-                Premium Digital Services
-              </span>
+        {/* ── GLOBAL LAVA LAMP LAYER ── */}
+        <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden bg-[#020104]">
+          <div
+            className="absolute inset-0 opacity-[0.04] mix-blend-overlay z-10"
+            style={{
+              backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
+            }}
+          />
+          {/* Orb 1 — deep violet */}
+          <div ref={addFluidRef} className="absolute top-[-10%] left-[5%] w-[70vw] h-[70vw] max-w-[1100px] max-h-[1100px] rounded-full mix-blend-color-dodge blur-[120px]"
+            style={{ background: "radial-gradient(circle at center, rgba(126,34,206,0.55) 0%, transparent 62%)" }} />
+          {/* Orb 2 — fuchsia */}
+          <div ref={addFluidRef} className="absolute bottom-[10%] right-[-10%] w-[80vw] h-[80vw] max-w-[1300px] max-h-[1300px] rounded-full mix-blend-screen blur-[140px]"
+            style={{ background: "radial-gradient(circle at center, rgba(217,70,239,0.35) 0%, transparent 62%)" }} />
+          {/* Orb 3 — indigo */}
+          <div ref={addFluidRef} className="absolute top-[40%] left-[30%] w-[60vw] h-[60vw] max-w-[900px] max-h-[900px] rounded-full mix-blend-color-dodge blur-[130px]"
+            style={{ background: "radial-gradient(circle at center, rgba(79,70,229,0.45) 0%, transparent 62%)" }} />
+        </div>
 
-              <h1
-                className="font-display text-[clamp(4.5rem,11vw,9rem)] leading-[0.9] text-[var(--foreground)] overflow-hidden pb-4"
-                aria-label={HERO_WORD}
-              >
-                {HERO_WORD.split("").map((char, i) => (
-                  <span key={i} className="hero-letter inline-block">
-                    {char}
-                  </span>
-                ))}
-              </h1>
-
-              <p className="hero-subtitle mt-6 text-[11px] font-semibold uppercase tracking-[0.4em] ethereal-text opacity-90">
-                Virtual Assistance Studio
-              </p>
-
-              <p className="hero-desc mt-8 max-w-lg text-[1.65rem] font-medium leading-snug sm:text-[2rem] opacity-90">
-                Scale your vision with seamless virtual support
-              </p>
-              <p className="hero-desc mt-5 max-w-sm text-[0.95rem] leading-[1.8] opacity-60">
-                Video, web, admin, and creative services — elevating your brand without the heavy overhead.
-              </p>
-
-              <div className="mt-12 flex flex-wrap gap-5">
-                <a href="#contact" className="hero-cta pill-btn-solid">
-                  Work With Us <ArrowRight size={14} />
-                </a>
-                <a href="#services" className="hero-cta pill-btn">
-                  View Services
-                </a>
+        {/* ── FLOATING NAV ── */}
+        <nav className="fixed top-6 inset-x-0 z-50 flex justify-center px-4 pointer-events-none">
+          <div className="bg-gradient-to-b from-white/[0.08] to-[#020104]/80 backdrop-blur-3xl border border-white/10 border-b-black/80 shadow-[0_20px_40px_rgba(0,0,0,0.8),inset_0_1px_1px_rgba(255,255,255,0.2)] rounded-full px-6 py-3 w-full max-w-5xl flex items-center justify-between pointer-events-auto transition-all duration-500">
+            <div className="font-bold tracking-[0.25em] uppercase text-[10px] flex items-center gap-3 text-white drop-shadow-md">
+              <div className="relative flex items-center justify-center">
+                <div className="absolute w-3 h-3 rounded-full bg-fuchsia-500/60 animate-ping" />
+                <div className="relative w-1.5 h-1.5 rounded-full bg-fuchsia-200 shadow-[0_0_15px_rgba(217,70,239,1)]" />
               </div>
+              Prominence
+            </div>
+            <div className="hidden md:flex items-center gap-10 text-[9px] font-bold tracking-[0.2em] text-white/50 uppercase">
+              <a href="#services" className="hover:text-white transition-all">Architecture</a>
+              <a href="#team" className="hover:text-white transition-all">The Engine</a>
+              <a href="#tools" className="hover:text-white transition-all">Ecosystem</a>
+              <a href="#work" className="hover:text-white transition-all">Archive</a>
+            </div>
+            <a href="#contact" className={skeuoButton}>Engage</a>
+          </div>
+        </nav>
 
-              {/* Stats */}
-              <div className="mt-16 flex flex-wrap gap-12">
-                {[
-                  { num: "50+", label: "Projects Delivered" },
-                  { num: "3+",  label: "Years Active"       },
-                  { num: "6",   label: "Team Members"       },
-                ].map((stat) => (
-                  <div key={stat.label} className="hero-stat">
-                    <p className="chrome-text font-display text-[2.75rem] leading-none mb-2">{stat.num}</p>
-                    <p className="text-[9.5px] uppercase tracking-[0.25em] opacity-50">
-                      {stat.label}
-                    </p>
-                  </div>
-                ))}
+        {/* ================================================================ */}
+        {/* HERO — Depth Layers                                              */}
+        {/* ================================================================ */}
+        <section
+          className="relative w-full h-[100vh] flex items-center justify-center overflow-hidden perspective-[1000px]"
+          onMouseMove={handleHeroMouseMove}
+          onMouseLeave={handleHeroMouseLeave}
+        >
+          {/* LAYER 0 — Deep background radial (coolest, most distant) */}
+          <div ref={heroBgRef} className="absolute inset-0 z-0 flex items-center justify-center opacity-90 pointer-events-none">
+            <div
+              className="w-[1600px] h-[1600px] rounded-full blur-[100px]"
+              style={{ background: "radial-gradient(circle at center, rgba(88,28,135,0.45) 0%, rgba(49,10,101,0.2) 40%, transparent 68%)" }}
+            />
+          </div>
+
+          {/* LAYER 1 — Golden hour warmth (warm light rising from below) */}
+          <div className="absolute inset-0 z-[1] pointer-events-none"
+            style={{ background: "radial-gradient(ellipse 130% 65% at 25% 115%, rgba(251,146,60,0.11) 0%, rgba(234,88,12,0.05) 38%, transparent 65%)" }}
+          />
+
+          {/* LAYER 2 — Perspective grid (midground) */}
+          <div className="absolute inset-0 z-[2] flex items-center justify-center pointer-events-none [transform:rotateX(60deg)_translateY(-150px)_scale(1.8)] opacity-25">
+            <div
+              className="absolute inset-0"
+              style={{
+                backgroundImage: "linear-gradient(rgba(255,255,255,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.06) 1px, transparent 1px)",
+                backgroundSize: "80px 80px",
+                maskImage: "radial-gradient(ellipse 60% 60% at 50% 50%, #000 30%, transparent 100%)",
+              }}
+            />
+          </div>
+
+          {/* LAYER 3 — Energy arcs (hero SVG pulse system) */}
+          <HeroEnergyArcs />
+
+          {/* LAYER 4 — Edge vignette / atmospheric fog */}
+          <div className="absolute inset-0 z-[8] pointer-events-none"
+            style={{ background: "radial-gradient(ellipse 92% 88% at 50% 50%, transparent 52%, rgba(2,1,4,0.5) 100%)" }}
+          />
+          {/* Bottom fog curl */}
+          <div className="absolute bottom-0 left-0 right-0 h-56 z-[9] pointer-events-none"
+            style={{ background: "linear-gradient(to top, rgba(2,1,4,0.7) 0%, transparent 100%)" }}
+          />
+
+          {/* LAYER 5 — Ghost brand typography (glassy watermark) */}
+          <div
+            ref={prominenceBrandRef}
+            className="absolute inset-0 z-[20] flex items-center justify-center pointer-events-none select-none transform-gpu"
+          >
+            <h1
+              className="font-black tracking-[0.1em] text-transparent opacity-35 mix-blend-plus-lighter"
+              style={{
+                fontSize: "clamp(3.5rem, 12vw, 13rem)",
+                WebkitTextStroke: "1.5px rgba(255,255,255,0.18)",
+                textShadow: "0 0 60px rgba(168,85,247,0.35), 0 0 120px rgba(168,85,247,0.12)",
+              }}
+            >
+              PROMINENCE
+            </h1>
+          </div>
+
+          {/* LAYER 6 — Hero content (foreground) */}
+          <div
+            className="relative z-[30] text-center max-w-4xl px-6 flex flex-col items-center pl-0 md:pl-20"
+            ref={addParallaxRef}
+            data-speed="0.8"
+          >
+            <div className="inline-flex items-center gap-4 mb-8 px-6 py-2.5 rounded-full bg-[#0a0412]/80 border border-white/10 shadow-[inset_0_2px_5px_rgba(0,0,0,0.9),0_2px_4px_rgba(255,255,255,0.05)] text-fuchsia-200 text-[9px] font-bold tracking-[0.2em] uppercase backdrop-blur-2xl">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-fuchsia-400 opacity-80" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-fuchsia-500 shadow-[0_0_10px_#f0abfc]" />
+              </span>
+              Invisible Architecture, Visible Results
+            </div>
+            <h2 className="text-4xl md:text-5xl lg:text-7xl font-light tracking-tight leading-[1.05] mb-8 text-white drop-shadow-[0_15px_30px_rgba(0,0,0,1)]">
+              Elevate your <br />
+              <span className="font-medium bg-clip-text text-transparent bg-gradient-to-b from-white via-purple-200 to-fuchsia-500">
+                digital reality.
+              </span>
+            </h2>
+            <p className="text-xs md:text-sm text-white/80 max-w-xl font-light leading-relaxed backdrop-blur-xl rounded-2xl p-5 border border-white/10 shadow-[0_20px_40px_rgba(0,0,0,0.8)] bg-black/40">
+              We are the intelligence supporting your ascendancy. High-end virtual operations coordinating seamlessly in the void.
+            </p>
+          </div>
+        </section>
+
+        {/* ================================================================ */}
+        {/* MANIFESTO — The Creed                                            */}
+        {/* ================================================================ */}
+        <section className="py-36 px-6 relative z-20 overflow-hidden">
+          {/* Section ambient — warm gold-violet */}
+          <div className="absolute inset-0 pointer-events-none"
+            style={{ background: "radial-gradient(ellipse 80% 60% at 60% 50%, rgba(109,40,217,0.14) 0%, transparent 70%)" }}
+          />
+
+          <div className="max-w-6xl mx-auto pl-6 md:pl-32">
+            <div ref={addToRefs}>
+              <div className="text-[9px] tracking-[0.5em] text-purple-400/50 uppercase font-bold mb-10 flex items-center gap-4">
+                <div className="w-8 h-[1px] bg-purple-500/50" /> The Creed
+              </div>
+              <blockquote
+                className="text-3xl md:text-5xl lg:text-[3.4rem] font-light text-white/90 leading-[1.2] tracking-tight max-w-4xl"
+              >
+                We occupy the space between{" "}
+                <span className="font-medium text-transparent bg-clip-text bg-gradient-to-r from-purple-300 via-fuchsia-300 to-purple-400">
+                  what you envision
+                </span>{" "}
+                and what the world receives.
+              </blockquote>
+              <div className="mt-14 flex items-center gap-5">
+                <div className="w-16 h-[1px] bg-gradient-to-r from-purple-500/60 to-transparent" />
+                <span className="text-[8px] tracking-[0.4em] text-white/25 uppercase font-semibold">Prominence · Est. Operations</span>
               </div>
             </div>
+          </div>
+        </section>
 
-            {/* Right: floating stat cards */}
-            <div className="hidden lg:flex flex-col gap-6 pl-12 pt-12 animate-float">
-              {/* Floating card 1 — mini bar chart */}
-              <div className="hero-float stat-float-card w-[240px] self-end chrome-border">
-                <div className="flex items-center justify-between mb-4">
-                  <p className="text-[10px] uppercase tracking-[0.2em] opacity-60 font-semibold">Growth</p>
-                  <TrendingUp size={14} className="text-[var(--accent-lavender)]" />
-                </div>
-                <MiniBarChart />
-                <p className="mt-3 text-[9px] opacity-40 tracking-wider">Client results · 2024</p>
+        {/* ================================================================ */}
+        {/* SERVICES — Phase 01                                              */}
+        {/* Color: Indigo / Blue-violet                                      */}
+        {/* ================================================================ */}
+        <section id="services" className="py-32 px-6 max-w-6xl mx-auto relative z-20 pl-6 md:pl-32">
+          <div className="absolute inset-0 pointer-events-none -z-10"
+            style={{ background: "radial-gradient(ellipse 90% 70% at 10% 50%, rgba(79,70,229,0.18) 0%, transparent 65%)" }}
+          />
+
+          <div ref={addToRefs} className="mb-20 flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-white/[0.05] pb-10">
+            <div className="max-w-2xl">
+              <div className={sectionLabel("indigo")}>
+                <div className="w-12 h-[1px] bg-gradient-to-r from-indigo-500 to-transparent" />
+                Phase 01: Architecture
               </div>
+              <h2 className="text-3xl md:text-4xl lg:text-5xl font-medium mb-6 drop-shadow-xl">Core Capacities</h2>
+              <p className="text-white/60 text-sm md:text-base font-light leading-relaxed">
+                We intercept and resolve the complexities of your operations. Focus on high-level growth, direction, and wealth creation. We handle the structure.
+              </p>
+            </div>
+          </div>
 
-              {/* Floating card 2 — rating */}
-              <div className="hero-float stat-float-card w-[190px] self-start" style={{ animationDelay: '1s' }}>
-                <div className="flex gap-1 mb-3">
-                  {Array(5).fill(0).map((_, i) => (
-                    <Star key={i} size={12} className="fill-[var(--accent-blue)] text-[var(--accent-blue)] opacity-80" />
-                  ))}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {[
+              { title: "Development", desc: "Scalable frontend and backend architectures built by specialized engineers. Robust, exact, and future-proof." },
+              { title: "Post-Production", desc: "Cinematic editing and visual workflows that elevate your brand's narrative to ultra-premium standards." },
+              { title: "Creative Design", desc: "High-fidelity identity mapping, from asset creation to complete, immersive brand ecosystems." },
+            ].map((service, i) => (
+              <div key={i} ref={addToRefs} className={skeuoGlassCard}>
+                <div className="absolute top-0 right-0 w-48 h-48 blur-[70px] group-hover:opacity-100 opacity-70 transition-opacity duration-1000 pointer-events-none"
+                  style={{ background: "radial-gradient(circle at center, rgba(99,102,241,0.35) 0%, transparent 70%)" }} />
+                <div className={`w-14 h-14 rounded-xl ${raisedTactileBox} flex items-center justify-center mb-8 relative z-10 group-hover:-translate-y-2 transition-all duration-500`}>
+                  <div className="w-2.5 h-2.5 rounded-full bg-indigo-300 shadow-[0_0_20px_rgba(165,180,252,1)] group-hover:scale-150 transition-transform duration-500" />
                 </div>
-                <p className="font-display text-3xl">5.0</p>
-                <p className="text-[9.5px] uppercase tracking-[0.2em] opacity-50 mt-1">
-                  Client Rating
+                <h3 className="text-xl md:text-2xl font-medium mb-4 relative z-10 text-white/90 group-hover:text-white drop-shadow-md">{service.title}</h3>
+                <p className="text-white/60 text-xs md:text-sm leading-relaxed font-light relative z-10 group-hover:text-white/90 transition-colors duration-500">{service.desc}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* ================================================================ */}
+        {/* TEAM — Phase 02                                                  */}
+        {/* Color: Fuchsia / Magenta                                         */}
+        {/* ================================================================ */}
+        <section id="team" className="py-32 px-6 max-w-6xl mx-auto relative z-20 pl-6 md:pl-32">
+          <div className="absolute inset-0 pointer-events-none -z-10"
+            style={{ background: "radial-gradient(ellipse 80% 65% at 90% 40%, rgba(192,38,211,0.18) 0%, transparent 65%)" }}
+          />
+
+          <div ref={addToRefs} className="mb-20 flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-white/[0.05] pb-10">
+            <div className="max-w-2xl">
+              <div className={sectionLabel("fuchsia")}>
+                <div className="w-12 h-[1px] bg-gradient-to-r from-fuchsia-500 to-transparent" />
+                Phase 02: The Engine
+              </div>
+              <h2 className="text-3xl md:text-4xl lg:text-5xl font-medium mb-6 drop-shadow-xl">Intelligence Behind</h2>
+              <p className="text-white/60 text-sm md:text-base font-light leading-relaxed">
+                A curated syndicate of specialists operating as a unified control hub. Invisible, but immensely felt.
+              </p>
+            </div>
+          </div>
+
+          {/* CEO Highlight */}
+          <div ref={addToRefs} className={`${skeuoGlassCard} mb-12 flex flex-col md:flex-row items-center gap-12 !p-10 md:!p-14`}>
+            <div className="absolute inset-0 bg-gradient-to-br from-fuchsia-900/30 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-1000 pointer-events-none" />
+            <div className={`relative z-10 w-40 h-40 md:w-48 md:h-48 shrink-0 rounded-full ${recessedWell} p-3 group-hover:border-fuchsia-500/40 transition-colors duration-700`}>
+              <div className="w-full h-full rounded-full bg-gradient-to-tr from-purple-900 to-black flex items-center justify-center text-4xl font-light text-white/30 overflow-hidden relative shadow-[inset_0_2px_15px_rgba(0,0,0,1),0_1px_1px_rgba(255,255,255,0.2)]">
+                <span className="absolute tracking-[0.2em] font-bold">VA</span>
+                <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=800')] bg-cover bg-center mix-blend-luminosity opacity-70 group-hover:opacity-100 group-hover:scale-105 transition-all duration-1000" />
+              </div>
+            </div>
+            <div className="relative z-10 text-center md:text-left">
+              <div className={`inline-flex px-5 py-2 rounded-full ${raisedTactileBox} text-fuchsia-200 text-[9px] font-bold tracking-[0.25em] uppercase mb-6`}>
+                CEO & Founder
+              </div>
+              <h3 className="text-3xl md:text-4xl lg:text-5xl font-medium text-white mb-6 drop-shadow-xl">Vien Abache</h3>
+              <p className="text-white/70 text-sm md:text-base max-w-xl font-light leading-relaxed">
+                Architecting operations and steering the central vision to deliver invisible infrastructure with compounding, visible results.
+              </p>
+            </div>
+          </div>
+
+          {/* Team Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {teamData.map((member, i) => (
+              <div key={i} ref={addToRefs} className={`${skeuoGlassCard} flex items-center gap-6 !p-6 group/member`}>
+                <div className={`w-14 h-14 shrink-0 rounded-xl ${recessedWell} flex items-center justify-center text-2xl text-white/50 group-hover/member:text-fuchsia-400 group-hover/member:shadow-[inset_0_4px_10px_rgba(0,0,0,0.9),0_0_20px_rgba(217,70,239,0.4)] transition-all duration-500`}>
+                  {member.icon}
+                </div>
+                <div>
+                  <h4 className="text-lg md:text-xl font-medium text-white/90 group-hover/member:text-white transition-colors duration-300 mb-1">{member.name}</h4>
+                  <div className="text-[9px] text-fuchsia-400/80 tracking-[0.2em] font-bold uppercase group-hover/member:text-fuchsia-300">{member.role}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* ================================================================ */}
+        {/* TOOLS — Phase 03                                                 */}
+        {/* Color: Royal indigo / Deep blue                                  */}
+        {/* ================================================================ */}
+        <section id="tools" className="py-32 px-6 relative z-20 pl-6 md:pl-32">
+          <div className="absolute inset-0 pointer-events-none -z-10"
+            style={{ background: "linear-gradient(to bottom, transparent, rgba(15,6,50,0.7) 40%, rgba(8,2,20,0.9) 60%, transparent)" }}
+          />
+          <div className="absolute inset-0 pointer-events-none -z-10"
+            style={{ background: "radial-gradient(ellipse 70% 60% at 50% 50%, rgba(67,56,202,0.2) 0%, transparent 70%)" }}
+          />
+
+          <div className="max-w-6xl mx-auto">
+            <div ref={addToRefs} className="mb-20 flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-white/[0.05] pb-10">
+              <div className="max-w-2xl">
+                <div className={sectionLabel("violet")}>
+                  <div className="w-12 h-[1px] bg-gradient-to-r from-violet-500 to-transparent" />
+                  Phase 03: Ecosystem
+                </div>
+                <h2 className="text-3xl md:text-4xl lg:text-5xl font-medium mb-6 drop-shadow-xl">Stack & Frameworks</h2>
+                <p className="text-white/60 text-sm md:text-base font-light leading-relaxed">
+                  The foundational digital instruments empowering our silent operations.
                 </p>
               </div>
-
-              {/* Floating card 3 — active projects */}
-              <div className="hero-float stat-float-card w-[220px] self-end" style={{ animationDelay: '2s' }}>
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="w-2 h-2 rounded-full bg-[var(--accent-blush)] animate-pulse" />
-                  <p className="text-[10px] uppercase tracking-[0.2em] opacity-60 font-semibold">Active</p>
-                </div>
-                <p className="font-display text-[2.5rem] mt-2">12</p>
-                <p className="text-[9.5px] opacity-50 tracking-wider mt-1">Projects in flight</p>
-              </div>
             </div>
-          </div>
-        </div>
 
-        {/* Scroll indicator */}
-        <div className="absolute bottom-10 left-[5vw] flex flex-col items-start gap-3 opacity-40">
-          <div className="h-12 w-px bg-gradient-to-b from-[var(--accent-lavender)] to-transparent" />
-          <p className="text-[9px] uppercase tracking-[0.4em]">Scroll</p>
-        </div>
-      </section>
-
-      {/* ── Ticker ── */}
-      <Ticker />
-
-      {/* ══════════════════════════════════════════
-          ABOUT
-          ══════════════════════════════════════════ */}
-      <section
-        id="about"
-        className="depth-section mx-auto w-[94%] max-w-5xl py-28 relative z-10"
-      >
-        <span className="mag-bg-type absolute -top-12 right-0 opacity-[0.02]" aria-hidden>
-          ABOUT
-        </span>
-
-        <div className="ethereal-card p-10 sm:p-16 corner-accent">
-          <div className="grid gap-16 lg:grid-cols-2 lg:items-center">
-            {/* Left */}
-            <div>
-              <p className="pill-tag mb-6">About Prominence</p>
-              <h2 className="mt-4 text-[2.5rem] font-display leading-[1.1] sm:text-[3.5rem]">
-                Elevating visions for those <br /> <span className="ethereal-text">who move fast.</span>
-              </h2>
-              <p className="mt-6 text-[0.95rem] leading-[1.9] opacity-70">
-                We&rsquo;re a dedicated digital collective that handles the orchestration behind your growth —
-                video, web, admin, and creative systems, all gracefully managed in one place.
-              </p>
-
-              {/* Values */}
-              <div className="mt-10 flex flex-col gap-4">
-                {[
-                  { label: "Reliable Delivery",  sub: "On time, every time — seamless execution."  },
-                  { label: "On-Brand Creative",  sub: "Assets that resonate with your ethereal vision."  },
-                  { label: "Clear Systems",       sub: "Intuitive workflows from day one."     },
-                ].map((v, i) => (
-                  <div
-                    key={v.label}
-                    className="about-value neu-pressed flex items-start gap-5 px-6 py-5"
-                  >
-                    <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--accent-lavender)]/10 border border-[var(--accent-lavender)]/20">
-                      <Zap size={14} className="text-[var(--accent-lavender)]" />
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {techStack.map((category, idx) => (
+                <div key={idx} ref={addToRefs} className={`${skeuoGlassCard} flex flex-col justify-between`}>
+                  <div>
+                    <div className="text-violet-300 text-[10px] font-bold tracking-[0.2em] uppercase mb-10 flex items-center gap-4">
+                      <div className="flex-grow h-[1px] bg-gradient-to-r from-violet-500/50 to-transparent" />
+                      {category.title}
                     </div>
-                    <div>
-                      <p className="text-[0.95rem] font-semibold">{v.label}</p>
-                      <p className="mt-1.5 text-[0.8rem] leading-relaxed opacity-60">{v.sub}</p>
+                    <div className="flex flex-col gap-6">
+                      {category.tools.map((tool, i) => (
+                        <div key={i} className="flex items-center gap-5 group/item cursor-default">
+                          <div className={`w-12 h-12 rounded-xl ${raisedTactileBox} flex items-center justify-center group-hover/item:border-violet-400/60 transition-all duration-300 group-hover/item:shadow-[0_6px_20px_rgba(139,92,246,0.5),inset_0_1px_2px_rgba(255,255,255,0.5)]`}>
+                            <div className="text-white/50 group-hover/item:text-violet-300 transition-colors transform group-hover/item:scale-110 duration-300 text-xl">
+                              {tool.icon}
+                            </div>
+                          </div>
+                          <span className="text-sm md:text-base font-light text-white/70 group-hover/item:text-white transition-colors duration-300">
+                            {tool.name}
+                          </span>
+                        </div>
+                      ))}
                     </div>
-                  </div>
-                ))}
-              </div>
-
-              <a
-                href="#contact"
-                className="mt-10 inline-flex items-center gap-3 text-sm font-semibold ethereal-text transition-all hover:gap-4"
-              >
-                Start a journey <ArrowRight size={14} />
-              </a>
-            </div>
-
-            {/* Right: circular stats */}
-            <div className="flex flex-col items-center gap-10">
-              <div className="flex gap-10 justify-center">
-                <CircularStat value={50} label="Projects" size={120} />
-                <CircularStat value={98} label="Satisfaction" size={120} />
-              </div>
-              <div className="flex gap-10 justify-center">
-                <CircularStat value={75} label="On-Time Rate" size={120} />
-                <CircularStat value={60} label="Repeat Clients" size={120} />
-              </div>
-              <p className="text-[9.5px] uppercase tracking-[0.25em] opacity-40 text-center mt-4">
-                Performance metrics · 2024
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ══════════════════════════════════════════
-          SERVICES — Pinned Horizontal Scroll
-          ══════════════════════════════════════════ */}
-      <section
-        id="services"
-        ref={servicesPinRef}
-        className="relative h-screen w-full overflow-hidden z-10"
-      >
-        <div
-          ref={servicesScrollRef}
-          className="absolute flex h-full w-[280vw] sm:w-[220vw] lg:w-[160vw] items-center px-[5vw]"
-        >
-          {/* Intro */}
-          <div className="w-[90vw] sm:w-[52vw] lg:w-[38vw] shrink-0 pr-12">
-            <p className="pill-tag mb-6">What We Do</p>
-            <h2 className="mt-3 font-display text-[clamp(3.5rem,8vw,6rem)] leading-[0.9]">
-              OUR<br />SERVICES
-            </h2>
-            <p className="mt-6 max-w-sm text-[0.95rem] leading-[1.9] opacity-70">
-              Drift through to explore how we elevate and scale your digital presence.
-            </p>
-            <div className="mt-10 flex gap-2 text-[var(--accent-lavender)]/50">
-              {[0, 0.2, 0.4].map((d, i) => (
-                <ArrowRight key={i} size={24} className="animate-pulse" style={{ animationDelay: `${d}s` }} />
-              ))}
-            </div>
-          </div>
-
-          {/* Cards */}
-          <div className="flex shrink-0 gap-8 sm:gap-10">
-            {services.map(({ _id, title, description, sub, Icon }, i) => (
-              <article
-                key={_id}
-                className="service-card group glass-panel flex h-[420px] w-[300px] sm:w-[360px] flex-col justify-between p-10 hover:border-[var(--accent-blue)]/40 hover:shadow-[0_20px_60px_rgba(168,200,232,0.15)]"
-              >
-                {/* Icon */}
-                <div className="flex flex-col gap-6">
-                  <div className="skeuo-icon text-[var(--accent-lavender)] group-hover:text-[var(--accent-blue)] group-hover:scale-110">
-                    <Icon size={24} />
-                  </div>
-                  {/* Number */}
-                  <span className="font-display text-[3.5rem] opacity-20 leading-none chrome-text">
-                    {String(i + 1).padStart(2, "0")}
-                  </span>
-                </div>
-
-                <div>
-                  <h3 className="text-[1.35rem] font-semibold tracking-wide">{title}</h3>
-                  <p className="mt-3 text-[0.9rem] leading-relaxed opacity-60">{description}</p>
-                  <p className="mt-4 text-[10px] font-semibold uppercase tracking-[0.2em] ethereal-text opacity-80">
-                    {sub}
-                  </p>
-                  <span className="pill-btn mt-8 !py-[8px] !px-[16px] !text-[9px]">Explore</span>
-                </div>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ══════════════════════════════════════════
-          PROJECTS
-          ══════════════════════════════════════════ */}
-      <section
-        id="projects"
-        className="depth-section mx-auto w-[94%] max-w-5xl py-28 relative z-10"
-      >
-        <span className="mag-bg-type absolute -top-8 right-0 opacity-[0.02]" aria-hidden>
-          WORK
-        </span>
-        <div className="mb-14 flex items-end justify-between">
-          <div>
-            <p className="pill-tag mb-5">Our Work</p>
-            <h2 className="mt-3 font-display text-[clamp(3rem,7vw,5rem)] leading-none">
-              PROJECTS
-            </h2>
-          </div>
-          <a
-            href="#contact"
-            className="hidden sm:inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.2em] opacity-60 hover:opacity-100 hover:text-[var(--accent-lavender)] transition"
-          >
-            View all <ArrowRight size={13} />
-          </a>
-        </div>
-        <div className="grid gap-6 md:grid-cols-2">
-          {projects.map((project) => (
-            <article key={project._id} className="project-card group h-[360px]">
-              <Image
-                src={project.image}
-                alt={project.title}
-                fill
-                className="object-cover opacity-40 transition duration-[1s] group-hover:scale-105 group-hover:opacity-70"
-                sizes="(max-width: 768px) 100vw, 50vw"
-              />
-              {/* Corner marker */}
-              <div className="absolute top-6 right-6 z-10 opacity-0 group-hover:opacity-100 transition duration-500">
-                <div className="flex h-10 w-10 items-center justify-center rounded-full glass-accent text-[var(--accent-lavender)]">
-                  <ExternalLink size={14} />
-                </div>
-              </div>
-              <div className="card-content absolute bottom-0 left-0 right-0 p-8 z-10">
-                <span className="pill-tag mb-4 !bg-black/20 !border-white/10">{project.type}</span>
-                <h3 className="text-[1.4rem] font-display tracking-wide text-white">{project.title}</h3>
-                <p className="mt-2 text-[0.95rem] leading-[1.8] text-white/70">{project.summary}</p>
-              </div>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      {/* ══════════════════════════════════════════
-          TEAM
-          ══════════════════════════════════════════ */}
-      <section
-        id="team"
-        className="depth-section mx-auto w-[94%] max-w-5xl py-28 relative z-10"
-      >
-        <span className="mag-bg-type absolute -top-8 left-0 opacity-[0.02]" aria-hidden>
-          TEAM
-        </span>
-        <div className="mb-14">
-          <p className="pill-tag mb-5">Our People</p>
-          <h2 className="mt-3 font-display text-[clamp(3rem,7vw,5rem)] leading-none">
-            THE TEAM
-          </h2>
-        </div>
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {team.map(({ _id, name, role, bio, socials }) => (
-            <article
-              key={_id}
-              className="team-card group ethereal-card p-8 transition duration-500 hover:-translate-y-2"
-            >
-              {/* Main content */}
-              <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl glass-accent font-display text-2xl text-[var(--accent-lavender)] transition duration-500 group-hover:scale-110">
-                {name.charAt(0)}
-              </div>
-              <p className="text-[1.1rem] font-semibold tracking-wide">{name}</p>
-              <p className="mt-2 text-[10px] uppercase tracking-[0.2em] opacity-50">{role}</p>
-
-              {/* Bio overlay on hover */}
-              <div className="team-bio-overlay">
-                <p className="text-[10px] uppercase tracking-[0.2em] ethereal-text mb-3">{role}</p>
-                <p className="font-semibold text-[1.1rem] mb-4">{name}</p>
-                <p className="text-[0.85rem] leading-[1.8] opacity-70">{bio}</p>
-                <div className="mt-6 flex gap-3">
-                  {socials.map(({ platform, Icon }) => (
-                    <a
-                      key={platform}
-                      href="#"
-                      className="flex h-9 w-9 items-center justify-center rounded-full glass-accent text-[var(--foreground)] opacity-70 transition hover:opacity-100 hover:text-[var(--accent-lavender)] hover:scale-110"
-                    >
-                      <Icon size={14} />
-                    </a>
-                  ))}
-                </div>
-              </div>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      {/* ══════════════════════════════════════════
-          PROCESS — Cinematic Vertical Timeline
-          ══════════════════════════════════════════ */}
-      <section
-        id="process"
-        className="depth-section mx-auto w-[94%] max-w-5xl py-28 relative z-10"
-      >
-        <div className="glass-heavy p-10 sm:p-16 border-none">
-          <div className="grid gap-16 lg:grid-cols-2 lg:items-start">
-            {/* Left: heading */}
-            <div className="lg:sticky lg:top-32">
-              <p className="pill-tag mb-6">How We Work</p>
-              <h2 className="mt-3 font-display text-[clamp(3rem,7vw,5rem)] leading-none">
-                THE<br />PROCESS
-              </h2>
-              <p className="mt-8 text-[0.95rem] leading-[1.9] opacity-70 max-w-sm">
-                A serene, repeatable flow designed to manifest outcomes — effortlessly bringing ideas into reality.
-              </p>
-
-              {/* Decorative globe */}
-              <div className="dotted-globe mt-12 h-[200px] w-[200px] opacity-60" />
-            </div>
-
-            {/* Right: timeline */}
-            <div className="timeline-container mt-8 lg:mt-0">
-              {processSteps.map(({ _id, step, title, description, Icon }) => (
-                <div key={_id} className="timeline-step">
-                  <div className="step-dot" />
-                  <div className="group transition duration-500 hover:translate-x-2">
-                    <div className="flex items-center gap-4 mb-3">
-                      <span className="font-display text-[var(--accent-lavender)]/40 text-[1.75rem]">{step}</span>
-                      <div className="flex h-10 w-10 items-center justify-center rounded-xl glass-accent text-[var(--foreground)] opacity-60 transition duration-400 group-hover:opacity-100 group-hover:text-[var(--accent-lavender)] group-hover:scale-110">
-                        <Icon size={16} />
-                      </div>
-                    </div>
-                    <h3 className="text-[1.2rem] font-semibold tracking-wide">{title}</h3>
-                    <p className="mt-3 text-[0.95rem] leading-[1.9] opacity-60">{description}</p>
                   </div>
                 </div>
               ))}
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* ══════════════════════════════════════════
-          TOOLS & TECHNOLOGIES
-          ══════════════════════════════════════════ */}
-      <section
-        id="tools"
-        className="depth-section mx-auto w-[94%] max-w-5xl py-28 relative z-10"
-      >
-        <div className="mb-14">
-          <p className="pill-tag mb-5">Our Stack</p>
-          <h2 className="mt-3 font-display text-[clamp(3rem,7vw,5rem)] leading-none">
-            TOOLS &amp;<br />TECH
-          </h2>
-        </div>
-        <div className="grid gap-12 sm:grid-cols-2 md:grid-cols-3">
-          {toolsData.map((group) => (
-            <div key={group.category} className="flex flex-col gap-6">
-              <h3 className="overline-label chrome-text !opacity-100">{group.category}</h3>
-              <div className="flex flex-col gap-4">
-                {group.items.map((tool) => (
-                  <article
-                    key={tool.id}
-                    className="tool-card group neu-flat flex items-center gap-5 p-5"
-                  >
-                    <div className="skeuo-icon !w-12 !h-12 !rounded-xl text-[var(--foreground)] opacity-60 group-hover:opacity-100 group-hover:text-[var(--accent-lavender)]">
-                      <tool.Icon size={18} />
-                    </div>
-                    <div>
-                      <p className="text-[0.95rem] font-semibold tracking-wide">{tool.name}</p>
-                      <p className="mt-1 text-[0.75rem] opacity-50">{tool.desc}</p>
-                    </div>
-                  </article>
-                ))}
+        {/* ================================================================ */}
+        {/* PROJECTS — Phase 04                                              */}
+        {/* Color: Rich violet                                               */}
+        {/* ================================================================ */}
+        <section id="work" className="py-32 px-6 max-w-6xl mx-auto relative z-20 pl-6 md:pl-32">
+          <div className="absolute inset-0 pointer-events-none -z-10"
+            style={{ background: "radial-gradient(ellipse 75% 55% at 15% 60%, rgba(124,58,237,0.15) 0%, transparent 65%)" }}
+          />
+
+          <div ref={addToRefs} className="mb-20 flex flex-col md:flex-row md:items-end justify-between gap-8 border-b border-white/[0.05] pb-10">
+            <div className="max-w-2xl">
+              <div className={sectionLabel("purple")}>
+                <div className="w-12 h-[1px] bg-gradient-to-r from-purple-500 to-transparent" />
+                Phase 04: Archive
               </div>
+              <h2 className="text-3xl md:text-4xl lg:text-5xl font-medium mb-6 drop-shadow-xl">Executed Intelligence</h2>
+              <p className="text-white/60 text-sm md:text-base font-light leading-relaxed">
+                A curated glimpse into the robust systems and cinematic media we've successfully deployed.
+              </p>
             </div>
-          ))}
-        </div>
-      </section>
+            <button className={`${skeuoButton} self-start md:self-auto`}>Explore Archive</button>
+          </div>
 
-      {/* ══════════════════════════════════════════
-          CTA / CONTACT
-          ══════════════════════════════════════════ */}
-      <section
-        id="contact"
-        className="depth-section mx-auto w-[94%] max-w-5xl py-28 relative z-10"
-      >
-        <div className="glass-panel relative overflow-hidden p-14 text-center sm:p-24 border-none !bg-[var(--glass-heavy)]">
-          {/* Glow blobs */}
-          <div className="pointer-events-none absolute -right-20 -top-24 h-96 w-96 rounded-full bg-[var(--accent-lavender)]/20 blur-[120px] animate-pulse-glow" />
-          <div className="pointer-events-none absolute -bottom-20 -left-20 h-80 w-80 rounded-full bg-[var(--accent-blue)]/15 blur-[120px] animate-pulse-glow" style={{ animationDelay: '2s' }} />
-
-          <span
-            className="mag-bg-type absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-[0.015]"
-            aria-hidden
-          >
-            GROW
-          </span>
-
-          {/* Top decorative line */}
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-[2px] bg-gradient-to-r from-transparent via-[var(--accent-lavender)]/60 to-transparent" />
-
-          <p className="relative pill-tag mb-8 chrome-border !bg-transparent">Ready to Ascend?</p>
-          <h2 className="relative font-display text-[clamp(3rem,8vw,6rem)] leading-none">
-            Let&rsquo;s Create Something{" "}
-            <span className="ethereal-text">Ethereal</span>
-          </h2>
-          <p className="relative mx-auto mt-8 max-w-lg text-[1rem] leading-[1.9] opacity-70">
-            Share your vision with us. We&rsquo;ll gently weave it into reality — elegant, seamless, and beautifully on-brand.
-          </p>
-
-          {/* Email CTA */}
-          <a
-            href="mailto:hello@prominenceva.com"
-            className="relative mt-12 inline-flex"
-          >
-            <span className="pill-btn-solid gap-4 text-[0.95rem] !px-[36px] !py-[16px]">
-              <Mail size={16} />
-              hello@prominenceva.com
-            </span>
-          </a>
-
-          {/* Quick trust signals */}
-          <div className="relative mt-16 flex flex-wrap justify-center gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {[
-              "Response within 24h",
-              "No heavy contracts",
-              "Curated for visionaries",
-            ].map((t) => (
-              <div key={t} className="flex items-center gap-3 text-[10px] font-semibold uppercase tracking-[0.2em] opacity-50">
-                <div className="w-1.5 h-1.5 rounded-full bg-[var(--accent-lavender)] shadow-[0_0_8px_var(--accent-lavender)]" />
-                {t}
+              { id: 1, img: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop", title: "Core Dashboard", subtitle: "Infrastructure" },
+              { id: 2, img: "https://images.unsplash.com/photo-1558655146-d09347e92766?q=80&w=2000&auto=format&fit=crop", title: "System Reel '25", subtitle: "Video Production" },
+              { id: 3, img: "https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?q=80&w=2000&auto=format&fit=crop", title: "Identity Phase II", subtitle: "Creative Design" },
+              { id: 4, img: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=2000&auto=format&fit=crop", title: "App Stack", subtitle: "Development" },
+            ].map((project) => (
+              <div key={project.id} ref={addToRefs} className="group relative aspect-[4/3] rounded-[2rem] overflow-hidden bg-[#020104] border border-white/10 border-b-black/80 shadow-[0_20px_50px_rgba(0,0,0,0.9),inset_0_1px_2px_rgba(255,255,255,0.15)] cursor-pointer hover:shadow-[0_35px_70px_rgba(168,85,247,0.4),inset_0_1px_3px_rgba(255,255,255,0.3)] hover:-translate-y-2 transition-all duration-700 perspective-[1000px]">
+                <div
+                  className="absolute inset-[-10%] bg-cover bg-center transform group-hover:scale-105 transition-transform duration-[3s] ease-out opacity-70 group-hover:opacity-100"
+                  style={{ backgroundImage: `url(${project.img})` }}
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#020104] via-[#020104]/80 to-transparent opacity-90 group-hover:opacity-60 transition-opacity duration-1000" />
+                <div className="absolute bottom-0 inset-x-0 p-8 md:p-10 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-700 ease-out z-20">
+                  <div className="flex items-end justify-between">
+                    <div>
+                      <div className="text-purple-300 text-[9px] font-bold tracking-[0.3em] uppercase mb-3 opacity-80 group-hover:opacity-100 transition-opacity duration-700 delay-100">{project.subtitle}</div>
+                      <h3 className="text-xl md:text-2xl font-medium text-white drop-shadow-lg">{project.title}</h3>
+                    </div>
+                    <div className={`w-10 h-10 rounded-full ${raisedTactileBox} flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-500 delay-100 group-hover:scale-110`}>
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
+                    </div>
+                  </div>
+                </div>
               </div>
             ))}
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* ── Scripture Banner ── */}
-      <ScriptureBanner />
+        {/* ================================================================ */}
+        {/* TESTIMONIALS                                                      */}
+        {/* Color: Deep plum / rose                                          */}
+        {/* ================================================================ */}
+        <section id="testimonials" className="py-32 px-6 max-w-6xl mx-auto relative z-20 pl-6 md:pl-32">
+          <div className="absolute inset-0 pointer-events-none -z-10"
+            style={{ background: "radial-gradient(ellipse 80% 60% at 85% 45%, rgba(157,23,77,0.12) 0%, rgba(109,40,217,0.1) 40%, transparent 70%)" }}
+          />
 
-      {/* ══════════════════════════════════════════
-          FOOTER
-          ══════════════════════════════════════════ */}
-      <footer className="border-t border-[var(--glass-border)] bg-[var(--surface-1)] py-16 relative z-20">
-        <div className="mx-auto w-[94%] max-w-5xl">
-          <div className="mb-14 grid gap-10 sm:grid-cols-3">
-            {/* Brand */}
-            <div>
-              <p className="font-display text-[1.1rem] tracking-[0.25em] ethereal-text">PROMINENCE VA</p>
-              <p className="mt-4 text-[0.85rem] leading-[1.9] opacity-50 max-w-[220px]">
-                Ethereal virtual services for creators and visionary brands.
-              </p>
-              <p className="mt-4 text-[0.85rem] opacity-50">hello@prominenceva.com</p>
-            </div>
+          <div ref={addToRefs} className="mb-20 flex flex-col items-center text-center border-b border-white/[0.05] pb-10">
+            <div className="text-rose-400/70 text-[9px] font-bold tracking-[0.3em] uppercase mb-6">Impact Validation</div>
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-medium mb-6 drop-shadow-xl">Proven Elevation</h2>
+            <p className="text-white/60 max-w-2xl text-sm md:text-base font-light">The mathematical results of diligent hands and unyielding service.</p>
+          </div>
 
-            {/* Links */}
-            <div>
-              <p className="overline-label mb-6">Navigation</p>
-              <div className="flex flex-col gap-3">
-                {["about", "services", "projects", "team", "process", "contact"].map((id) => (
-                  <a
-                    key={id}
-                    href={`#${id}`}
-                    className="text-[0.85rem] font-medium capitalize opacity-60 transition hover:text-[var(--accent-lavender)] hover:opacity-100"
-                  >
-                    {id}
-                  </a>
-                ))}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {[
+              { quote: "Prominence completely restructured our backend while flawlessly handling our media. True silent partners in our growth trajectory.", author: "Tech Startup CEO" },
+              { quote: "Their work ethic aligns precisely with their values. Diligent, brilliant, and proactive. They don't just execute tasks; they elevate the standard.", author: "Agency Director" },
+              { quote: "The video production quality was purely cinematic, and the web integration was seamless. A truly unified, ethereal service.", author: "E-Commerce Founder" },
+            ].map((testimonial, i) => (
+              <div key={i} ref={addToRefs} className={`${skeuoGlassCard} flex flex-col justify-between group`}>
+                <div>
+                  <Quotes className="w-10 h-10 text-purple-500/40 mb-8 group-hover:text-purple-400/80 transition-colors duration-500" weight="duotone" />
+                  <p className="text-white/80 text-sm md:text-base leading-relaxed font-light mb-10 group-hover:text-white transition-colors duration-500">"{testimonial.quote}"</p>
+                </div>
+                <div className="text-[9px] uppercase tracking-[0.3em] font-bold text-purple-400/90 group-hover:text-purple-300 transition-colors">
+                  — {testimonial.author}
+                </div>
               </div>
-            </div>
+            ))}
+          </div>
+        </section>
 
-            {/* Social */}
-            <div>
-              <p className="overline-label mb-6">Follow Along</p>
-              <div className="flex flex-wrap gap-3">
-                {[
-                  { label: "Instagram", href: "https://instagram.com" },
-                  { label: "Facebook",  href: "https://facebook.com"  },
-                  { label: "LinkedIn",  href: "https://linkedin.com"  },
-                ].map((s) => (
-                  <a
-                    key={s.label}
-                    href={s.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="pill-btn !py-[8px] !px-[16px] !text-[9.5px] opacity-70 hover:opacity-100"
-                  >
-                    {s.label} <ExternalLink size={10} />
-                  </a>
-                ))}
+        {/* ================================================================ */}
+        {/* CONTACT — Phase 05                                               */}
+        {/* Color: Rich purple / gold warmth                                 */}
+        {/* ================================================================ */}
+        <section id="contact" className="py-32 px-6 max-w-6xl mx-auto relative z-20 pl-6 md:pl-32">
+          <div ref={addToRefs} className="bg-gradient-to-b from-white/[0.04] to-[#010002]/95 backdrop-blur-[80px] border border-white/10 border-b-black/80 rounded-[3rem] p-10 md:p-16 shadow-[0_50px_100px_-20px_rgba(0,0,0,1),inset_0_1px_3px_rgba(255,255,255,0.2)] relative overflow-hidden group perspective-[1000px]">
+            <div className="absolute -top-40 -right-40 w-[600px] h-[600px] rounded-full blur-[180px] pointer-events-none group-hover:opacity-100 opacity-70 transition-opacity duration-1000"
+              style={{ background: "radial-gradient(circle at center, rgba(109,40,217,0.35) 0%, transparent 70%)" }} />
+            <div className="absolute -bottom-40 -left-40 w-[500px] h-[500px] rounded-full blur-[150px] pointer-events-none group-hover:opacity-100 opacity-60 transition-opacity duration-1000"
+              style={{ background: "radial-gradient(circle at center, rgba(67,56,202,0.3) 0%, transparent 70%)" }} />
+            {/* Gold warmth hint */}
+            <div className="absolute bottom-0 right-0 w-[400px] h-[400px] rounded-full blur-[160px] pointer-events-none opacity-30"
+              style={{ background: "radial-gradient(circle at center, rgba(251,191,36,0.12) 0%, transparent 70%)" }} />
+
+            <div className="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center" ref={addParallaxRef} data-speed="0.05">
+              <div>
+                <div className="text-white/70 text-[9px] font-bold tracking-[0.3em] uppercase mb-6 flex items-center gap-4">
+                  <div className="w-12 h-[1px] bg-white/50" /> Phase 05: Engage
+                </div>
+                <h2 className="text-4xl md:text-5xl lg:text-6xl font-medium mb-8 leading-[1.05] drop-shadow-2xl">Initiate <br /> Connection.</h2>
+                <p className="text-white/60 text-sm md:text-base font-light leading-relaxed mb-12">
+                  Ready to integrate Prominence into your ecosystem? Transmit your signal to schedule a high-level infrastructure review.
+                </p>
+                <div className="space-y-8">
+                  <div className="flex items-center gap-6 text-sm font-light text-white/90">
+                    <div className={`w-12 h-12 rounded-xl ${raisedTactileBox} flex items-center justify-center shadow-[0_4px_15px_rgba(217,70,239,0.3),inset_0_1px_2px_rgba(255,255,255,0.4)]`}>
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-fuchsia-300"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" /></svg>
+                    </div>
+                    <span className="tracking-wide">System Priority Access</span>
+                  </div>
+                  <div className="flex items-center gap-6 text-sm font-light text-white/90">
+                    <div className={`w-12 h-12 rounded-xl ${raisedTactileBox} flex items-center justify-center shadow-[0_4px_15px_rgba(217,70,239,0.3),inset_0_1px_2px_rgba(255,255,255,0.4)]`}>
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-fuchsia-300"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" /><polyline points="22,6 12,13 2,6" /></svg>
+                    </div>
+                    <span className="tracking-wide">direct@prominence.co</span>
+                  </div>
+                </div>
               </div>
+
+              <form onSubmit={handleContactSubmit} className={`space-y-6 ${recessedWell} p-8 md:p-12 rounded-[2.5rem]`}>
+                <input type="text" placeholder="Nomenclature (Name)" value={formData.name} onChange={(e) => setFormData((p) => ({ ...p, name: e.target.value }))} required
+                  className={`w-full ${recessedWell} rounded-2xl px-6 py-4 text-sm text-white placeholder:text-white/40 focus:outline-none focus:border-fuchsia-500/60 focus:bg-white/[0.04] transition-all`} />
+                <input type="email" placeholder="Transmission Vector (Email)" value={formData.email} onChange={(e) => setFormData((p) => ({ ...p, email: e.target.value }))} required
+                  className={`w-full ${recessedWell} rounded-2xl px-6 py-4 text-sm text-white placeholder:text-white/40 focus:outline-none focus:border-fuchsia-500/60 focus:bg-white/[0.04] transition-all`} />
+                <textarea placeholder="Operational Intent (Message)" rows={4} value={formData.message} onChange={(e) => setFormData((p) => ({ ...p, message: e.target.value }))} required
+                  className={`w-full ${recessedWell} rounded-2xl px-6 py-4 text-sm text-white placeholder:text-white/40 focus:outline-none focus:border-fuchsia-500/60 focus:bg-white/[0.04] transition-all resize-none`} />
+                <button type="submit" disabled={formStatus === "sending"}
+                  className={`${skeuoButton} w-full mt-4 py-4
+                    ${formStatus === "sending" ? "opacity-60 cursor-wait" : ""}
+                    ${formStatus === "success" ? "!from-emerald-400 !to-emerald-600 !text-white" : ""}
+                    ${formStatus === "error" ? "!from-red-400 !to-red-600 !text-white" : ""}`}>
+                  {formStatus === "idle" && "Transmit Signal"}
+                  {formStatus === "sending" && "Transmitting..."}
+                  {formStatus === "success" && "✓ Signal Received"}
+                  {formStatus === "error" && "✗ Transmission Failed"}
+                </button>
+              </form>
+            </div>
+          </div>
+        </section>
+
+        {/* ================================================================ */}
+        {/* SCRIPTURE BANNER — Foundation (anchored at end)                  */}
+        {/* ================================================================ */}
+        <div className="relative z-40 py-16 overflow-hidden">
+          {/* Ambient glow above/below */}
+          <div className="absolute inset-0 pointer-events-none"
+            style={{ background: "linear-gradient(to bottom, transparent, rgba(49,10,101,0.12) 40%, rgba(49,10,101,0.12) 60%, transparent)" }}
+          />
+          <div className="absolute inset-x-0 top-0 h-[1px] bg-gradient-to-r from-transparent via-purple-800/40 to-transparent" />
+          <div className="absolute inset-x-0 bottom-0 h-[1px] bg-gradient-to-r from-transparent via-purple-800/40 to-transparent" />
+
+          {/* Label */}
+          <div className="text-center mb-10">
+            <div className="inline-flex items-center gap-4 px-5 py-2 rounded-full border border-white/[0.06] bg-white/[0.02]">
+              <div className="w-1 h-1 rounded-full bg-purple-500/60" />
+              <span className="text-[8px] tracking-[0.5em] text-white/25 uppercase font-semibold">Foundation — The Word</span>
+              <div className="w-1 h-1 rounded-full bg-purple-500/60" />
             </div>
           </div>
 
-          {/* Bottom bar */}
-          <div className="section-divider-subtle mb-8" />
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <p className="text-[10px] uppercase tracking-[0.25em] opacity-40">
-              &copy; {new Date().getFullYear()} Prominence VA. All rights reserved.
-            </p>
-            <p className="text-[10px] uppercase tracking-[0.25em] opacity-40">
-              Crafted with ether &amp; intent.
-            </p>
+          {/* Marquee */}
+          <div className="flex whitespace-nowrap overflow-hidden">
+            <div ref={marqueeRef} className="flex gap-16 items-center px-8">
+              {[...scriptures, ...scriptures].map((text, i) => (
+                <span key={i} className="text-[9px] font-semibold tracking-[0.32em] text-white/30 uppercase">
+                  {text}
+                </span>
+              ))}
+            </div>
           </div>
         </div>
-      </footer>
-    </main>
+
+        {/* ================================================================ */}
+        {/* FOOTER                                                            */}
+        {/* ================================================================ */}
+        <footer className="py-20 text-center text-white/50 text-[9px] tracking-[0.4em] uppercase relative z-10 bg-black">
+          <div className="flex items-center justify-center gap-6 mb-8">
+            <div className="w-1.5 h-1.5 rounded-full bg-white/30" />
+            <div className="w-2.5 h-2.5 rounded-full bg-white/80 shadow-[0_0_20px_rgba(255,255,255,1)] animate-pulse" />
+            <div className="w-1.5 h-1.5 rounded-full bg-white/30" />
+          </div>
+          <p className="opacity-90 font-bold">© {new Date().getFullYear()} Prominence. All operational rights reserved.</p>
+          <p className="mt-4 opacity-50">Olongapo City, 2200</p>
+        </footer>
+      </main>
+    </>
   );
 }
