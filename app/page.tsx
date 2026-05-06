@@ -1,10 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState, useMemo } from "react";
+import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { Canvas, useFrame } from "@react-three/fiber";
-import * as THREE from "three";
 import { db } from "@/lib/firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import {
@@ -15,7 +13,6 @@ import {
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
-  (window as any).globalScrollProgress = 0;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -210,265 +207,134 @@ const ProminenceLoader = ({ onComplete }: { onComplete: () => void }) => {
 };
 
 /* -------------------------------------------------------------------------- */
-/* HERO ENERGY ARCS (SVG Overlay)                                             */
+/* MOUNTAIN PARALLAX BACKGROUND                                                */
 /* -------------------------------------------------------------------------- */
-const HeroEnergyArcs = () => (
-  <div className="absolute inset-0 z-[5] pointer-events-none overflow-hidden">
-    <svg
-      className="w-full h-full"
-      viewBox="0 0 1440 900"
-      preserveAspectRatio="xMidYMid slice"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <defs>
-        <filter id="arcGlow" x="-40%" y="-40%" width="180%" height="180%">
-          <feGaussianBlur stdDeviation="2" result="blur" />
-          <feMerge>
-            <feMergeNode in="blur" />
-            <feMergeNode in="SourceGraphic" />
-          </feMerge>
-        </filter>
-        <style>{`
-          @keyframes travel1 {
-            0%   { stroke-dashoffset: 1400; opacity: 0; }
-            4%   { opacity: 1; }
-            96%  { opacity: 0.75; }
-            100% { stroke-dashoffset: -180; opacity: 0; }
-          }
-          @keyframes travel2 {
-            0%   { stroke-dashoffset: 1100; opacity: 0; }
-            4%   { opacity: 0.85; }
-            96%  { opacity: 0.5; }
-            100% { stroke-dashoffset: -150; opacity: 0; }
-          }
-          @keyframes travel3 {
-            0%   { stroke-dashoffset: 1250; opacity: 0; }
-            4%   { opacity: 0.6; }
-            96%  { opacity: 0.35; }
-            100% { stroke-dashoffset: -160; opacity: 0; }
-          }
-          @keyframes nodePing {
-            0%   { transform: scale(1); opacity: 0.8; }
-            60%  { transform: scale(4); opacity: 0; }
-            100% { transform: scale(1); opacity: 0; }
-          }
-          @keyframes nodeBeat {
-            0%,100% { opacity: 0.45; }
-            50%     { opacity: 1; }
-          }
-        `}</style>
-      </defs>
+const MountainParallax = () => {
+  const mountainContainerRef = useRef<HTMLDivElement>(null);
+  const farRef = useRef<HTMLDivElement>(null);
+  const midRef = useRef<HTMLDivElement>(null);
+  const nearRef = useRef<HTMLDivElement>(null);
+  const hazeRef = useRef<HTMLDivElement>(null);
+  const blurOverlayRef = useRef<HTMLDivElement>(null);
 
-      {/* ── Base arcs (subtle static) ── */}
-      <path d="M 70,220 C 330,90 680,190 990,330 C 1195,430 1370,370 1445,285" fill="none" stroke="rgba(168,85,247,0.08)" strokeWidth="1" />
-      <path d="M 0,530 C 250,445 570,565 855,495 C 1090,430 1275,555 1445,600" fill="none" stroke="rgba(217,70,239,0.06)" strokeWidth="1" />
-      <path d="M 1445,135 C 1155,65 850,210 555,155 C 295,100 95,250 0,315" fill="none" stroke="rgba(139,92,246,0.07)" strokeWidth="1" />
+  useEffect(() => {
+    if (!mountainContainerRef.current) return;
+    const ctx = gsap.context(() => {
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: "main",
+          start: "top top",
+          end: "bottom bottom",
+          scrub: 1.2,
+        },
+      });
 
-      {/* ── Traveling pulses ── */}
-      {/* Arc 1 — fast fuchsia */}
-      <path d="M 70,220 C 330,90 680,190 990,330 C 1195,430 1370,370 1445,285" fill="none" stroke="rgba(217,70,239,0.9)" strokeWidth="1.5" strokeDasharray="75 2000" filter="url(#arcGlow)" style={{ animation: "travel1 4.2s linear infinite" }} />
-      <path d="M 70,220 C 330,90 680,190 990,330 C 1195,430 1370,370 1445,285" fill="none" stroke="rgba(168,85,247,0.5)" strokeWidth="1" strokeDasharray="38 2000" filter="url(#arcGlow)" style={{ animation: "travel1 4.2s linear infinite", animationDelay: "2.1s" }} />
+      // Far mountains — slowest, scale up gently
+      tl.fromTo(farRef.current, { y: "0%", scale: 1 }, { y: "-15%", scale: 1.25 }, 0);
+      // Mid mountains — medium speed
+      tl.fromTo(midRef.current, { y: "0%", scale: 1 }, { y: "-25%", scale: 1.45 }, 0);
+      // Near mountains — fastest, biggest scale (approach effect)
+      tl.fromTo(nearRef.current, { y: "0%", scale: 1 }, { y: "-40%", scale: 1.8 }, 0);
+      // Haze clears as you approach
+      tl.fromTo(hazeRef.current, { opacity: 0.7 }, { opacity: 0 }, 0);
 
-      {/* Arc 2 — mid fuchsia */}
-      <path d="M 0,530 C 250,445 570,565 855,495 C 1090,430 1275,555 1445,600" fill="none" stroke="rgba(192,38,211,0.75)" strokeWidth="1.5" strokeDasharray="58 2000" filter="url(#arcGlow)" style={{ animation: "travel2 5.4s linear infinite", animationDelay: "1.1s" }} />
-
-      {/* Arc 3 — slower violet */}
-      <path d="M 1445,135 C 1155,65 850,210 555,155 C 295,100 95,250 0,315" fill="none" stroke="rgba(139,92,246,0.6)" strokeWidth="1" strokeDasharray="48 2000" filter="url(#arcGlow)" style={{ animation: "travel3 6.1s linear infinite", animationDelay: "0.6s" }} />
-
-      {/* ── Nodes ── */}
-      {([[70, 220], [990, 330], [1445, 285], [855, 495], [555, 155]] as [number, number][]).map(([cx, cy], i) => (
-        <g key={i}>
-          <circle cx={cx} cy={cy} r="6" fill="none" stroke="rgba(217,70,239,0.45)" strokeWidth="0.8"
-            style={{ transformOrigin: `${cx}px ${cy}px`, animation: `nodePing 2.8s ease-out infinite`, animationDelay: `${i * 0.55}s` }}
-          />
-          <circle cx={cx} cy={cy} r="2.2" fill="rgba(224,90,245,0.95)" filter="url(#arcGlow)"
-            style={{ animation: `nodeBeat 3s ease-in-out infinite`, animationDelay: `${i * 0.42}s` }}
-          />
-        </g>
-      ))}
-    </svg>
-  </div>
-);
-
-/* -------------------------------------------------------------------------- */
-/* THREE.JS SHADER — Deep Root / Vine System                                  */
-/* -------------------------------------------------------------------------- */
-const ElectricVine = () => {
-  const materialRef = useRef<THREE.ShaderMaterial>(null);
-  const numBranches = 100;
-  const segmentsPerBranch = 1000;
-  const particleCount = numBranches * segmentsPerBranch;
-  const vineLength = 120.0;
-
-  const [positions, randoms] = useMemo(() => {
-    const pos = new Float32Array(particleCount * 3);
-    const rnd = new Float32Array(particleCount);
-    for (let b = 0; b < numBranches; b++) {
-      const baseX = (Math.random() - 0.5) * 6.0;
-      const baseZ = (Math.random() - 0.5) * 6.0;
-      const bRandom = Math.random();
-      for (let s = 0; s < segmentsPerBranch; s++) {
-        const i = b * segmentsPerBranch + s;
-        const normalizedY = s / segmentsPerBranch;
-        pos[i * 3] = baseX;
-        pos[i * 3 + 1] = 2.0 - normalizedY * vineLength;
-        pos[i * 3 + 2] = baseZ;
-        rnd[i] = bRandom;
-      }
-    }
-    return [pos, rnd];
+      // Motion blur on scroll — increases with scroll velocity
+      let lastScroll = 0;
+      let blurTween: gsap.core.Tween | null = null;
+      const onScroll = () => {
+        const currentScroll = window.scrollY;
+        const velocity = Math.abs(currentScroll - lastScroll);
+        lastScroll = currentScroll;
+        const blurAmount = Math.min(velocity * 0.15, 12);
+        if (blurOverlayRef.current) {
+          if (blurTween) blurTween.kill();
+          blurTween = gsap.to(blurOverlayRef.current, {
+            filter: `blur(${blurAmount}px)`,
+            duration: 0.08,
+            ease: "none",
+            onComplete: () => {
+              gsap.to(blurOverlayRef.current, {
+                filter: "blur(0px)",
+                duration: 0.6,
+                ease: "power2.out",
+              });
+            },
+          });
+        }
+      };
+      window.addEventListener("scroll", onScroll, { passive: true });
+      return () => window.removeEventListener("scroll", onScroll);
+    }, mountainContainerRef);
+    return () => ctx.revert();
   }, []);
 
-  useFrame((state) => {
-    const scrollP = (window as any).globalScrollProgress || 0;
-    state.camera.position.y = -scrollP * vineLength;
-    if (materialRef.current) {
-      materialRef.current.uniforms.uTime.value = state.clock.elapsedTime;
-      materialRef.current.uniforms.uHeadY.value = 1.0 - scrollP * vineLength;
-    }
-  });
-
-  const vertexShader = `
-    uniform float uTime;
-    uniform float uHeadY;
-    attribute float aRandom;
-    varying vec3 vColor;
-    varying float vAlphaMask;
-
-    vec3 mod289(vec3 x){return x-floor(x*(1.0/289.0))*289.0;}
-    vec4 mod289(vec4 x){return x-floor(x*(1.0/289.0))*289.0;}
-    vec4 permute(vec4 x){return mod289(((x*34.0)+1.0)*x);}
-    vec4 taylorInvSqrt(vec4 r){return 1.79284291400159-0.85373472095314*r;}
-
-    float snoise(vec3 v){
-      const vec2 C=vec2(1.0/6.0,1.0/3.0);
-      const vec4 D=vec4(0.0,0.5,1.0,2.0);
-      vec3 i=floor(v+dot(v,C.yyy));
-      vec3 x0=v-i+dot(i,C.xxx);
-      vec3 g=step(x0.yzx,x0.xyz);
-      vec3 l=1.0-g;
-      vec3 i1=min(g.xyz,l.zxy);
-      vec3 i2=max(g.xyz,l.zxy);
-      vec3 x1=x0-i1+C.xxx;
-      vec3 x2=x0-i2+C.yyy;
-      vec3 x3=x0-D.yyy;
-      i=mod289(i);
-      vec4 p=permute(permute(permute(i.z+vec4(0.0,i1.z,i2.z,1.0))+i.y+vec4(0.0,i1.y,i2.y,1.0))+i.x+vec4(0.0,i1.x,i2.x,1.0));
-      float n_=0.142857142857;
-      vec3 ns=n_*D.wyz-D.xzx;
-      vec4 j=p-49.0*floor(p*ns.z*ns.z);
-      vec4 x_=floor(j*ns.z);
-      vec4 y_=floor(j-7.0*x_);
-      vec4 x=x_*ns.x+ns.yyyy;
-      vec4 y=y_*ns.x+ns.yyyy;
-      vec4 h=1.0-abs(x)-abs(y);
-      vec4 b0=vec4(x.xy,y.xy);
-      vec4 b1=vec4(x.zw,y.zw);
-      vec4 s0=floor(b0)*2.0+1.0;
-      vec4 s1=floor(b1)*2.0+1.0;
-      vec4 sh=-step(h,vec4(0.0));
-      vec4 a0=b0.xzyw+s0.xzyw*sh.xxyy;
-      vec4 a1=b1.xzyw+s1.xzyw*sh.zzww;
-      vec3 p0=vec3(a0.xy,h.x);
-      vec3 p1=vec3(a0.zw,h.y);
-      vec3 p2=vec3(a1.xy,h.z);
-      vec3 p3=vec3(a1.zw,h.w);
-      vec4 norm=taylorInvSqrt(vec4(dot(p0,p0),dot(p1,p1),dot(p2,p2),dot(p3,p3)));
-      p0*=norm.x; p1*=norm.y; p2*=norm.z; p3*=norm.w;
-      vec4 m=max(0.6-vec4(dot(x0,x0),dot(x1,x1),dot(x2,x2),dot(x3,x3)),0.0);
-      m=m*m;
-      return 42.0*dot(m*m,vec4(dot(p0,x0),dot(p1,x1),dot(p2,x2),dot(p3,x3)));
-    }
-
-    vec3 snoiseVec3(vec3 x){
-      return vec3(
-        snoise(vec3(x)),
-        snoise(vec3(x.y-19.1,x.z+33.4,x.x+47.2)),
-        snoise(vec3(x.z+74.2,x.x-124.5,x.y+99.4))
-      );
-    }
-
-    vec3 curlNoise(vec3 p){
-      const float e=0.1;
-      vec3 dx=vec3(e,0.0,0.0);
-      vec3 dy=vec3(0.0,e,0.0);
-      vec3 dz=vec3(0.0,0.0,e);
-      vec3 px0=snoiseVec3(p-dx),px1=snoiseVec3(p+dx);
-      vec3 py0=snoiseVec3(p-dy),py1=snoiseVec3(p+dy);
-      vec3 pz0=snoiseVec3(p-dz),pz1=snoiseVec3(p+dz);
-      float x=py1.z-py0.z-pz1.y+pz0.y;
-      float y=pz1.x-pz0.x-px1.z+px0.z;
-      float z=px1.y-px0.y-py1.x+py0.x;
-      return normalize(vec3(x,y,z)*(1.0/(2.0*e)));
-    }
-
-    void main(){
-      vec3 pos=position;
-      float distToHead=pos.y-uHeadY;
-      vAlphaMask=smoothstep(-2.0,2.0,distToHead);
-      if(vAlphaMask==0.0){gl_PointSize=0.0;gl_Position=vec4(0.0);return;}
-      float depthProgress=(2.0-pos.y)/120.0;
-      float expansion=pow(depthProgress,1.2)*20.0*aRandom;
-      vec2 dir=normalize(pos.xz+vec2(0.001));
-      pos.xz+=dir*expansion;
-      float noiseFreq=0.15;
-      float timeScale=0.2;
-      vec3 noisePos=vec3(pos.x,pos.y*0.5,pos.z)*noiseFreq+(aRandom*100.0);
-      vec3 curl=curlNoise(noisePos-vec3(0.0,uTime*timeScale,0.0));
-      pos+=curl*(2.0+depthProgress*6.0);
-      vec3 colorTail=vec3(0.2,0.0,0.6);
-      vec3 colorHead=vec3(0.9,0.4,1.0);
-      float colorMix=smoothstep(0.0,15.0,distToHead);
-      vColor=mix(colorHead,colorTail,colorMix);
-      vec4 mvPosition=modelViewMatrix*vec4(pos,1.0);
-      gl_PointSize=(4.0*vAlphaMask)*(15.0/-mvPosition.z);
-      gl_Position=projectionMatrix*mvPosition;
-    }
-  `;
-
-  const fragmentShader = `
-    varying vec3 vColor;
-    varying float vAlphaMask;
-    void main(){
-      if(vAlphaMask==0.0)discard;
-      vec2 uv=gl_PointCoord.xy-0.5;
-      float dist=length(uv);
-      if(dist>0.5)discard;
-      float alpha=(0.5-dist)*2.0;
-      gl_FragColor=vec4(vColor,alpha*0.08*vAlphaMask);
-    }
-  `;
-
   return (
-    <points>
-      <bufferGeometry>
-        <bufferAttribute attach="attributes-position" args={[positions, 3]} />
-        <bufferAttribute attach="attributes-aRandom" args={[randoms, 1]} />
-      </bufferGeometry>
-      <shaderMaterial
-        ref={materialRef}
-        uniforms={{ uTime: { value: 0 }, uHeadY: { value: 2.0 } }}
-        vertexShader={vertexShader}
-        fragmentShader={fragmentShader}
-        transparent
-        depthWrite={false}
-        blending={THREE.AdditiveBlending}
-      />
-    </points>
+    <div ref={mountainContainerRef} className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
+      {/* Base dark sky */}
+      <div className="absolute inset-0 bg-[#020104]" />
+
+      {/* Subtle starfield */}
+      <div className="absolute inset-0 opacity-[0.04]" style={{
+        backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
+      }} />
+
+      {/* Motion blur wrapper — this div gets blurred on fast scroll */}
+      <div ref={blurOverlayRef} className="absolute inset-0" style={{ willChange: "filter" }}>
+        {/* Sky gradient — deep purple to dark */}
+        <div className="absolute inset-0" style={{
+          background: "linear-gradient(to bottom, #020104 0%, #0a0320 20%, #150840 40%, #0d0525 70%, #020104 100%)",
+        }} />
+
+        {/* Far mountains layer */}
+        <div ref={farRef} className="absolute inset-x-0 bottom-0 h-[70vh] transform-gpu" style={{ willChange: "transform" }}>
+          <div className="absolute inset-0 bg-cover bg-bottom bg-no-repeat opacity-50" style={{
+            backgroundImage: "url('/images/mountains-far.png')",
+            filter: "brightness(0.6) saturate(0.8) hue-rotate(-10deg)",
+          }} />
+        </div>
+
+        {/* Mid mountains layer */}
+        <div ref={midRef} className="absolute inset-x-0 bottom-0 h-[65vh] transform-gpu" style={{ willChange: "transform" }}>
+          <div className="absolute inset-0 bg-cover bg-bottom bg-no-repeat opacity-65" style={{
+            backgroundImage: "url('/images/mountains-mid.png')",
+            filter: "brightness(0.5) saturate(0.9)",
+          }} />
+        </div>
+
+        {/* Near mountains layer */}
+        <div ref={nearRef} className="absolute inset-x-0 bottom-0 h-[60vh] transform-gpu" style={{ willChange: "transform" }}>
+          <div className="absolute inset-0 bg-cover bg-bottom bg-no-repeat opacity-80" style={{
+            backgroundImage: "url('/images/mountains-near.png')",
+            filter: "brightness(0.35) saturate(1.1)",
+          }} />
+        </div>
+      </div>
+
+      {/* Atmospheric haze overlay — clears on scroll */}
+      <div ref={hazeRef} className="absolute inset-0" style={{
+        background: "radial-gradient(ellipse 120% 80% at 50% 60%, rgba(88,28,135,0.25) 0%, rgba(20,5,50,0.4) 40%, rgba(2,1,4,0.6) 100%)",
+      }} />
+
+      {/* Bottom fog */}
+      <div className="absolute bottom-0 left-0 right-0 h-64" style={{
+        background: "linear-gradient(to top, rgba(2,1,4,1) 0%, rgba(2,1,4,0.8) 30%, transparent 100%)",
+      }} />
+    </div>
   );
 };
+
+
+
 
 /* -------------------------------------------------------------------------- */
 /* MAIN LANDING PAGE COMPONENT                                                */
 /* -------------------------------------------------------------------------- */
 export default function ProminenceLanding() {
   const containerRef = useRef<HTMLDivElement>(null);
-  const heroBgRef = useRef<HTMLDivElement>(null);
   const prominenceBrandRef = useRef<HTMLDivElement>(null);
   const marqueeRef = useRef<HTMLDivElement>(null);
 
   const revealRefs = useRef<HTMLDivElement[]>([]);
-  const fluidBlobsRef = useRef<HTMLDivElement[]>([]);
   const parallaxRefs = useRef<HTMLDivElement[]>([]);
 
   const [mounted, setMounted] = useState(false);
@@ -501,26 +367,6 @@ export default function ProminenceLanding() {
   useEffect(() => {
     if (!mounted) return;
     const ctx = gsap.context(() => {
-      ScrollTrigger.create({
-        trigger: containerRef.current,
-        start: "top top",
-        end: "bottom bottom",
-        onUpdate: (self) => { (window as any).globalScrollProgress = self.progress; },
-      });
-
-      fluidBlobsRef.current.forEach((blob) => {
-        gsap.to(blob, {
-          x: "random(-400, 400)",
-          y: "random(-400, 400)",
-          rotation: "random(-180, 180)",
-          scale: "random(1.1, 2.2)",
-          duration: "random(20, 38)",
-          ease: "sine.inOut",
-          repeat: -1,
-          yoyo: true,
-        });
-      });
-
       parallaxRefs.current.forEach((el) => {
         const speed = el.dataset.speed || "1";
         gsap.to(el, {
@@ -533,11 +379,6 @@ export default function ProminenceLanding() {
             scrub: true,
           },
         });
-      });
-
-      gsap.to(heroBgRef.current, {
-        y: "20%", opacity: 0, scale: 1.05, ease: "none",
-        scrollTrigger: { trigger: containerRef.current, start: "top top", end: "bottom top", scrub: true },
       });
 
       gsap.to(prominenceBrandRef.current, {
@@ -585,9 +426,6 @@ export default function ProminenceLanding() {
   const addToRefs = (el: HTMLDivElement | null) => {
     if (el && !revealRefs.current.includes(el)) revealRefs.current.push(el);
   };
-  const addFluidRef = (el: HTMLDivElement | null) => {
-    if (el && !fluidBlobsRef.current.includes(el)) fluidBlobsRef.current.push(el);
-  };
   const addParallaxRef = (el: HTMLDivElement | null) => {
     if (el && !parallaxRefs.current.includes(el)) parallaxRefs.current.push(el);
   };
@@ -615,33 +453,8 @@ export default function ProminenceLanding() {
         ref={containerRef}
         className="relative bg-[#020104] text-white font-sans overflow-hidden selection:bg-fuchsia-500/40 selection:text-white"
       >
-        {/* ── VINE ROOT SYSTEM (Three.js) ── */}
-        {mounted && (
-          <div className="fixed inset-0 w-full max-w-[800px] left-[-100px] z-10 pointer-events-none hidden md:block opacity-80 mix-blend-screen">
-            <Canvas camera={{ position: [0, 0, 5], fov: 45 }} gl={{ alpha: true, antialias: true }}>
-              <ElectricVine />
-            </Canvas>
-          </div>
-        )}
-
-        {/* ── GLOBAL LAVA LAMP LAYER ── */}
-        <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden bg-[#020104]">
-          <div
-            className="absolute inset-0 opacity-[0.04] mix-blend-overlay z-10"
-            style={{
-              backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
-            }}
-          />
-          {/* Orb 1 — deep violet */}
-          <div ref={addFluidRef} className="absolute top-[-10%] left-[5%] w-[70vw] h-[70vw] max-w-[1100px] max-h-[1100px] rounded-full mix-blend-color-dodge blur-[120px]"
-            style={{ background: "radial-gradient(circle at center, rgba(126,34,206,0.55) 0%, transparent 62%)" }} />
-          {/* Orb 2 — fuchsia */}
-          <div ref={addFluidRef} className="absolute bottom-[10%] right-[-10%] w-[80vw] h-[80vw] max-w-[1300px] max-h-[1300px] rounded-full mix-blend-screen blur-[140px]"
-            style={{ background: "radial-gradient(circle at center, rgba(217,70,239,0.35) 0%, transparent 62%)" }} />
-          {/* Orb 3 — indigo */}
-          <div ref={addFluidRef} className="absolute top-[40%] left-[30%] w-[60vw] h-[60vw] max-w-[900px] max-h-[900px] rounded-full mix-blend-color-dodge blur-[130px]"
-            style={{ background: "radial-gradient(circle at center, rgba(79,70,229,0.45) 0%, transparent 62%)" }} />
-        </div>
+        {/* ── MOUNTAIN PARALLAX BACKGROUND ── */}
+        {mounted && <MountainParallax />}
 
         {/* ── FLOATING NAV ── */}
         <nav className="fixed top-6 inset-x-0 z-50 flex justify-center px-4 pointer-events-none">
@@ -671,41 +484,9 @@ export default function ProminenceLanding() {
           onMouseMove={handleHeroMouseMove}
           onMouseLeave={handleHeroMouseLeave}
         >
-          {/* LAYER 0 — Deep background radial (coolest, most distant) */}
-          <div ref={heroBgRef} className="absolute inset-0 z-0 flex items-center justify-center opacity-90 pointer-events-none">
-            <div
-              className="w-[1600px] h-[1600px] rounded-full blur-[100px]"
-              style={{ background: "radial-gradient(circle at center, rgba(88,28,135,0.45) 0%, rgba(49,10,101,0.2) 40%, transparent 68%)" }}
-            />
-          </div>
-
-          {/* LAYER 1 — Golden hour warmth (warm light rising from below) */}
-          <div className="absolute inset-0 z-[1] pointer-events-none"
-            style={{ background: "radial-gradient(ellipse 130% 65% at 25% 115%, rgba(251,146,60,0.11) 0%, rgba(234,88,12,0.05) 38%, transparent 65%)" }}
-          />
-
-          {/* LAYER 2 — Perspective grid (midground) */}
-          <div className="absolute inset-0 z-[2] flex items-center justify-center pointer-events-none [transform:rotateX(60deg)_translateY(-150px)_scale(1.8)] opacity-25">
-            <div
-              className="absolute inset-0"
-              style={{
-                backgroundImage: "linear-gradient(rgba(255,255,255,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.06) 1px, transparent 1px)",
-                backgroundSize: "80px 80px",
-                maskImage: "radial-gradient(ellipse 60% 60% at 50% 50%, #000 30%, transparent 100%)",
-              }}
-            />
-          </div>
-
-          {/* LAYER 3 — Energy arcs (hero SVG pulse system) */}
-          <HeroEnergyArcs />
-
-          {/* LAYER 4 — Edge vignette / atmospheric fog */}
+          {/* Edge vignette */}
           <div className="absolute inset-0 z-[8] pointer-events-none"
             style={{ background: "radial-gradient(ellipse 92% 88% at 50% 50%, transparent 52%, rgba(2,1,4,0.5) 100%)" }}
-          />
-          {/* Bottom fog curl */}
-          <div className="absolute bottom-0 left-0 right-0 h-56 z-[9] pointer-events-none"
-            style={{ background: "linear-gradient(to top, rgba(2,1,4,0.7) 0%, transparent 100%)" }}
           />
 
           {/* LAYER 5 — Ghost brand typography (glassy watermark) */}
