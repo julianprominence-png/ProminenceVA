@@ -3,17 +3,28 @@
 :root {
   --bg-deep: #0a110f;
   --accent-purple: #9333ea;
+  --cloud-light: #ffffff;
+  --cloud-shadow: #f5f7fa;
 }
 
 html {
   scroll-behavior: smooth;
   background-color: var(--bg-deep);
   color: #ffffff;
+  overflow-x: hidden; /* Allow vertical but prevent horizontal */
 }
 
 body {
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  position: relative;
+}
+
+/* Prevent horizontal scroll from cloud overflow */
+body, #__next {
+  max-width: 100vw;
+  overflow-x: hidden;
 }
 
 /* Custom UI Utilities using Tailwind v4 @utility directive */
@@ -33,7 +44,7 @@ body {
   @apply bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-purple-600;
 }
 
-/* Subtle animated glow */
+/* Ethereal glow animation for clouds */
 @keyframes pulse-glow {
   0%, 100% { opacity: 0.4; }
   50% { opacity: 0.7; }
@@ -41,4 +52,54 @@ body {
 
 @utility animate-glow {
   animation: pulse-glow 6s ease-in-out infinite;
+}
+
+/* Floating animation */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+@utility animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+/* Subtle shimmer for light elements */
+@keyframes shimmer {
+  0% { opacity: 0.5; }
+  50% { opacity: 1; }
+  100% { opacity: 0.5; }
+}
+
+@utility animate-shimmer {
+  animation: shimmer 4s ease-in-out infinite;
+}
+
+/* Cinematic fade */
+@keyframes cinematic-fade {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@utility animate-cinematic-fade {
+  animation: cinematic-fade 1.2s ease-out forwards;
+}
+
+/* Performance optimization for 3D transforms */
+.will-change-transform {
+  will-change: transform;
+}
+
+/* Smooth scrolling for immersive experience */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+/* GPU acceleration for smooth animations */
+.gpu-accelerated {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
 }
