@@ -10,6 +10,25 @@ if (typeof window !== "undefined") {
 }
 
 /* -------------------------------------------------------------------------- */
+/* TEAM DATA                                                                  */
+/* -------------------------------------------------------------------------- */
+const teamData = {
+  ceo: {
+    name: "Vien Abache",
+    role: "CEO & Founder",
+    about: "Visionary leader driving innovation and pushing the boundaries of digital architecture. Orchestrating the intersection of design and robust engineering to build systems that scale."
+  },
+  members: [
+    { name: "Vinz Iligan", role: "Lead Engineer", about: "Architecting scalable backend systems and ensuring seamless data pipelines." },
+    { name: "Julian Tolentino", role: "Frontend Wizard", about: "Crafting pixel-perfect, interactive user interfaces with modern frameworks." },
+    { name: "Giervan Sabalbero", role: "Fullstack Dev", about: "Bridging the gap between intuitive frontends and powerful server logic." },
+    { name: "Andrea Turalba", role: "UI/UX Dev", about: "Translating complex user journeys into elegant, accessible web experiences." },
+    { name: "Gian Cruz", role: "Senior Editor", about: "Transforming raw concepts into cinematic, narrative-driven visual stories." },
+    { name: "Russel Minimo", role: "Motion Graphics", about: "Breathing life into static assets through fluid motion and dynamic effects." }
+  ]
+};
+
+/* -------------------------------------------------------------------------- */
 /* PROCEDURAL CLOUD DENSITY MAP                                               */
 /* -------------------------------------------------------------------------- */
 const createProceduralCloudTexture = () => {
@@ -190,6 +209,10 @@ export default function MountainLanding() {
   const [loaderDone, setLoaderDone] = useState(false);
   const [showPage, setShowPage] = useState(false);
 
+  // Form State
+  const [formData, setFormData] = useState({ name: "", email: "", message: "" });
+  const [submitStatus, setSubmitStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+
   const mountainBgRef = useRef<HTMLDivElement>(null);
   const uiWrapperRef = useRef<HTMLDivElement>(null);
   const floatingCardRef = useRef<HTMLDivElement>(null);
@@ -214,6 +237,31 @@ export default function MountainLanding() {
   const handleLoaderComplete = () => {
     setLoaderDone(true);
     setTimeout(() => setShowPage(true), 300);
+  };
+
+  const handleContactSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSubmitStatus("loading");
+    
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+
+      if (res.ok) {
+        setSubmitStatus("success");
+        setFormData({ name: "", email: "", message: "" });
+        setTimeout(() => setSubmitStatus("idle"), 4000);
+      } else {
+        setSubmitStatus("error");
+        setTimeout(() => setSubmitStatus("idle"), 4000);
+      }
+    } catch (error) {
+      setSubmitStatus("error");
+      setTimeout(() => setSubmitStatus("idle"), 4000);
+    }
   };
 
   /* --- THREE.JS CLOUD SETUP --- */
@@ -417,16 +465,13 @@ export default function MountainLanding() {
   useEffect(() => {
     if (!showPage) return;
     
-    // Initial States
     gsap.set(uiWrapperRef.current, { opacity: 0, y: -20 });
     gsap.set(floatingCardRef.current, { opacity: 0, x: -20 });
 
     const ctx = gsap.context(() => {
-      // Intro Animations
       gsap.to(uiWrapperRef.current, { opacity: 1, y: 0, duration: 1.2, ease: "power3.out", delay: 0.2 });
       gsap.to(floatingCardRef.current, { opacity: 1, x: 0, duration: 1.2, ease: "power3.out", delay: 0.4 });
 
-      // Parallax Hero
       if (mountainBgRef.current) {
         gsap.fromTo(mountainBgRef.current, { scale: 1.4 }, { 
           scale: 1.0, ease: "power2.out", 
@@ -434,13 +479,11 @@ export default function MountainLanding() {
         });
       }
 
-      // Fade out floating card on scroll
       gsap.to(floatingCardRef.current, {
         opacity: 0, x: -20, ease: "power2.in",
         scrollTrigger: { trigger: heroSpacerRef.current, start: "top -10%", end: "top -30%", scrub: true }
       });
 
-      // Services Fade Up
       if (servicesRef.current) {
         gsap.fromTo(servicesRef.current.children, 
             { opacity: 0, y: 40 },
@@ -448,35 +491,42 @@ export default function MountainLanding() {
         );
       }
 
-      // Team Morphing Cards
+      // Morphing Team Profile Cards
       const teamCards = gsap.utils.toArray('.team-card') as HTMLElement[];
       teamCards.forEach((card) => {
         const content = card.querySelector('.team-content');
         const img = card.querySelector('.team-img');
+        const bio = card.querySelector('.team-bio');
         
-        // Initial setup for the circle
         gsap.set(card, { width: '120px', height: '120px', borderRadius: '50%' });
         gsap.set(content, { opacity: 0, y: 20 });
+        gsap.set(bio, { opacity: 0, height: 0 });
         gsap.set(img, { scale: 1.2 });
 
         const tl = gsap.timeline({
           scrollTrigger: { trigger: card, start: "top 80%", toggleActions: "play none none reverse" }
         });
 
-        tl.to(card, { width: '100%', height: '320px', borderRadius: '24px', duration: 0.8, ease: "power3.inOut" })
+        tl.to(card, { width: '100%', height: '360px', borderRadius: '24px', duration: 0.8, ease: "power3.inOut" })
           .to(img, { scale: 1, duration: 0.8, ease: "power3.inOut" }, "<")
-          .to(content, { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" }, "-=0.3");
+          .to(content, { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" }, "-=0.3")
+          .to(bio, { opacity: 1, height: 'auto', duration: 0.4, ease: "power2.out" }, "-=0.2");
       });
 
-      // Tools Reveal
+      // Bouncy Float for Tools Columns
       if (toolsRef.current) {
         gsap.fromTo('.tool-column', 
-            { opacity: 0, y: 30 },
-            { opacity: 1, y: 0, duration: 0.8, stagger: 0.2, ease: "power2.out", scrollTrigger: { trigger: toolsRef.current, start: "top 80%" } }
+            { opacity: 0, y: 40 },
+            { opacity: 1, y: 0, duration: 0.8, stagger: 0.2, ease: "power2.out", scrollTrigger: { trigger: toolsRef.current, start: "top 80%" },
+              onComplete: () => {
+                gsap.to('.tool-column', {
+                  y: -15, duration: 2.5, ease: "sine.inOut", stagger: 0.2, repeat: -1, yoyo: true
+                });
+              }
+            }
         );
       }
 
-      // Projects Reveal
       if (projectsRef.current) {
         gsap.fromTo('.project-card', 
             { opacity: 0, scale: 0.95 },
@@ -484,7 +534,6 @@ export default function MountainLanding() {
         );
       }
       
-      // CTA Scale Up
       if (ctaRef.current) {
         gsap.fromTo(ctaRef.current, 
             { opacity: 0, scale: 0.9 },
@@ -496,53 +545,53 @@ export default function MountainLanding() {
     return () => ctx.revert();
   }, [showPage]);
 
-  // Styles
-  const neumorphicNavbar = "w-full max-w-4xl flex items-center justify-between rounded-full px-4 py-3 bg-white/10 backdrop-blur-xl border border-white/20 shadow-[0_8px_32px_rgba(0,0,0,0.2)]";
-  const neumorphicButton = "bg-white text-fuchsia-600 font-bold rounded-full px-6 py-2.5 text-[10px] uppercase tracking-widest shadow-[0_4px_15px_rgba(255,255,255,0.3)] hover:shadow-[0_4px_20px_rgba(192,132,252,0.5)] hover:scale-105 transition-all duration-300";
-  const glassCard = "bg-white/5 backdrop-blur-xl border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.1)] rounded-3xl p-8";
+  // Neumorphic System Styles (Base: #e6eaf0)
+  const neuOuter = "bg-[#e6eaf0] shadow-[12px_12px_24px_#c8d0e0,-12px_-12px_24px_#ffffff]";
+  const neuInner = "bg-[#e6eaf0] shadow-[inset_6px_6px_12px_#c8d0e0,inset_-6px_-6px_12px_#ffffff]";
+  const neuButton = "bg-[#e6eaf0] shadow-[6px_6px_12px_#c8d0e0,-6px_-6px_12px_#ffffff] hover:shadow-[8px_8px_16px_#c8d0e0,-8px_-8px_16px_#ffffff] active:shadow-[inset_4px_4px_8px_#c8d0e0,inset_-4px_-4px_8px_#ffffff] transition-all duration-300 text-fuchsia-600 font-bold uppercase tracking-widest";
+  const neuInput = "w-full bg-[#e6eaf0] shadow-[inset_6px_6px_12px_#c8d0e0,inset_-6px_-6px_12px_#ffffff] rounded-xl px-5 py-4 text-sm font-medium text-gray-700 outline-none focus:ring-2 focus:ring-fuchsia-500/30 transition-all border-none placeholder-gray-400";
 
   return (
     <>
       {!loaderDone && <TriangleLoader onComplete={handleLoaderComplete} />}
 
-      <div className={`relative min-h-[300vh] bg-[#f3f5f8] font-sans selection:bg-fuchsia-500/30 ${showPage ? 'opacity-100' : 'opacity-0'} transition-opacity duration-1000`}>
+      <div className={`relative min-h-[300vh] bg-[#e6eaf0] font-sans selection:bg-fuchsia-500/30 ${showPage ? 'opacity-100' : 'opacity-0'} transition-opacity duration-1000`}>
         
         {/* --- FIXED MOUNTAIN BACKGROUND LAYER --- */}
         <div className="fixed inset-0 z-0 pointer-events-none bg-[#020104]">
           <div ref={mountainBgRef} className="absolute inset-0 will-change-transform" style={{ backgroundImage: "url('/images/mountain.jpg')", backgroundSize: "cover", backgroundPosition: "center center", backgroundRepeat: "no-repeat", transform: "scale(1.4)" }} />
-          <div className="absolute inset-0 pointer-events-none opacity-60" style={{ background: "linear-gradient(to bottom, rgba(2,1,4,0.3) 0%, transparent 20%, transparent 80%, rgba(243,245,248,1) 100%)" }} />
+          <div className="absolute inset-0 pointer-events-none opacity-60" style={{ background: "linear-gradient(to bottom, rgba(2,1,4,0.3) 0%, transparent 20%, transparent 80%, #e6eaf0 100%)" }} />
         </div>
 
         {/* --- NAVBAR --- */}
         <div ref={uiWrapperRef} className="fixed top-6 inset-x-0 flex justify-center px-4 z-50 pointer-events-none">
-          <div className={`pointer-events-auto ${neumorphicNavbar}`}>
+          <div className={`pointer-events-auto w-full max-w-4xl flex items-center justify-between rounded-full px-4 py-3 ${neuOuter}`}>
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center border border-white/30 overflow-hidden relative">
-                {/* Fallback styling for icon-logo.png */}
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center overflow-hidden relative ${neuInner}`}>
                 <img src="/images/icon-logo.png" alt="Prominence" className="w-full h-full object-cover opacity-80" onError={(e) => e.currentTarget.style.display = 'none'} />
                 <div className="absolute w-2 h-2 rounded-full bg-fuchsia-500 animate-pulse mix-blend-screen" />
               </div>
-              <span className="font-black tracking-[0.2em] uppercase text-[11px] text-white drop-shadow-md">
+              <span className="font-black tracking-[0.2em] uppercase text-[11px] text-gray-800 drop-shadow-sm">
                 Prominence
               </span>
             </div>
-            <div className="hidden md:flex items-center gap-8 text-[9px] font-bold tracking-[0.2em] text-white/70 uppercase">
-              <a href="#services" className="hover:text-fuchsia-400 transition-colors duration-300">Services</a>
-              <a href="#team" className="hover:text-fuchsia-400 transition-colors duration-300">Team</a>
-              <a href="#tools" className="hover:text-fuchsia-400 transition-colors duration-300">Stack</a>
+            <div className="hidden md:flex items-center gap-8 text-[9px] font-bold tracking-[0.2em] text-gray-500 uppercase">
+              <a href="#services" className="hover:text-fuchsia-500 transition-colors duration-300">Services</a>
+              <a href="#team" className="hover:text-fuchsia-500 transition-colors duration-300">Team</a>
+              <a href="#tools" className="hover:text-fuchsia-500 transition-colors duration-300">Stack</a>
             </div>
-            <a href="#cta" className={neumorphicButton}>Contact Us</a>
+            <a href="#cta" className={`px-6 py-2.5 rounded-full text-[10px] ${neuButton}`}>Contact Us</a>
           </div>
         </div>
 
         {/* --- FLOATING INFO CARD --- */}
         <div ref={floatingCardRef} className="fixed bottom-10 left-10 z-50 pointer-events-none hidden lg:block">
-          <div className="pointer-events-auto bg-black/40 backdrop-blur-2xl border border-white/10 rounded-2xl p-6 w-72 shadow-[0_10px_40px_rgba(0,0,0,0.3)]">
+          <div className={`pointer-events-auto rounded-2xl p-6 w-72 ${neuOuter}`}>
             <div className="flex items-center gap-3 mb-3">
               <div className="w-2 h-2 rounded-full bg-fuchsia-500 shadow-[0_0_10px_rgba(217,70,239,0.8)] animate-pulse" />
-              <h4 className="text-white text-[10px] uppercase tracking-widest font-bold">Systems Online</h4>
+              <h4 className="text-gray-800 text-[10px] uppercase tracking-widest font-black">Systems Online</h4>
             </div>
-            <p className="text-white/60 text-xs leading-relaxed font-light">
+            <p className="text-gray-500 text-xs leading-relaxed font-medium">
               We build the foundations required to scale the highest peaks. Premium development, cinematic video editing, and modern graphics.
             </p>
           </div>
@@ -555,164 +604,261 @@ export default function MountainLanding() {
            <div ref={threeCanvasRef} className="absolute inset-0 w-full h-[150vh] -top-[50vh]" style={{ pointerEvents: "none", maskImage: "linear-gradient(to bottom, transparent 0%, black 15%, black 60%, transparent 85%)", WebkitMaskImage: "linear-gradient(to bottom, transparent 0%, black 15%, black 60%, transparent 85%)" }} />
         </div>
 
-        {/* --- MAIN CONTENT (LIGHT THEME) --- */}
-        <div className="relative z-30 w-full bg-[#f3f5f8] rounded-t-[3rem] -mt-10 pt-24 pb-32 px-6 sm:px-12 shadow-[0_-20px_40px_rgba(243,245,248,1)] overflow-hidden">
+        {/* --- MAIN CONTENT --- */}
+        <div className="relative z-30 w-full bg-[#e6eaf0] rounded-t-[3rem] -mt-10 pt-24 pb-32 px-6 sm:px-12 shadow-[0_-20px_40px_rgba(230,234,240,1)] overflow-hidden">
           
           {/* Section 1: Services */}
           <section id="services" className="max-w-6xl mx-auto pt-10 pb-32">
             <div className="text-center mb-20">
-              <h2 className="text-3xl md:text-5xl font-black uppercase tracking-[0.2em] text-gray-900 mb-6">The Ascent</h2>
+              <h2 className="text-3xl md:text-5xl font-black uppercase tracking-[0.2em] text-gray-800 mb-6 drop-shadow-sm">The Ascent</h2>
               <div className="w-px h-16 bg-gradient-to-b from-fuchsia-500 to-transparent mx-auto" />
             </div>
             
-            <div ref={servicesRef} className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div ref={servicesRef} className="grid grid-cols-1 md:grid-cols-3 gap-10">
               {[
                 { title: "Web Architecture", desc: "Forging highly optimized, scalable Next.js environments tailored for performance and aesthetics." },
                 { title: "Cinematic Edits", desc: "Transforming raw footage into premium, narrative-driven experiences that capture attention instantly." },
                 { title: "Brand Identity", desc: "Crafting visually striking graphic design systems using industry-standard tools to solidify your presence." }
               ].map((service, i) => (
-                <div key={i} className="bg-white p-10 rounded-3xl shadow-xl shadow-gray-200/50 border border-gray-100 hover:-translate-y-2 hover:shadow-fuchsia-500/10 transition-all duration-500 group">
-                  <div className="w-12 h-12 rounded-full bg-fuchsia-50 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                    <div className="w-4 h-4 bg-fuchsia-500 rounded-sm rotate-45" />
+                <div key={i} className={`p-10 rounded-[2rem] transition-all duration-500 group relative overflow-hidden ${neuOuter}`}>
+                  <div className="w-12 h-12 rounded-full flex items-center justify-center mb-6 group-hover:scale-110 transition-transform relative z-10 bg-[#e6eaf0] shadow-[6px_6px_12px_#c8d0e0,-6px_-6px_12px_#ffffff]">
+                    <div className="w-4 h-4 bg-fuchsia-500 rounded-sm rotate-45 shadow-[0_0_10px_rgba(217,70,239,0.3)]" />
                   </div>
-                  <h3 className="text-fuchsia-600 font-bold tracking-widest text-[11px] uppercase mb-4">{service.title}</h3>
-                  <p className="text-gray-500 text-sm leading-loose">{service.desc}</p>
+                  <h3 className="text-fuchsia-600 font-bold tracking-widest text-[11px] uppercase mb-4 relative z-10">{service.title}</h3>
+                  <p className="text-gray-500 text-sm leading-loose relative z-10 font-medium">{service.desc}</p>
                 </div>
               ))}
             </div>
           </section>
 
           {/* Section 2: Team */}
-          <section id="team" className="max-w-6xl mx-auto py-32 border-t border-gray-200/60">
-            <h2 className="text-3xl md:text-5xl font-black uppercase tracking-[0.2em] text-gray-900 mb-20 text-center">The Engine</h2>
+          <section id="team" className="max-w-6xl mx-auto py-32 border-t border-gray-300/30">
+            <h2 className="text-3xl md:text-5xl font-black uppercase tracking-[0.2em] text-gray-800 mb-20 text-center drop-shadow-sm">The Engine</h2>
             
-            {/* CEO */}
-            <div className="flex justify-center mb-16">
-              <div className="team-card relative bg-white shadow-xl shadow-gray-200/50 overflow-hidden flex flex-col items-center justify-end mx-auto border border-gray-100">
-                <div className="absolute inset-0 bg-gray-100 team-img transition-transform" />
-                <div className="team-content absolute bottom-0 inset-x-0 p-6 bg-gradient-to-t from-white via-white/90 to-transparent text-center">
-                  <h3 className="text-gray-900 font-black tracking-widest uppercase text-sm">Vien Abache</h3>
-                  <p className="text-fuchsia-600 text-[10px] tracking-[0.2em] font-bold mt-1">CEO & Founder</p>
+            {/* CEO HERO PROFILE */}
+            <div className="flex justify-center mb-24 px-4">
+              <div className={`relative w-full max-w-4xl rounded-[2.5rem] p-8 md:p-12 flex flex-col md:flex-row items-center gap-10 overflow-hidden group transition-shadow duration-500 ${neuOuter}`}>
+                
+                {/* Image Placeholder */}
+                <div className={`w-full md:w-5/12 h-[340px] rounded-[2rem] overflow-hidden relative flex-shrink-0 ${neuInner}`}>
+                  <div className="absolute inset-0 transition-transform duration-700 group-hover:scale-105" />
+                  <div className="absolute inset-0 flex items-center justify-center">
+                     <span className="text-gray-400 text-xs tracking-widest uppercase font-bold">Image_Placeholder</span>
+                  </div>
+                </div>
+                
+                {/* Content */}
+                <div className="w-full md:w-7/12 text-left z-10">
+                  <div className={`inline-block px-5 py-2 rounded-full mb-6 ${neuInner}`}>
+                    <p className="text-fuchsia-600 font-black tracking-[0.2em] uppercase text-[10px]">{teamData.ceo.role}</p>
+                  </div>
+                  <h3 className="text-4xl md:text-5xl font-black text-gray-800 tracking-wider uppercase mb-6 drop-shadow-sm">{teamData.ceo.name}</h3>
+                  <p className="text-gray-500 leading-relaxed text-sm md:text-base font-medium border-l-2 border-fuchsia-300 pl-6">
+                    {teamData.ceo.about}
+                  </p>
                 </div>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
-              {/* Developers */}
-              <div>
-                <h3 className="text-center text-[10px] font-bold tracking-[0.3em] uppercase text-gray-400 mb-8">Development</h3>
-                <div className="grid grid-cols-2 gap-6">
-                  {["Vinz Iligan", "Julian Tolentino", "Giervan Sabalbero", "Andrea Turalba"].map((name, i) => (
-                    <div key={i} className="team-card relative bg-white shadow-xl shadow-gray-200/50 overflow-hidden flex flex-col items-center justify-end mx-auto border border-gray-100">
-                      <div className="absolute inset-0 bg-gray-50 team-img transition-transform" />
-                      <div className="team-content absolute bottom-0 inset-x-0 p-5 bg-gradient-to-t from-white via-white/90 to-transparent text-center">
-                        <h3 className="text-gray-800 font-bold tracking-wider uppercase text-xs">{name}</h3>
-                        <p className="text-fuchsia-500 text-[9px] tracking-widest font-semibold mt-1">Engineer</p>
-                      </div>
+            {/* Unified Team Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-12 px-4">
+              {teamData.members.map((member, i) => (
+                <div key={i} className={`team-card relative overflow-hidden flex flex-col items-center justify-end mx-auto group ${neuOuter}`}>
+                  <div className={`absolute inset-0 team-img transition-transform duration-700 ${neuInner} m-4 rounded-[1.5rem]`} />
+                  
+                  <div className="team-content absolute bottom-0 inset-x-0 p-6 text-center flex flex-col justify-end bg-gradient-to-t from-[#e6eaf0] via-[#e6eaf0]/90 to-transparent">
+                    <h3 className="text-gray-800 font-black tracking-wider uppercase text-sm mb-1">{member.name}</h3>
+                    <p className="text-fuchsia-600 text-[10px] tracking-widest font-bold uppercase">{member.role}</p>
+                    <div className="team-bio overflow-hidden mt-3">
+                      <p className="text-gray-500 text-xs leading-relaxed font-medium">{member.about}</p>
                     </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Editors */}
-              <div>
-                <h3 className="text-center text-[10px] font-bold tracking-[0.3em] uppercase text-gray-400 mb-8">Post-Production</h3>
-                <div className="flex justify-center gap-6">
-                  {["Gian Cruz", "Russel Minimo"].map((name, i) => (
-                    <div key={i} className="team-card relative bg-white shadow-xl shadow-gray-200/50 overflow-hidden flex flex-col items-center justify-end border border-gray-100">
-                      <div className="absolute inset-0 bg-gray-50 team-img transition-transform" />
-                      <div className="team-content absolute bottom-0 inset-x-0 p-5 bg-gradient-to-t from-white via-white/90 to-transparent text-center">
-                        <h3 className="text-gray-800 font-bold tracking-wider uppercase text-xs">{name}</h3>
-                        <p className="text-fuchsia-500 text-[9px] tracking-widest font-semibold mt-1">Video Editor</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </section>
-
-          {/* Section 3: Tools */}
-          <section id="tools" className="max-w-6xl mx-auto py-32 border-t border-gray-200/60" ref={toolsRef}>
-            <div className="text-center mb-20">
-              <h2 className="text-3xl md:text-5xl font-black uppercase tracking-[0.2em] text-gray-900 mb-6">Ecosystem</h2>
-              <p className="text-gray-500 text-sm tracking-widest uppercase">The tools that forge our systems.</p>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
-              <div className="tool-column bg-white rounded-3xl p-8 border border-gray-100 shadow-xl shadow-gray-200/40">
-                <h3 className="text-fuchsia-600 font-bold tracking-widest text-[11px] uppercase mb-8 border-b border-gray-100 pb-4">Coding Tools</h3>
-                <ul className="space-y-4 text-sm font-semibold text-gray-600 tracking-wide">
-                  {['Next.js', 'VS Code', 'Firebase', 'Vercel'].map(tool => (
-                    <li key={tool} className="flex items-center gap-3 hover:text-fuchsia-500 hover:translate-x-2 transition-all cursor-default">
-                      <span className="w-1.5 h-1.5 rounded-full bg-gray-300" /> {tool}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <div className="tool-column bg-white rounded-3xl p-8 border border-gray-100 shadow-xl shadow-gray-200/40">
-                <h3 className="text-fuchsia-600 font-bold tracking-widest text-[11px] uppercase mb-8 border-b border-gray-100 pb-4">Video Editing</h3>
-                <ul className="space-y-4 text-sm font-semibold text-gray-600 tracking-wide">
-                  {['Canva', 'CapCut', 'Adobe Premiere'].map(tool => (
-                    <li key={tool} className="flex items-center gap-3 hover:text-fuchsia-500 hover:translate-x-2 transition-all cursor-default">
-                      <span className="w-1.5 h-1.5 rounded-full bg-gray-300" /> {tool}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <div className="tool-column bg-white rounded-3xl p-8 border border-gray-100 shadow-xl shadow-gray-200/40">
-                <h3 className="text-fuchsia-600 font-bold tracking-widest text-[11px] uppercase mb-8 border-b border-gray-100 pb-4">Graphics</h3>
-                <ul className="space-y-4 text-sm font-semibold text-gray-600 tracking-wide">
-                  {['Canva', 'Photoshop', 'Adobe Illustrator'].map(tool => (
-                    <li key={tool} className="flex items-center gap-3 hover:text-fuchsia-500 hover:translate-x-2 transition-all cursor-default">
-                      <span className="w-1.5 h-1.5 rounded-full bg-gray-300" /> {tool}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          </section>
-
-          {/* Section 4: Projects (Placeholder Grid) */}
-          <section id="projects" className="max-w-6xl mx-auto py-32 border-t border-gray-200/60">
-            <h2 className="text-3xl md:text-5xl font-black uppercase tracking-[0.2em] text-gray-900 mb-20 text-center">Selected Work</h2>
-            <div ref={projectsRef} className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {[1, 2, 3, 4].map((item) => (
-                <div key={item} className="project-card bg-gray-100/50 h-80 rounded-3xl border border-gray-200/50 flex flex-col items-center justify-center group hover:bg-white hover:shadow-2xl hover:shadow-gray-200/50 transition-all duration-500 cursor-pointer overflow-hidden relative">
-                  <div className="absolute inset-0 bg-gradient-to-br from-fuchsia-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                  <p className="text-gray-400 font-bold tracking-widest uppercase text-xs group-hover:text-fuchsia-500 transition-colors z-10">Project 0{item}</p>
+                  </div>
                 </div>
               ))}
             </div>
           </section>
 
-          {/* Section 5: CTA */}
-          <section id="cta" className="max-w-4xl mx-auto py-32 my-20" ref={ctaRef}>
-            <div className="bg-[#020104] rounded-[3rem] p-16 md:p-24 text-center relative overflow-hidden shadow-2xl shadow-fuchsia-900/20">
-              <div className="absolute inset-0 bg-gradient-to-b from-fuchsia-500/10 to-transparent pointer-events-none" />
-              <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-fuchsia-500 to-transparent opacity-50" />
+          {/* Section 3: Tools */}
+          <section id="tools" className="max-w-6xl mx-auto py-32 border-t border-gray-300/30" ref={toolsRef}>
+            <div className="text-center mb-24">
+              <h2 className="text-3xl md:text-5xl font-black uppercase tracking-[0.2em] text-gray-800 mb-6 drop-shadow-sm">Ecosystem</h2>
+              <p className="text-gray-500 text-sm tracking-widest uppercase font-medium">The tools that forge our systems.</p>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-10 px-4">
               
-              <h2 className="text-4xl md:text-6xl font-black uppercase tracking-[0.1em] text-white mb-6">Reach the Summit</h2>
-              <p className="text-white/60 text-sm md:text-base leading-relaxed tracking-wide font-light max-w-xl mx-auto mb-12">
-                Ready to elevate your digital presence? Partner with Prominence and let us build the systems that drive your success.
-              </p>
-              <button className="bg-fuchsia-600 text-white font-black rounded-full px-10 py-4 text-xs uppercase tracking-widest shadow-[0_0_30px_rgba(192,132,252,0.4)] hover:bg-fuchsia-500 hover:shadow-[0_0_40px_rgba(192,132,252,0.6)] hover:-translate-y-1 transition-all duration-300">
-                Book a Demo
-              </button>
+              {/* CODING TOOLS */}
+              <div className={`tool-column rounded-[2rem] p-10 ${neuOuter}`}>
+                <h3 className="text-fuchsia-600 font-black tracking-widest text-xs uppercase mb-8 border-b border-gray-300/50 pb-4">Engineering</h3>
+                <ul className="space-y-6 text-sm font-bold text-gray-600 tracking-wide">
+                  <li className="flex items-center gap-4 cursor-default">
+                    <div className={`p-2 rounded-lg ${neuInner}`}>
+                      <svg className="w-5 h-5 text-gray-700" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 22h20L12 2zm0 3.5L18.5 19h-13L12 5.5z"/></svg>
+                    </div>
+                    Next.js
+                  </li>
+                  <li className="flex items-center gap-4 cursor-default">
+                    <div className={`p-2 rounded-lg ${neuInner}`}>
+                      <svg className="w-5 h-5 text-blue-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="4 17 10 11 4 5"></polyline><line x1="12" y1="19" x2="20" y2="19"></line></svg>
+                    </div>
+                    VS Code
+                  </li>
+                  <li className="flex items-center gap-4 cursor-default">
+                    <div className={`p-2 rounded-lg ${neuInner}`}>
+                      <svg className="w-5 h-5 text-orange-400" viewBox="0 0 24 24" fill="currentColor"><path d="M11.5 2L7.5 10l-4 3 8 8 9-18-9-1z"/></svg>
+                    </div>
+                    Firebase
+                  </li>
+                  <li className="flex items-center gap-4 cursor-default">
+                    <div className={`p-2 rounded-lg ${neuInner}`}>
+                      <svg className="w-5 h-5 text-black" viewBox="0 0 24 24" fill="currentColor"><path d="M24 22.525H0l12-21.05 12 21.05z"/></svg>
+                    </div>
+                    Vercel
+                  </li>
+                </ul>
+              </div>
+
+              {/* VIDEO EDITING */}
+              <div className={`tool-column rounded-[2rem] p-10 ${neuOuter}`}>
+                <h3 className="text-fuchsia-600 font-black tracking-widest text-xs uppercase mb-8 border-b border-gray-300/50 pb-4">Post-Production</h3>
+                <ul className="space-y-6 text-sm font-bold text-gray-600 tracking-wide">
+                  <li className="flex items-center gap-4 cursor-default">
+                    <div className={`p-2 rounded-lg ${neuInner}`}>
+                      <svg className="w-5 h-5 text-purple-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect><line x1="7" y1="2" x2="7" y2="22"></line><line x1="17" y1="2" x2="17" y2="22"></line><line x1="2" y1="12" x2="22" y2="12"></line><line x1="2" y1="7" x2="7" y2="7"></line><line x1="2" y1="17" x2="7" y2="17"></line><line x1="17" y1="17" x2="22" y2="17"></line><line x1="17" y1="7" x2="22" y2="7"></line></svg>
+                    </div>
+                    CapCut
+                  </li>
+                  <li className="flex items-center gap-4 cursor-default">
+                    <div className={`p-2 rounded-lg ${neuInner}`}>
+                      <svg className="w-5 h-5 text-blue-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                    </div>
+                    Adobe Premiere
+                  </li>
+                  <li className="flex items-center gap-4 cursor-default">
+                    <div className={`p-2 rounded-lg ${neuInner}`}>
+                      <svg className="w-5 h-5 text-teal-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                    </div>
+                    DaVinci Resolve
+                  </li>
+                </ul>
+              </div>
+
+              {/* GRAPHICS */}
+              <div className={`tool-column rounded-[2rem] p-10 ${neuOuter}`}>
+                <h3 className="text-fuchsia-600 font-black tracking-widest text-xs uppercase mb-8 border-b border-gray-300/50 pb-4">Graphics</h3>
+                <ul className="space-y-6 text-sm font-bold text-gray-600 tracking-wide">
+                  <li className="flex items-center gap-4 cursor-default">
+                    <div className={`p-2 rounded-lg ${neuInner}`}>
+                      <svg className="w-5 h-5 text-blue-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="4"></circle><line x1="21.17" y1="8" x2="12" y2="8"></line><line x1="3.95" y1="6.06" x2="8.54" y2="14"></line><line x1="10.88" y1="21.94" x2="15.46" y2="14"></line></svg>
+                    </div>
+                    Canva
+                  </li>
+                  <li className="flex items-center gap-4 cursor-default">
+                    <div className={`p-2 rounded-lg ${neuInner}`}>
+                      <svg className="w-5 h-5 text-indigo-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                    </div>
+                    Photoshop
+                  </li>
+                  <li className="flex items-center gap-4 cursor-default">
+                    <div className={`p-2 rounded-lg ${neuInner}`}>
+                      <svg className="w-5 h-5 text-orange-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 19l7-7 3 3-7 7-3-3z"></path><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"></path><path d="M2 2l7.586 7.586"></path><circle cx="11" cy="11" r="2"></circle></svg>
+                    </div>
+                    Illustrator
+                  </li>
+                </ul>
+              </div>
+
+            </div>
+          </section>
+
+          {/* Section 4: Projects */}
+          <section id="projects" className="max-w-6xl mx-auto py-32 border-t border-gray-300/30">
+            <h2 className="text-3xl md:text-5xl font-black uppercase tracking-[0.2em] text-gray-800 mb-20 text-center drop-shadow-sm">Selected Work</h2>
+            <div ref={projectsRef} className="grid grid-cols-1 md:grid-cols-2 gap-10 px-4">
+              {[1, 2, 3, 4].map((item) => (
+                <div key={item} className={`project-card h-80 rounded-[2.5rem] flex flex-col items-center justify-center group cursor-pointer overflow-hidden relative ${neuOuter}`}>
+                  <div className={`absolute inset-6 rounded-[2rem] transition-transform duration-500 ${neuInner}`} />
+                  <p className="text-gray-500 font-bold tracking-widest uppercase text-sm z-10">Project 0{item}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          {/* Section 5: Contact Form (Functional CTA) */}
+          <section id="cta" className="max-w-4xl mx-auto py-32 my-10 px-4" ref={ctaRef}>
+            <div className={`rounded-[3rem] p-10 md:p-20 relative overflow-hidden ${neuOuter}`}>
+              <div className="text-center mb-12">
+                <h2 className="text-4xl md:text-5xl font-black uppercase tracking-[0.1em] text-gray-800 mb-4 drop-shadow-sm">Communicate</h2>
+                <p className="text-gray-500 text-sm md:text-base leading-relaxed tracking-wide font-medium max-w-lg mx-auto">
+                  Initialize a secure channel. Submit your parameters below to deploy our systems for your next operation.
+                </p>
+              </div>
+
+              <form onSubmit={handleContactSubmit} className="max-w-xl mx-auto space-y-6">
+                <div>
+                  <input 
+                    type="text" 
+                    required 
+                    placeholder="Identification (Name)" 
+                    className={neuInput}
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <input 
+                    type="email" 
+                    required 
+                    placeholder="Transmission Protocol (Email)" 
+                    className={neuInput}
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <textarea 
+                    required 
+                    placeholder="Payload (Message details)" 
+                    rows={5}
+                    className={`${neuInput} resize-none`}
+                    value={formData.message}
+                    onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                  ></textarea>
+                </div>
+
+                {submitStatus === "success" && (
+                  <p className="text-green-600 text-sm font-bold tracking-widest uppercase text-center">Transmission Successful.</p>
+                )}
+                {submitStatus === "error" && (
+                  <p className="text-red-500 text-sm font-bold tracking-widest uppercase text-center">Transmission Failed. Retrying...</p>
+                )}
+
+                <div className="flex justify-center pt-4">
+                  <button 
+                    type="submit" 
+                    disabled={submitStatus === "loading"}
+                    className={`px-12 py-4 rounded-full ${neuButton} ${submitStatus === "loading" ? "opacity-50 cursor-wait" : ""}`}
+                  >
+                    {submitStatus === "loading" ? "Transmitting..." : "Initiate Contact"}
+                  </button>
+                </div>
+              </form>
             </div>
           </section>
 
         </div>
 
         {/* --- FOOTER --- */}
-        <footer className="relative z-30 py-12 text-center text-gray-400 text-[9px] tracking-[0.4em] uppercase bg-white border-t border-gray-100 shadow-[0_-10px_30px_rgba(0,0,0,0.02)]">
+        <footer className="relative z-30 py-12 text-center text-gray-500 text-[9px] tracking-[0.4em] uppercase bg-[#e6eaf0] border-t border-gray-300/40">
           <div className="flex items-center justify-center gap-6 mb-6">
-            <div className="w-1.5 h-1.5 rounded-full bg-gray-300" />
-            <div className="w-2.5 h-2.5 rounded-full bg-fuchsia-500 animate-pulse shadow-[0_0_15px_rgba(217,70,239,0.4)]" />
-            <div className="w-1.5 h-1.5 rounded-full bg-gray-300" />
+            <div className={`w-2.5 h-2.5 rounded-full ${neuInner}`} />
+            <div className={`w-3.5 h-3.5 rounded-full flex items-center justify-center ${neuInner}`}>
+               <div className="w-1.5 h-1.5 rounded-full bg-fuchsia-500 animate-pulse shadow-[0_0_10px_rgba(217,70,239,0.5)]" />
+            </div>
+            <div className={`w-2.5 h-2.5 rounded-full ${neuInner}`} />
           </div>
-          <p className="opacity-90 font-bold text-gray-500">© {new Date().getFullYear()} Prominence. All operational rights reserved.</p>
-          <p className="mt-4 opacity-50">Olongapo City, 2200</p>
+          <p className="font-bold">© {new Date().getFullYear()} Prominence. All operational rights reserved.</p>
+          <p className="mt-4 font-medium">Olongapo City, 2200</p>
         </footer>
       </div>
     </>
