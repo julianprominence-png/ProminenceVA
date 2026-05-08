@@ -29,11 +29,11 @@ interface WorkItem {
 
 // ─── Static Data ──────────────────────────────────────────────────────────────
 const LILY_PADS: LilyPad[] = [
-  { id: 0, x: 6,  y: 18, size: 75, rotation: 22,  depth: 0.3, delay: 0   }, // top-left corner
-  { id: 1, x: 88, y: 12, size: 62, rotation: -18, depth: 0.5, delay: 0.5 }, // top-right corner
-  { id: 2, x: 92, y: 72, size: 82, rotation: 14,  depth: 0.6, delay: 0.2 }, // bottom-right
-  { id: 3, x: 4,  y: 80, size: 58, rotation: -35, depth: 0.4, delay: 0.8 }, // bottom-left
-  { id: 4, x: 50, y: 88, size: 52, rotation: 50,  depth: 0.7, delay: 0.4 }, // bottom-center
+  { id: 0, x: 6,  y: 18, size: 75, rotation: 22,  depth: 0.3, delay: 0   },
+  { id: 1, x: 88, y: 12, size: 62, rotation: -18, depth: 0.5, delay: 0.5 },
+  { id: 2, x: 92, y: 72, size: 82, rotation: 14,  depth: 0.6, delay: 0.2 },
+  { id: 3, x: 4,  y: 80, size: 58, rotation: -35, depth: 0.4, delay: 0.8 },
+  { id: 4, x: 50, y: 88, size: 52, rotation: 50,  depth: 0.7, delay: 0.4 },
 ];
 
 const WORKS: WorkItem[] = [
@@ -70,6 +70,9 @@ const TOOLS = [
   { logo: "DR", name: "DaVinci Resolve", color: "#ff6b6b", borderColor: "rgba(255,107,107,0.2)",     url: "https://www.blackmagicdesign.com/products/davinciresolve",             desc: "Professional colour grading and post-production suite. Where the grade lives and breathes." },
 ];
 
+// ─── Rounding helper — prevents SSR/client floating-point hydration mismatches
+const r = (n: number, decimals = 4) => parseFloat(n.toFixed(decimals));
+
 // ─── Main Component ───────────────────────────────────────────────────────────
 export default function VideoEditPage() {
   const [scrollY, setScrollY]     = useState(0);
@@ -82,11 +85,24 @@ export default function VideoEditPage() {
   const [ringPos, setRingPos]     = useState({ x: 0, y: 0 });
   const [cursorBig, setCursorBig] = useState(false);
 
-  const rippleId   = useRef(0);
-  const autoTimer  = useRef<ReturnType<typeof setInterval> | null>(null);
-  const ringRef    = useRef({ x: 0, y: 0 });
-  const targetRef  = useRef({ x: 0, y: 0 });
-  const rafRef     = useRef<number | null>(null);
+  const rippleId    = useRef(0);
+  const autoTimer   = useRef<ReturnType<typeof setInterval> | null>(null);
+  const ringRef     = useRef({ x: 0, y: 0 });
+  const targetRef   = useRef({ x: 0, y: 0 });
+  const rafRef      = useRef<number | null>(null);
+  // ── Refs for coordinate conversion
+  const waterSvgRef = useRef<SVGSVGElement | null>(null);
+  const lilySvgRef  = useRef<SVGSVGElement | null>(null);
+
+  // ── Convert screen pixel coords → SVG viewBox coords (0–100 space)
+  const svgToViewBox = useCallback((svgEl: SVGSVGElement, clientX: number, clientY: number) => {
+    const rect = svgEl.getBoundingClientRect();
+    const vb   = svgEl.viewBox.baseVal; // width:100, height:100
+    return {
+      x: ((clientX - rect.left) / rect.width)  * vb.width,
+      y: ((clientY - rect.top)  / rect.height) * vb.height,
+    };
+  }, []);
 
   // ── Scroll
   useEffect(() => {
@@ -154,14 +170,29 @@ export default function VideoEditPage() {
     return () => { if (autoTimer.current) clearInterval(autoTimer.current); };
   }, []);
 
-  // ── Ripple
+  // ── Ripple — takes SVG viewBox coords directly
   const addRipple = (x: number, y: number) => {
     const id = rippleId.current++;
     setRipples(prev => [...prev, { id, x, y }]);
     setTimeout(() => setRipples(prev => prev.filter(r => r.id !== id)), 2200);
   };
 
-  // ── Lily pad parallax transform — subtle, edge-only drift
+  // ── Handle click anywhere on the hero section → convert to viewBox coords
+  const handleHeroClick = useCallback((e: React.MouseEvent<SVGSVGElement>) => {
+    if (!waterSvgRef.current) return;
+    const { x, y } = svgToViewBox(waterSvgRef.current, e.clientX, e.clientY);
+    addRipple(x, y);
+  }, [svgToViewBox]);
+
+  // ── Handle lily pad click → use lily SVG for accurate conversion
+  const handleLilyClick = useCallback((e: React.MouseEvent<SVGGElement>) => {
+    e.stopPropagation(); // prevent double-firing with water layer
+    if (!lilySvgRef.current) return;
+    const { x, y } = svgToViewBox(lilySvgRef.current, e.clientX, e.clientY);
+    addRipple(x, y);
+  }, [svgToViewBox]);
+
+  // ── Lily pad parallax transform
   const padTransform = (pad: LilyPad) => {
     const mouseX = mousePos.x * pad.depth * 9;
     const mouseY = mousePos.y * pad.depth * 6;
@@ -174,7 +205,6 @@ export default function VideoEditPage() {
     if (formState.name && formState.email && formState.message) setSubmitted(true);
   };
 
-  // ── All Works duplicated for looping
   const allWorks = [...WORKS, ...WORKS];
 
   return (
@@ -582,12 +612,18 @@ export default function VideoEditPage() {
         overflow: "hidden",
       }}>
 
-        {/* ── Water canvas (hero only) ── */}
+        {/* ── Water canvas — receives all hero clicks for ripples ── */}
         <svg
-          style={{ position: "absolute", inset: 0, width: "100%", height: "100%", zIndex: 0, pointerEvents: "none" }}
+          ref={waterSvgRef}
+          style={{
+            position: "absolute", inset: 0, width: "100%", height: "100%",
+            zIndex: 0,
+            cursor: "crosshair",
+          }}
           viewBox="0 0 100 100"
           preserveAspectRatio="xMidYMid slice"
           xmlns="http://www.w3.org/2000/svg"
+          onClick={handleHeroClick}
         >
           <defs>
             <radialGradient id="waterGrad" cx="50%" cy="40%" r="70%">
@@ -622,7 +658,6 @@ export default function VideoEditPage() {
           <rect width="100" height="100" fill="url(#caustic)" style={{ animation: "shimmer 5s ease-in-out infinite", opacity: 0.6 }} />
           <rect width="100" height="100" fill="url(#caustic)" style={{ animation: "shimmer 9s ease-in-out infinite", transform: "rotate(45deg) scale(1.5)", transformOrigin: "50% 50%", opacity: 0.4 }} />
 
-          {/* Very faint horizontal shimmer lines — only 8 */}
           {Array.from({ length: 8 }, (_, i) => (
             <line key={i}
               x1="0" y1={10 + i * 10}
@@ -633,12 +668,11 @@ export default function VideoEditPage() {
             />
           ))}
 
-          {/* Soft glow blobs — very low opacity */}
           <ellipse cx="15"  cy="20" rx="22" ry="14" fill="rgba(80,20,160,0.08)"  filter="url(#blur4)" />
           <ellipse cx="85"  cy="75" rx="18" ry="11" fill="rgba(80,20,160,0.06)"  filter="url(#blur4)" />
           <ellipse cx="50"  cy="50" rx="15" ry="9"  fill="rgba(155,93,229,0.04)" filter="url(#blur4)" />
 
-          {/* Ripples */}
+          {/* ── Ripples rendered here — in viewBox coordinate space ── */}
           {ripples.map(r => (
             <g key={r.id}>
               <circle cx={r.x} cy={r.y} r="1" fill="none" stroke="rgba(155,93,229,0.9)" strokeWidth="0.5" style={{ animation: "rippleOut 2.2s ease-out forwards" }} />
@@ -648,9 +682,14 @@ export default function VideoEditPage() {
           ))}
         </svg>
 
-        {/* ── Lily Pads SVG layer ── */}
+        {/* ── Lily Pads SVG layer — separate layer, pointer-events enabled ── */}
         <svg
-          style={{ position: "absolute", inset: 0, width: "100%", height: "100%", zIndex: 1, overflow: "visible" }}
+          ref={lilySvgRef}
+          style={{
+            position: "absolute", inset: 0, width: "100%", height: "100%",
+            zIndex: 1, overflow: "visible",
+            pointerEvents: "none", // container ignores clicks; only <g> elements respond
+          }}
           viewBox="0 0 100 100"
           preserveAspectRatio="xMidYMid slice"
           xmlns="http://www.w3.org/2000/svg"
@@ -671,45 +710,50 @@ export default function VideoEditPage() {
                   animation: `float ${5 + pad.depth * 4}s ease-in-out ${pad.delay}s infinite`,
                   opacity,
                   willChange: "transform",
+                  pointerEvents: "all", // each pad is individually clickable
                 }}
-                onClick={() => addRipple(pad.x, pad.y)}
+                onClick={handleLilyClick}
               >
                 {/* Shadow */}
-                <ellipse cx={pad.x} cy={pad.y + s * 120} rx={s * 460} ry={s * 140} fill="rgba(0,0,0,0.3)" filter="url(#reflBlur)" />
+                <ellipse cx={pad.x} cy={r(pad.y + s*120)} rx={r(s*460)} ry={r(s*140)} fill="rgba(0,0,0,0.3)" filter="url(#reflBlur)" />
 
                 {/* Pad */}
                 <g transform={`translate(${pad.x},${pad.y}) rotate(${pad.rotation})`}>
-                  <ellipse cx={-s * 80} cy={-s * 100} rx={s * 175} ry={s * 95} fill="rgba(255,255,255,0.08)" style={{ filter: "blur(1px)" }} />
+                  <ellipse cx={r(-s*80)} cy={r(-s*100)} rx={r(s*175)} ry={r(s*95)} fill="rgba(255,255,255,0.08)" style={{ filter: "blur(1px)" }} />
                   <path
-                    d={`M 0 0 L ${s*500*Math.cos(Math.PI*0.15)} ${-s*500*Math.sin(Math.PI*0.15)} A ${s*500} ${s*500} 0 1 1 ${s*500*Math.cos(Math.PI*0.85)} ${-s*500*Math.sin(Math.PI*0.85)} Z`}
+                    d={`M 0 0 L ${r(s*500*Math.cos(Math.PI*0.15))} ${r(-s*500*Math.sin(Math.PI*0.15))} A ${r(s*500)} ${r(s*500)} 0 1 1 ${r(s*500*Math.cos(Math.PI*0.85))} ${r(-s*500*Math.sin(Math.PI*0.85))} Z`}
                     fill={pad.depth > 0.5 ? "url(#lilyGrad)" : "url(#lilyGradDeep)"}
                     stroke="rgba(82,183,136,0.25)"
-                    strokeWidth={s * 28}
+                    strokeWidth={r(s*28)}
                   />
                   {[0,40,80,120,160,200,240,280,320].map((angle, vi) => (
                     <line key={vi} x1="0" y1="0"
-                      x2={s*480*Math.cos((angle*Math.PI)/180)}
-                      y2={s*480*Math.sin((angle*Math.PI)/180)}
-                      stroke="rgba(82,183,136,0.2)" strokeWidth={s*10} />
+                      x2={r(s*480*Math.cos((angle*Math.PI)/180))}
+                      y2={r(s*480*Math.sin((angle*Math.PI)/180))}
+                      stroke="rgba(82,183,136,0.2)" strokeWidth={r(s*10)} />
                   ))}
                   {hasFlower && (
-                    <g transform={`translate(${-s*60},${-s*60})`}>
-                      {[0,72,144,216,288].map((a, fi) => (
-                        <ellipse key={fi}
-                          cx={s*80*Math.cos((a*Math.PI)/180)} cy={s*80*Math.sin((a*Math.PI)/180)}
-                          rx={s*88} ry={s*52} fill="url(#flowerGrad)" opacity="0.8"
-                          transform={`rotate(${a},${s*80*Math.cos((a*Math.PI)/180)},${s*80*Math.sin((a*Math.PI)/180)})`}
-                        />
-                      ))}
-                      <circle cx="0" cy="0" r={s*52} fill="#ffefd5" opacity="0.9" />
-                      <circle cx="0" cy="0" r={s*26} fill="#ffd700" opacity="0.85" />
+                    <g transform={`translate(${r(-s*60)},${r(-s*60)})`}>
+                      {[0,72,144,216,288].map((a, fi) => {
+                        const fcx = r(s*80*Math.cos((a*Math.PI)/180));
+                        const fcy = r(s*80*Math.sin((a*Math.PI)/180));
+                        return (
+                          <ellipse key={fi}
+                            cx={fcx} cy={fcy}
+                            rx={r(s*88)} ry={r(s*52)} fill="url(#flowerGrad)" opacity="0.8"
+                            transform={`rotate(${a},${fcx},${fcy})`}
+                          />
+                        );
+                      })}
+                      <circle cx="0" cy="0" r={r(s*52)} fill="#ffefd5" opacity="0.9" />
+                      <circle cx="0" cy="0" r={r(s*26)} fill="#ffd700" opacity="0.85" />
                     </g>
                   )}
                 </g>
 
                 {/* Reflection */}
-                <g transform={`translate(${pad.x},${pad.y+s*200}) rotate(${-pad.rotation}) scale(1,-0.3)`} opacity={reflOpacity} filter="url(#reflBlur)">
-                  <path d={`M 0 0 L ${s*500*Math.cos(Math.PI*0.15)} ${-s*500*Math.sin(Math.PI*0.15)} A ${s*500} ${s*500} 0 1 1 ${s*500*Math.cos(Math.PI*0.85)} ${-s*500*Math.sin(Math.PI*0.85)} Z`} fill="url(#lilyGrad)" />
+                <g transform={`translate(${pad.x},${r(pad.y+s*200)}) rotate(${-pad.rotation}) scale(1,-0.3)`} opacity={reflOpacity} filter="url(#reflBlur)">
+                  <path d={`M 0 0 L ${r(s*500*Math.cos(Math.PI*0.15))} ${r(-s*500*Math.sin(Math.PI*0.15))} A ${r(s*500)} ${r(s*500)} 0 1 1 ${r(s*500*Math.cos(Math.PI*0.85))} ${r(-s*500*Math.sin(Math.PI*0.85))} Z`} fill="url(#lilyGrad)" />
                 </g>
               </g>
             );
@@ -757,7 +801,7 @@ export default function VideoEditPage() {
         </div>
 
         {/* Hero content */}
-        <div style={{ position: "relative", zIndex: 5, maxWidth: 760 }}>
+        <div style={{ position: "relative", zIndex: 5, maxWidth: 760, pointerEvents: "none" }}>
           <div className="reveal" style={{ display: "flex", alignItems: "center", gap: "1rem", marginBottom: "2rem" }}>
             <div style={{
               width: 7, height: 7, borderRadius: "50%", background: "var(--purple)",
@@ -795,7 +839,7 @@ export default function VideoEditPage() {
             Cinematic storytelling through precision cutting, colour, and motion. Every frame is intentional. Every cut earns its place.
           </p>
 
-          <div className="reveal" style={{ display: "flex", gap: "1rem", marginTop: "3rem", flexWrap: "wrap", transitionDelay: "0.3s" }}>
+          <div className="reveal" style={{ display: "flex", gap: "1rem", marginTop: "3rem", flexWrap: "wrap", transitionDelay: "0.3s", pointerEvents: "all" }}>
             <a href="#reel" className="btn-primary"
               onMouseEnter={() => setCursorBig(true)} onMouseLeave={() => setCursorBig(false)}>
               View Works
@@ -828,6 +872,7 @@ export default function VideoEditPage() {
           color: "var(--text-muted)", fontSize: "0.62rem", letterSpacing: "0.3em",
           textTransform: "uppercase", zIndex: 5,
           opacity: Math.max(0, 1 - scrollY / 220),
+          pointerEvents: "none",
         }}>
           <div style={{
             width: 1, height: 50,
@@ -842,7 +887,6 @@ export default function VideoEditPage() {
           FILM STRIP REEL
       ════════════════════════════════════════ */}
       <section id="reel" style={{ padding: "7rem 0", background: "var(--bg)", position: "relative" }}>
-        {/* Header */}
         <div style={{
           padding: "0 clamp(2rem,7vw,7rem)",
           marginBottom: "3.5rem",
@@ -873,7 +917,6 @@ export default function VideoEditPage() {
           </div>
         </div>
 
-        {/* Film strip */}
         <div style={{ position: "relative", overflow: "hidden", padding: "16px 0" }}>
           <div className="reel-fade-left" />
           <div className="reel-fade-right" />
@@ -886,21 +929,16 @@ export default function VideoEditPage() {
             {allWorks.map((w, i) => (
               <div key={i} className="film-card"
                 onMouseEnter={() => setCursorBig(true)} onMouseLeave={() => setCursorBig(false)}>
-                {/* Top holes */}
                 <div className="film-holes">
                   {Array.from({ length: 9 }, (_, hi) => <div key={hi} className="hole" />)}
                 </div>
-
-                {/* Frame */}
                 <div className="film-frame">
                   <div className="film-frame-bg" style={{ background: w.gradient }} />
-
                   <div className="play-circle">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="var(--purple-light)">
                       <polygon points="5 3 19 12 5 21 5 3" />
                     </svg>
                   </div>
-
                   <div className="film-meta">
                     <span style={{ fontSize: "0.62rem", letterSpacing: "0.25em", textTransform: "uppercase", color: "var(--purple-light)", marginBottom: 4, display: "block" }}>
                       {w.cat}
@@ -910,15 +948,12 @@ export default function VideoEditPage() {
                     </div>
                     <span style={{ fontSize: "0.7rem", color: "rgba(255,255,255,0.35)", marginTop: 4, display: "block" }}>{w.dur}</span>
                   </div>
-
                   <span style={{
                     position: "absolute", top: 8, right: 12,
                     fontFamily: "'Bebas Neue', sans-serif", fontSize: "0.82rem",
                     color: "rgba(255,255,255,0.18)", letterSpacing: "0.1em", zIndex: 5,
                   }}>{w.num}</span>
                 </div>
-
-                {/* Bottom holes */}
                 <div className="film-holes" style={{ borderTop: "1px solid #1a1a1a", borderBottom: "none" }}>
                   {Array.from({ length: 9 }, (_, hi) => <div key={hi} className="hole" />)}
                 </div>
@@ -927,7 +962,6 @@ export default function VideoEditPage() {
           </div>
         </div>
 
-        {/* Dot indicators */}
         <div style={{ display: "flex", justifyContent: "center", gap: "0.5rem", marginTop: "2rem" }}>
           {WORKS.map((_, i) => (
             <button key={i} onClick={() => resetAuto(i)}
@@ -1005,7 +1039,6 @@ export default function VideoEditPage() {
         <div className="accent-dash reveal" style={{ transitionDelay: "0.2s" }} />
 
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "5rem", alignItems: "start", marginTop: "3rem" }} className="process-layout">
-          {/* Steps */}
           <div>
             {PROCESS_STEPS.map((step, i) => (
               <div key={step.n} className={`process-step reveal`} style={{ transitionDelay: `${i * 0.08}s` }}>
@@ -1018,7 +1051,6 @@ export default function VideoEditPage() {
             ))}
           </div>
 
-          {/* Visual */}
           <div className="reveal-right" style={{ position: "sticky", top: "3rem" }}>
             <div style={{
               aspectRatio: "4/5",
@@ -1045,7 +1077,6 @@ export default function VideoEditPage() {
                   Precision in every cut
                 </div>
               </div>
-              {/* Corner brackets */}
               {[
                 { top: 14, left: 14, borderTop: "1px solid rgba(155,93,229,0.35)", borderLeft: "1px solid rgba(155,93,229,0.35)" },
                 { top: 14, right: 14, borderTop: "1px solid rgba(155,93,229,0.35)", borderRight: "1px solid rgba(155,93,229,0.35)" },
@@ -1106,7 +1137,6 @@ export default function VideoEditPage() {
         <div className="accent-dash reveal" style={{ transitionDelay: "0.2s" }} />
 
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6rem", marginTop: "4rem" }} className="contact-layout">
-          {/* Info */}
           <div className="reveal-left" style={{ display: "flex", flexDirection: "column", gap: "2rem" }}>
             {[
               ["Email",         "hello@videoedit.studio"],
@@ -1124,7 +1154,6 @@ export default function VideoEditPage() {
             </p>
           </div>
 
-          {/* Form */}
           <div className="reveal-right">
             {submitted ? (
               <div style={{
