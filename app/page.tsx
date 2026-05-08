@@ -225,6 +225,7 @@ export default function MountainLanding() {
   const teamRef = useRef<HTMLDivElement>(null);
   const toolsRef = useRef<HTMLDivElement>(null);
   const projectsRef = useRef<HTMLDivElement>(null);
+  const collabRef = useRef<HTMLDivElement>(null);
   const ctaRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -533,6 +534,25 @@ export default function MountainLanding() {
             { opacity: 1, scale: 1, duration: 0.8, stagger: 0.15, ease: "power2.out", scrollTrigger: { trigger: projectsRef.current, start: "top 75%" } }
         );
       }
+
+      // Morphing Collaboration Cards (NEW)
+      const collabCards = gsap.utils.toArray('.collab-card') as HTMLElement[];
+      collabCards.forEach((card) => {
+        const content = card.querySelector('.collab-content');
+        const icon = card.querySelector('.collab-icon');
+
+        gsap.set(card, { width: '120px', height: '120px', borderRadius: '50%' });
+        gsap.set(content, { opacity: 0, scale: 0.8, pointerEvents: 'none' });
+        gsap.set(icon, { opacity: 1, scale: 1, y: 0 });
+
+        const tl = gsap.timeline({
+          scrollTrigger: { trigger: card, start: "top 85%", toggleActions: "play none none reverse" }
+        });
+
+        tl.to(card, { width: '100%', height: '280px', borderRadius: '32px', duration: 0.8, ease: "power3.inOut" })
+          .to(icon, { y: -20, opacity: 0, scale: 0.5, duration: 0.4, ease: "power2.inOut" }, 0)
+          .to(content, { opacity: 1, scale: 1, pointerEvents: 'auto', duration: 0.5, ease: "back.out(1.2)" }, "-=0.2");
+      });
       
       if (ctaRef.current) {
         gsap.fromTo(ctaRef.current, 
@@ -545,11 +565,20 @@ export default function MountainLanding() {
     return () => ctx.revert();
   }, [showPage]);
 
-  // Neumorphic System Styles (Base: #e6eaf0)
+  // Neumorphic System Styles (Base Light: #e6eaf0 | Base Dark: #161821)
   const neuOuter = "bg-[#e6eaf0] shadow-[12px_12px_24px_#c8d0e0,-12px_-12px_24px_#ffffff]";
   const neuInner = "bg-[#e6eaf0] shadow-[inset_6px_6px_12px_#c8d0e0,inset_-6px_-6px_12px_#ffffff]";
   const neuButton = "bg-[#e6eaf0] shadow-[6px_6px_12px_#c8d0e0,-6px_-6px_12px_#ffffff] hover:shadow-[8px_8px_16px_#c8d0e0,-8px_-8px_16px_#ffffff] active:shadow-[inset_4px_4px_8px_#c8d0e0,inset_-4px_-4px_8px_#ffffff] transition-all duration-300 text-fuchsia-600 font-bold uppercase tracking-widest";
   const neuInput = "w-full bg-[#e6eaf0] shadow-[inset_6px_6px_12px_#c8d0e0,inset_-6px_-6px_12px_#ffffff] rounded-xl px-5 py-4 text-sm font-medium text-gray-700 outline-none focus:ring-2 focus:ring-fuchsia-500/30 transition-all border-none placeholder-gray-400";
+
+  // Dark Neumorphic System Styles for CTA
+  const darkNeuOuter = "bg-[#161821] shadow-[12px_12px_24px_#0e0f15,-12px_-12px_24px_#1e212d]";
+  const darkNeuInner = "bg-[#161821] shadow-[inset_6px_6px_12px_#0e0f15,inset_-6px_-6px_12px_#1e212d]";
+  const darkNeuButton = "bg-[#161821] shadow-[8px_8px_16px_#0e0f15,-8px_-8px_16px_#1e212d] hover:shadow-[12px_12px_24px_#0e0f15,-12px_-12px_24px_#1e212d] active:shadow-[inset_4px_4px_8px_#0e0f15,inset_-4px_-4px_8px_#1e212d] transition-all duration-300";
+
+  const handleSmoothScrollToContact = () => {
+    document.getElementById('cta')?.scrollIntoView({ behavior: 'smooth' });
+  };
 
   return (
     <>
@@ -604,7 +633,7 @@ export default function MountainLanding() {
            <div ref={threeCanvasRef} className="absolute inset-0 w-full h-[150vh] -top-[50vh]" style={{ pointerEvents: "none", maskImage: "linear-gradient(to bottom, transparent 0%, black 15%, black 60%, transparent 85%)", WebkitMaskImage: "linear-gradient(to bottom, transparent 0%, black 15%, black 60%, transparent 85%)" }} />
         </div>
 
-        {/* --- MAIN CONTENT --- */}
+        {/* --- MAIN CONTENT (LIGHT THEME) --- */}
         <div className="relative z-30 w-full bg-[#e6eaf0] rounded-t-[3rem] -mt-10 pt-24 pb-32 px-6 sm:px-12 shadow-[0_-20px_40px_rgba(230,234,240,1)] overflow-hidden">
           
           {/* Section 1: Services */}
@@ -638,16 +667,12 @@ export default function MountainLanding() {
             {/* CEO HERO PROFILE */}
             <div className="flex justify-center mb-24 px-4">
               <div className={`relative w-full max-w-4xl rounded-[2.5rem] p-8 md:p-12 flex flex-col md:flex-row items-center gap-10 overflow-hidden group transition-shadow duration-500 ${neuOuter}`}>
-                
-                {/* Image Placeholder */}
                 <div className={`w-full md:w-5/12 h-[340px] rounded-[2rem] overflow-hidden relative flex-shrink-0 ${neuInner}`}>
                   <div className="absolute inset-0 transition-transform duration-700 group-hover:scale-105" />
                   <div className="absolute inset-0 flex items-center justify-center">
                      <span className="text-gray-400 text-xs tracking-widest uppercase font-bold">Image_Placeholder</span>
                   </div>
                 </div>
-                
-                {/* Content */}
                 <div className="w-full md:w-7/12 text-left z-10">
                   <div className={`inline-block px-5 py-2 rounded-full mb-6 ${neuInner}`}>
                     <p className="text-fuchsia-600 font-black tracking-[0.2em] uppercase text-[10px]">{teamData.ceo.role}</p>
@@ -665,7 +690,6 @@ export default function MountainLanding() {
               {teamData.members.map((member, i) => (
                 <div key={i} className={`team-card relative overflow-hidden flex flex-col items-center justify-end mx-auto group ${neuOuter}`}>
                   <div className={`absolute inset-0 team-img transition-transform duration-700 ${neuInner} m-4 rounded-[1.5rem]`} />
-                  
                   <div className="team-content absolute bottom-0 inset-x-0 p-6 text-center flex flex-col justify-end bg-gradient-to-t from-[#e6eaf0] via-[#e6eaf0]/90 to-transparent">
                     <h3 className="text-gray-800 font-black tracking-wider uppercase text-sm mb-1">{member.name}</h3>
                     <p className="text-fuchsia-600 text-[10px] tracking-widest font-bold uppercase">{member.role}</p>
@@ -686,7 +710,6 @@ export default function MountainLanding() {
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-10 px-4">
-              
               {/* CODING TOOLS */}
               <div className={`tool-column rounded-[2rem] p-10 ${neuOuter}`}>
                 <h3 className="text-fuchsia-600 font-black tracking-widest text-xs uppercase mb-8 border-b border-gray-300/50 pb-4">Engineering</h3>
@@ -767,12 +790,11 @@ export default function MountainLanding() {
                   </li>
                 </ul>
               </div>
-
             </div>
           </section>
 
           {/* Section 4: Projects */}
-          <section id="projects" className="max-w-6xl mx-auto py-32 border-t border-gray-300/30">
+          <section id="projects" className="max-w-6xl mx-auto pt-32 pb-48 border-t border-gray-300/30">
             <h2 className="text-3xl md:text-5xl font-black uppercase tracking-[0.2em] text-gray-800 mb-20 text-center drop-shadow-sm">Selected Work</h2>
             <div ref={projectsRef} className="grid grid-cols-1 md:grid-cols-2 gap-10 px-4">
               {[1, 2, 3, 4].map((item) => (
@@ -783,9 +805,60 @@ export default function MountainLanding() {
               ))}
             </div>
           </section>
+        </div>
 
+        {/* --- STANDALONE COLLAB CTA (DARK NEUMORPHIC OVERLAP TRANSITION) --- */}
+        <div 
+          className="relative z-40 w-full bg-[#161821] py-32 px-6 sm:px-12 shadow-[0_-30px_60px_rgba(22,24,33,0.8)] border-t border-[#1e212d]/50" 
+          style={{ borderRadius: '4rem 4rem 0 0', marginTop: '-4rem' }}
+          ref={collabRef}
+        >
+          <div className="max-w-6xl mx-auto">
+            <div className="text-center mb-24">
+              <h2 className="text-4xl md:text-6xl font-black uppercase tracking-[0.2em] text-white mb-6 drop-shadow-2xl">Work With Us</h2>
+              <div className="w-px h-16 bg-gradient-to-b from-fuchsia-500 to-transparent mx-auto opacity-70" />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-12 place-items-center max-w-4xl mx-auto">
+              
+              {/* Card 1: Video Editing */}
+              <div className="w-full max-w-[380px] flex justify-center items-center h-[320px]">
+                <button onClick={handleSmoothScrollToContact} className={`collab-card relative flex flex-col items-center justify-center overflow-hidden group ${darkNeuButton}`}>
+                  <div className={`collab-icon absolute w-16 h-16 rounded-full flex items-center justify-center ${darkNeuInner}`}>
+                    <svg className="w-6 h-6 text-fuchsia-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polygon points="23 7 16 12 23 17 23 7"></polygon><rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect></svg>
+                  </div>
+                  <div className="collab-content absolute inset-0 flex flex-col items-center justify-center p-8 text-center bg-gradient-to-t from-[#161821] via-[#161821]/80 to-transparent">
+                    <h3 className="text-2xl font-black text-white uppercase tracking-wider mb-2">Video Editing</h3>
+                    <p className="text-fuchsia-500 text-[10px] tracking-widest font-bold uppercase mb-4">Cinematic Cuts & Motion</p>
+                    <p className="text-gray-400 text-xs leading-relaxed font-medium">Ready to transform your raw footage into high-retention, narrative-driven content? Initiate contact for a tailored post-production pipeline.</p>
+                    <span className={`mt-6 px-6 py-2 rounded-full text-[10px] font-bold text-fuchsia-500 uppercase tracking-widest ${darkNeuInner}`}>Select Core</span>
+                  </div>
+                </button>
+              </div>
+
+              {/* Card 2: Graphic Design */}
+              <div className="w-full max-w-[380px] flex justify-center items-center h-[320px]">
+                <button onClick={handleSmoothScrollToContact} className={`collab-card relative flex flex-col items-center justify-center overflow-hidden group ${darkNeuButton}`}>
+                  <div className={`collab-icon absolute w-16 h-16 rounded-full flex items-center justify-center ${darkNeuInner}`}>
+                    <svg className="w-6 h-6 text-fuchsia-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 19l7-7 3 3-7 7-3-3z"></path><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"></path><path d="M2 2l7.586 7.586"></path><circle cx="11" cy="11" r="2"></circle></svg>
+                  </div>
+                  <div className="collab-content absolute inset-0 flex flex-col items-center justify-center p-8 text-center bg-gradient-to-t from-[#161821] via-[#161821]/80 to-transparent">
+                    <h3 className="text-2xl font-black text-white uppercase tracking-wider mb-2">Graphic Design</h3>
+                    <p className="text-fuchsia-500 text-[10px] tracking-widest font-bold uppercase mb-4">Brand Identity & Assets</p>
+                    <p className="text-gray-400 text-xs leading-relaxed font-medium">Require pixel-perfect design systems, thumbnails, or striking brand visuals? Deploy our graphics unit to forge your digital presence.</p>
+                    <span className={`mt-6 px-6 py-2 rounded-full text-[10px] font-bold text-fuchsia-500 uppercase tracking-widest ${darkNeuInner}`}>Select Core</span>
+                  </div>
+                </button>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        {/* --- MAIN CONTENT OVERLAP BACK TO LIGHT (CONTACT FORM) --- */}
+        <div className="relative z-50 w-full bg-[#e6eaf0] py-24 px-6 sm:px-12 shadow-[0_-30px_60px_rgba(230,234,240,0.8)] border-t border-white/50" style={{ borderRadius: '4rem 4rem 0 0', marginTop: '-4rem' }}>
           {/* Section 5: Contact Form (Functional CTA) */}
-          <section id="cta" className="max-w-4xl mx-auto py-32 my-10 px-4" ref={ctaRef}>
+          <section id="cta" className="max-w-4xl mx-auto py-16 px-4" ref={ctaRef}>
             <div className={`rounded-[3rem] p-10 md:p-20 relative overflow-hidden ${neuOuter}`}>
               <div className="text-center mb-12">
                 <h2 className="text-4xl md:text-5xl font-black uppercase tracking-[0.1em] text-gray-800 mb-4 drop-shadow-sm">Communicate</h2>
@@ -845,11 +918,10 @@ export default function MountainLanding() {
               </form>
             </div>
           </section>
-
         </div>
 
         {/* --- FOOTER --- */}
-        <footer className="relative z-30 py-12 text-center text-gray-500 text-[9px] tracking-[0.4em] uppercase bg-[#e6eaf0] border-t border-gray-300/40">
+        <footer className="relative z-50 py-12 text-center text-gray-500 text-[9px] tracking-[0.4em] uppercase bg-[#e6eaf0] border-t border-gray-300/40">
           <div className="flex items-center justify-center gap-6 mb-6">
             <div className={`w-2.5 h-2.5 rounded-full ${neuInner}`} />
             <div className={`w-3.5 h-3.5 rounded-full flex items-center justify-center ${neuInner}`}>
