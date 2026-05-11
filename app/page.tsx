@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import * as THREE from "three";
@@ -867,14 +868,15 @@ export default function MountainLanding() {
 
                 {/* CTA Button — positioned right */}
                 <div className="flex flex-col items-end gap-3 shrink-0">
-                  <button
+                  <Link
+                    href="/graphics"
                     className={`group/btn flex items-center gap-4 px-10 py-5 rounded-full text-sm ${neuButton}`}
                   >
                     <span>Start a Project</span>
                     <span className="w-6 h-6 rounded-full flex items-center justify-center bg-fuchsia-500 text-white text-xs shadow-[0_0_12px_rgba(168,85,247,0.5)] group-hover/btn:shadow-[0_0_20px_rgba(168,85,247,0.7)] transition-shadow duration-300">
                       →
                     </span>
-                  </button>
+                  </Link>
                   <span className="text-gray-400 text-[9px] tracking-widest uppercase font-medium">
                     Response within 24h
                   </span>
@@ -958,7 +960,8 @@ export default function MountainLanding() {
 
                 {/* CTA Button — positioned left (row-reversed) */}
                 <div className="flex flex-col items-start gap-3 shrink-0">
-                  <button
+                  <Link
+                    href="/video"
                     className={`group/btn flex items-center gap-4 px-10 py-5 rounded-full text-sm ${neuButton}`}
                   >
                     <span
@@ -967,7 +970,7 @@ export default function MountainLanding() {
                       →
                     </span>
                     <span>Start a Project</span>
-                  </button>
+                  </Link>
                   <span className="text-gray-400 text-[9px] tracking-widest uppercase font-medium">
                     Response within 24h
                   </span>
