@@ -183,7 +183,6 @@ export default function MountainLanding() {
 
   const mountainBgRef   = useRef<HTMLDivElement>(null);
   const uiWrapperRef    = useRef<HTMLDivElement>(null);
-  const floatingCardRef = useRef<HTMLDivElement>(null);
 
   const heroSpacerRef   = useRef<HTMLDivElement>(null);
   const cloudTriggerRef = useRef<HTMLDivElement>(null);
@@ -397,23 +396,12 @@ export default function MountainLanding() {
   useEffect(() => {
     if (!showPage) return;
     gsap.set(uiWrapperRef.current,    { opacity: 0, y: -20 });
-    gsap.set(floatingCardRef.current, { opacity: 0, x: -20 });
 
     const ctx = gsap.context(() => {
       gsap.to(uiWrapperRef.current,    { opacity: 1, y: 0, duration: 1.2, ease: "power3.out", delay: 0.2 });
-      gsap.to(floatingCardRef.current, { opacity: 1, x: 0, duration: 1.2, ease: "power3.out", delay: 0.4 });
 
       if (mountainBgRef.current) {
-        gsap.fromTo(mountainBgRef.current, { scale: 1.4 }, {
-          scale: 1.0, ease: "power2.out",
-          scrollTrigger: { trigger: heroSpacerRef.current, start: "top top", end: "bottom top", scrub: 1.8 },
-        });
       }
-
-      gsap.to(floatingCardRef.current, {
-        opacity: 0, x: -20, ease: "power2.in",
-        scrollTrigger: { trigger: heroSpacerRef.current, start: "top -10%", end: "top -30%", scrub: true },
-      });
 
       if (servicesRef.current) {
         gsap.fromTo(servicesRef.current.children,
@@ -564,8 +552,7 @@ export default function MountainLanding() {
             scrollTrigger: {
               trigger: footerRef.current,
               start: "top 95%",
-              end: "top 40%",
-              scrub: 1.5,
+              toggleActions: "play reverse play reverse",
             },
           }
         );
@@ -585,6 +572,7 @@ export default function MountainLanding() {
             scrollTrigger: {
               trigger: footerRef.current,
               start: "top 70%",
+              toggleActions: "play reverse play reverse",
             },
           }
         );
@@ -754,19 +742,6 @@ export default function MountainLanding() {
               <a href="#tools"    className="hover:text-fuchsia-500 transition-colors duration-300">Stack</a>
             </div>
             <a href="#collab" className={`px-6 py-2.5 rounded-full text-[10px] ${neuButton}`}>Contact Us</a>
-          </div>
-        </div>
-
-        {/* ── FLOATING INFO CARD ── */}
-        <div ref={floatingCardRef} className="fixed bottom-10 left-10 z-50 pointer-events-none hidden lg:block">
-          <div className={`pointer-events-auto rounded-2xl p-6 w-72 ${neuOuter}`}>
-            <div className="flex items-center gap-3 mb-3">
-              <div className="w-2 h-2 rounded-full bg-fuchsia-500 shadow-[0_0_10px_rgba(217,70,239,0.8)] animate-pulse" />
-              <h4 className="text-gray-800 text-[10px] uppercase tracking-widest font-black">Systems Online</h4>
-            </div>
-            <p className="text-gray-500 text-xs leading-relaxed font-medium">
-              We build the foundations required to scale the highest peaks. Premium development, cinematic video editing, and modern graphics.
-            </p>
           </div>
         </div>
 
@@ -1205,8 +1180,35 @@ export default function MountainLanding() {
                 <stop offset="100%" stopColor="#1a1a2e" stopOpacity="0.3" />
               </linearGradient>
             </defs>
+            <style>
+              {`
+                @keyframes pan-clouds {
+                  0% { transform: translateX(0); }
+                  100% { transform: translateX(-1440px); }
+                }
+                .cloud-layer {
+                  animation: pan-clouds 80s linear infinite;
+                }
+              `}
+            </style>
             {/* Sky gradient backdrop */}
             <rect width="1440" height="320" fill="url(#summitSky)" />
+
+            {/* Low-poly clouds layer (duplicated for seamless loop) */}
+            <g className="cloud-layer" fill="rgba(255, 255, 255, 0.04)">
+              <path d="M50,220 L100,180 L150,200 L200,170 L250,210 L300,180 L350,230 Z" />
+              <path d="M400,240 L450,190 L500,210 L550,180 L600,240 Z" />
+              <path d="M700,220 L750,170 L800,200 L850,180 L900,230 Z" />
+              <path d="M1000,250 L1050,210 L1100,230 L1150,190 L1200,250 Z" />
+              <path d="M1300,230 L1340,180 L1380,210 L1420,170 L1460,230 Z" />
+              
+              <path d="M1490,220 L1540,180 L1590,200 L1640,170 L1690,210 L1740,180 L1790,230 Z" />
+              <path d="M1840,240 L1890,190 L1940,210 L1990,180 L2040,240 Z" />
+              <path d="M2140,220 L2190,170 L2240,200 L2290,180 L2340,230 Z" />
+              <path d="M2440,250 L2490,210 L2540,230 L2590,190 L2640,250 Z" />
+              <path d="M2740,230 L2780,180 L2820,210 L2860,170 L2900,230 Z" />
+            </g>
+
             {/* Far range — subtle, misty */}
             <path
               d="M0,280 L80,240 L160,255 L240,210 L320,230 L400,185 L480,200 L560,160 L640,175 L680,140 L720,120 L760,140 L800,165 L880,190 L960,170 L1040,195 L1120,175 L1200,200 L1280,185 L1360,210 L1440,195 L1440,320 L0,320 Z"
@@ -1241,15 +1243,6 @@ export default function MountainLanding() {
           {/* ── Footer Content ── */}
           <div style={{ background: "linear-gradient(to bottom, #0a0a14, #0d0d1a 40%, #111126)" }} className="relative">
 
-            {/* Faint grid overlay */}
-            <div
-              className="absolute inset-0 opacity-[0.025] pointer-events-none"
-              style={{
-                backgroundImage: "linear-gradient(rgba(255,255,255,1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,1) 1px, transparent 1px)",
-                backgroundSize: "60px 60px",
-              }}
-            />
-
             <div className="relative z-10 max-w-6xl mx-auto px-6 sm:px-12 pt-16 pb-10">
 
               {/* ── Top row: Brand + Contact ── */}
@@ -1271,44 +1264,17 @@ export default function MountainLanding() {
                   </div>
                 </div>
 
-                {/* Contact links */}
-                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
-                  {/* Gmail */}
-                  <a
-                    href="mailto:prominence.va@gmail.com"
-                    className="group flex items-center gap-3 px-5 py-3 rounded-xl transition-all duration-300 hover:scale-[1.03]"
-                    style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.06)" }}
-                  >
-                    <div className="w-9 h-9 rounded-lg flex items-center justify-center" style={{ background: "rgba(234,67,53,0.12)" }}>
-                      <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="#ea4335" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <rect x="2" y="4" width="20" height="16" rx="2" />
-                        <path d="M22 4L12 13L2 4" />
-                      </svg>
-                    </div>
-                    <div>
-                      <p className="text-[8px] tracking-[0.3em] uppercase text-white/30 font-bold">Gmail</p>
-                      <p className="text-white/70 text-xs font-medium group-hover:text-white transition-colors">prominence.va@gmail.com</p>
-                    </div>
-                  </a>
-
-                  {/* WhatsApp */}
-                  <a
-                    href="https://wa.me/639560542898"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="group flex items-center gap-3 px-5 py-3 rounded-xl transition-all duration-300 hover:scale-[1.03]"
-                    style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.06)" }}
-                  >
-                    <div className="w-9 h-9 rounded-lg flex items-center justify-center" style={{ background: "rgba(37,211,102,0.12)" }}>
-                      <svg className="w-4 h-4" viewBox="0 0 24 24" fill="#25d366">
-                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
-                      </svg>
-                    </div>
-                    <div>
-                      <p className="text-[8px] tracking-[0.3em] uppercase text-white/30 font-bold">WhatsApp</p>
-                      <p className="text-white/70 text-xs font-medium group-hover:text-white transition-colors">09560542898</p>
-                    </div>
-                  </a>
+                {/* Contact info — display only */}
+                <div className="flex items-center gap-5 flex-wrap">
+                  <span className="flex items-center gap-2.5 text-white/50 text-xs font-medium tracking-wide">
+                    <span className="w-1.5 h-1.5 rounded-full bg-purple-500/50" />
+                    prominence.va@gmail.com
+                  </span>
+                  <span className="w-px h-3 bg-white/10 hidden sm:block" />
+                  <span className="flex items-center gap-2.5 text-white/50 text-xs font-medium tracking-wide">
+                    <span className="w-1.5 h-1.5 rounded-full bg-purple-500/50" />
+                    09560542898
+                  </span>
                 </div>
               </div>
 
@@ -1322,8 +1288,8 @@ export default function MountainLanding() {
                   {["Services", "Team", "Stack", "Projects", "Contact"].map((link) => (
                     <a
                       key={link}
-                      href={`#${link === "Stack" ? "tools" : link === "Contact" ? "collab" : link.toLowerCase()}`}
-                      className="text-white/30 hover:text-purple-400 transition-colors duration-300"
+                      href={`#${link === "Stack" ? "tools" : (link === "Contact" || link === "Services") ? "collab" : link.toLowerCase()}`}
+                      className="p-3 -m-3 text-white/30 hover:text-purple-400 transition-colors duration-300"
                     >
                       {link}
                     </a>
