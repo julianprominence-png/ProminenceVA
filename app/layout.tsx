@@ -39,6 +39,9 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} ${inter.variable} ${cormorant.variable} dark h-full antialiased`}
     >
+      <head>
+        <link href="https://fonts.cdnfonts.com/css/astron" rel="stylesheet" />
+      </head>
       <body className="min-h-full flex flex-col">{children}</body>
     </html>
   );

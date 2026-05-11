@@ -183,6 +183,7 @@ export default function MountainLanding() {
 
   const mountainBgRef   = useRef<HTMLDivElement>(null);
   const uiWrapperRef    = useRef<HTMLDivElement>(null);
+  const heroSectionRef  = useRef<HTMLDivElement>(null);
 
   const heroSpacerRef   = useRef<HTMLDivElement>(null);
   const cloudTriggerRef = useRef<HTMLDivElement>(null);
@@ -401,6 +402,51 @@ export default function MountainLanding() {
       gsap.to(uiWrapperRef.current,    { opacity: 1, y: 0, duration: 1.2, ease: "power3.out", delay: 0.2 });
 
       if (mountainBgRef.current) {
+        gsap.fromTo(mountainBgRef.current, { scale: 1.4 }, {
+          scale: 1.0, ease: "power2.out",
+          scrollTrigger: { trigger: heroSpacerRef.current, start: "top top", end: "bottom top", scrub: 1.8 },
+        });
+      }
+
+      /* ─── HERO SECTION ENTRANCE ──────────────────────────────────────────── */
+      if (heroSectionRef.current) {
+        const heroEls = heroSectionRef.current.querySelectorAll(".hero-fade-in");
+        gsap.fromTo(heroEls,
+          { opacity: 0, y: 50 },
+          {
+            opacity: 1, y: 0, duration: 1, stagger: 0.15, ease: "power3.out",
+            scrollTrigger: { trigger: heroSectionRef.current, start: "top 80%" },
+          }
+        );
+
+        /* Backdrop logo gentle float */
+        const bdLogo = heroSectionRef.current.querySelector(".hero-backdrop-logo");
+        if (bdLogo) {
+          gsap.to(bdLogo, { y: -18, duration: 4, ease: "sine.inOut", repeat: -1, yoyo: true });
+          gsap.to(bdLogo, { rotation: 2, duration: 6, ease: "sine.inOut", repeat: -1, yoyo: true });
+        }
+
+        /* Orbital ring spin */
+        const rings = heroSectionRef.current.querySelectorAll(".orbital-ring");
+        rings.forEach((ring, i) => {
+          gsap.to(ring, { rotation: 360, duration: 20 + i * 8, ease: "none", repeat: -1, transformOrigin: "center center" });
+        });
+
+        /* Low-poly flowers grow upward */
+        const flowers = heroSectionRef.current.querySelectorAll(".flower-stem");
+        gsap.fromTo(flowers,
+          { scaleY: 0, transformOrigin: "bottom center" },
+          {
+            scaleY: 1, duration: 1.6, stagger: 0.12, ease: "elastic.out(1, 0.4)",
+            scrollTrigger: { trigger: heroSectionRef.current, start: "top 70%" },
+          }
+        );
+
+        /* Floating particles drift */
+        const particles = heroSectionRef.current.querySelectorAll(".hero-particle");
+        particles.forEach((p, i) => {
+          gsap.to(p, { y: -30 - i * 10, x: (i % 2 === 0 ? 15 : -15), duration: 3 + i * 0.8, ease: "sine.inOut", repeat: -1, yoyo: true });
+        });
       }
 
       if (servicesRef.current) {
@@ -755,6 +801,134 @@ export default function MountainLanding() {
         {/* MAIN CONTENT                                                        */}
         {/* ════════════════════════════════════════════════════════════════════ */}
         <div className="relative z-30 w-full bg-[#e6eaf0] rounded-t-[3rem] -mt-10 pt-24 pb-32 px-6 sm:px-12 shadow-[0_-20px_40px_rgba(230,234,240,1)] overflow-hidden">
+
+          {/* ══════════════════════════════════════════════════════════════════ */}
+          {/* HERO — OUR STORY                                                 */}
+          {/* ══════════════════════════════════════════════════════════════════ */}
+          <section ref={heroSectionRef} className="relative max-w-6xl mx-auto pt-10 pb-40 overflow-visible">
+
+            {/* ── Backdrop Logo — large, low-opacity, offset left ── */}
+            <div className="hero-backdrop-logo absolute pointer-events-none select-none" style={{ top: "-12%", left: "-15%", width: "clamp(400px, 60vw, 700px)", height: "clamp(400px, 60vw, 700px)", opacity: 0.12, zIndex: 0 }}>
+              {/* Radial glow behind logo */}
+              <div className="absolute inset-0 rounded-full" style={{ background: "radial-gradient(circle, rgba(147,51,234,0.06) 0%, rgba(236,72,153,0.03) 40%, transparent 70%)", transform: "scale(1.3)" }} />
+              <img src="/images/main-bg.png" alt="" className="w-full h-full object-contain relative z-10" style={{ filter: "grayscale(0.2)" }} />
+              {/* Orbital rings around logo */}
+              <svg className="orbital-ring absolute inset-0 w-full h-full" viewBox="0 0 200 200" fill="none" style={{ transform: "scale(1.15)" }}>
+                <ellipse cx="100" cy="100" rx="95" ry="95" stroke="rgba(147,51,234,0.35)" strokeWidth="1.2" strokeDasharray="8 6" />
+                <circle cx="100" cy="5" r="2.5" fill="rgba(147,51,234,0.5)" />
+              </svg>
+              <svg className="orbital-ring absolute inset-0 w-full h-full" viewBox="0 0 200 200" fill="none" style={{ transform: "rotate(60deg) scale(1.05)" }}>
+                <ellipse cx="100" cy="100" rx="82" ry="82" stroke="rgba(236,72,153,0.3)" strokeWidth="1" strokeDasharray="5 10" />
+                <circle cx="182" cy="100" r="2" fill="rgba(236,72,153,0.45)" />
+              </svg>
+              <svg className="orbital-ring absolute inset-0 w-full h-full" viewBox="0 0 200 200" fill="none" style={{ transform: "rotate(-30deg) scale(1.25)" }}>
+                <ellipse cx="100" cy="100" rx="98" ry="98" stroke="rgba(168,85,247,0.15)" strokeWidth="0.8" strokeDasharray="3 14" />
+              </svg>
+            </div>
+
+            {/* ── Floating decorative particles ── */}
+            <div className="hero-particle absolute w-1.5 h-1.5 rounded-full bg-fuchsia-400/20 pointer-events-none" style={{ top: "15%", left: "20%" }} />
+            <div className="hero-particle absolute w-1 h-1 rounded-full bg-purple-400/25 pointer-events-none" style={{ top: "35%", left: "8%" }} />
+            <div className="hero-particle absolute w-2 h-2 rounded-full bg-fuchsia-300/15 pointer-events-none" style={{ top: "60%", left: "15%" }} />
+            <div className="hero-particle absolute w-1 h-1 rounded-full bg-purple-500/20 pointer-events-none" style={{ top: "25%", right: "12%" }} />
+            <div className="hero-particle absolute w-1.5 h-1.5 rounded-full bg-pink-400/15 pointer-events-none" style={{ top: "70%", right: "8%" }} />
+
+            {/* ── Low-poly Flowers — LEFT ── */}
+            <div className="absolute left-0 bottom-0 w-32 md:w-48 h-full pointer-events-none select-none" style={{ transform: "translateX(-30%)" }}>
+              <svg className="flower-stem absolute bottom-8 left-4" width="40" height="180" viewBox="0 0 40 180" fill="none">
+                <path d="M20,180 L20,60 L15,50 L20,35 L25,50 L20,60" stroke="rgba(34,197,94,0.35)" strokeWidth="2" fill="none" />
+                <polygon points="20,35 12,15 20,0 28,15" fill="rgba(168,85,247,0.2)" />
+                <polygon points="20,25 14,10 20,0 26,10" fill="rgba(192,132,252,0.25)" />
+                <path d="M20,80 L8,65" stroke="rgba(34,197,94,0.25)" strokeWidth="1.5" />
+                <polygon points="8,65 0,55 8,50 12,60" fill="rgba(34,197,94,0.15)" />
+                <path d="M20,110 L32,95" stroke="rgba(34,197,94,0.25)" strokeWidth="1.5" />
+                <polygon points="32,95 40,85 32,80 28,90" fill="rgba(34,197,94,0.15)" />
+              </svg>
+              <svg className="flower-stem absolute bottom-4 left-16" width="35" height="140" viewBox="0 0 35 140" fill="none">
+                <path d="M17,140 L17,50 L12,40 L17,25 L22,40 L17,50" stroke="rgba(34,197,94,0.3)" strokeWidth="1.5" fill="none" />
+                <polygon points="17,25 10,8 17,0 24,8" fill="rgba(236,72,153,0.18)" />
+                <polygon points="17,18 12,6 17,0 22,6" fill="rgba(244,114,182,0.22)" />
+                <path d="M17,70 L7,58" stroke="rgba(34,197,94,0.2)" strokeWidth="1" />
+                <polygon points="7,58 0,50 7,46 10,54" fill="rgba(34,197,94,0.12)" />
+              </svg>
+              <svg className="flower-stem absolute bottom-12 left-8" width="30" height="100" viewBox="0 0 30 100" fill="none">
+                <path d="M15,100 L15,35 L11,28 L15,18 L19,28 L15,35" stroke="rgba(34,197,94,0.25)" strokeWidth="1.5" fill="none" />
+                <polygon points="15,18 9,5 15,0 21,5" fill="rgba(147,51,234,0.15)" />
+                <path d="M15,60 L25,50" stroke="rgba(34,197,94,0.2)" strokeWidth="1" />
+                <polygon points="25,50 30,42 24,38 22,46" fill="rgba(34,197,94,0.1)" />
+              </svg>
+            </div>
+
+            {/* ── Low-poly Flowers — RIGHT ── */}
+            <div className="absolute right-0 bottom-0 w-32 md:w-48 h-full pointer-events-none select-none" style={{ transform: "translateX(30%)" }}>
+              <svg className="flower-stem absolute bottom-6 right-6" width="40" height="160" viewBox="0 0 40 160" fill="none">
+                <path d="M20,160 L20,55 L15,45 L20,30 L25,45 L20,55" stroke="rgba(34,197,94,0.35)" strokeWidth="2" fill="none" />
+                <polygon points="20,30 12,12 20,0 28,12" fill="rgba(244,114,182,0.2)" />
+                <polygon points="20,22 14,8 20,0 26,8" fill="rgba(236,72,153,0.25)" />
+                <path d="M20,85 L30,72" stroke="rgba(34,197,94,0.25)" strokeWidth="1.5" />
+                <polygon points="30,72 38,62 30,58 26,68" fill="rgba(34,197,94,0.15)" />
+                <path d="M20,115 L10,100" stroke="rgba(34,197,94,0.25)" strokeWidth="1.5" />
+                <polygon points="10,100 2,90 10,86 14,96" fill="rgba(34,197,94,0.15)" />
+              </svg>
+              <svg className="flower-stem absolute bottom-10 right-16" width="35" height="130" viewBox="0 0 35 130" fill="none">
+                <path d="M17,130 L17,45 L12,36 L17,22 L22,36 L17,45" stroke="rgba(34,197,94,0.3)" strokeWidth="1.5" fill="none" />
+                <polygon points="17,22 10,7 17,0 24,7" fill="rgba(168,85,247,0.2)" />
+                <polygon points="17,15 12,5 17,0 22,5" fill="rgba(192,132,252,0.25)" />
+                <path d="M17,65 L27,55" stroke="rgba(34,197,94,0.2)" strokeWidth="1" />
+                <polygon points="27,55 35,47 27,43 24,51" fill="rgba(34,197,94,0.12)" />
+              </svg>
+              <svg className="flower-stem absolute bottom-2 right-10" width="28" height="95" viewBox="0 0 28 95" fill="none">
+                <path d="M14,95 L14,32 L10,25 L14,15 L18,25 L14,32" stroke="rgba(34,197,94,0.25)" strokeWidth="1.5" fill="none" />
+                <polygon points="14,15 8,4 14,0 20,4" fill="rgba(147,51,234,0.18)" />
+                <path d="M14,55 L5,45" stroke="rgba(34,197,94,0.2)" strokeWidth="1" />
+                <polygon points="5,45 0,38 6,34 8,42" fill="rgba(34,197,94,0.1)" />
+              </svg>
+            </div>
+
+            {/* ── Content — right-aligned on desktop ── */}
+            <div className="relative z-10 flex flex-col items-center md:items-end px-4 md:px-0 md:ml-auto md:max-w-[55%]">
+
+              {/* Overline */}
+              <p className="hero-fade-in text-fuchsia-500/70 text-[9px] tracking-[0.5em] uppercase font-black mb-8">
+                Isaiah 60 — 61
+              </p>
+
+              {/* Title with Astron font */}
+              <h1
+                className="hero-fade-in mb-8 text-center md:text-right"
+                style={{
+                  fontFamily: "'Astron', sans-serif",
+                  fontSize: "clamp(2.4rem, 7vw, 5.5rem)",
+                  letterSpacing: "0.12em",
+                  lineHeight: 1,
+                  color: "#1f2937",
+                  textShadow: "0 2px 20px rgba(147,51,234,0.08)",
+                }}
+              >
+                PROMINENCE
+              </h1>
+
+              {/* Decorative accent line */}
+              <div className="hero-fade-in flex items-center gap-4 mb-10">
+                <div className="w-16 h-px bg-gradient-to-r from-transparent to-fuchsia-400/40" />
+                <div className="w-1.5 h-1.5 rounded-full bg-fuchsia-500/40" />
+                <div className="w-8 h-px bg-gradient-to-l from-transparent to-fuchsia-400/40" />
+              </div>
+
+              {/* Story text */}
+              <p className="hero-fade-in text-gray-500 text-sm md:text-base leading-[2] font-medium max-w-lg text-center md:text-right" style={{ textWrap: "pretty" }}>
+                Founded through faith and inspired by Isaiah 60 to 61, Prominence Virtual Assistance was built from a small beginning with nothing but vision, purpose, and the courage to keep going. What started as a simple step of faith grew into a creative digital agency dedicated to helping businesses rise, shine, and bring their vision into prominence.
+              </p>
+
+              {/* Subtle tagline */}
+              <p className="hero-fade-in text-fuchsia-600/40 text-[9px] tracking-[0.4em] uppercase font-bold mt-10">
+                Virtual Assistance &nbsp;·&nbsp; Creative Studio &nbsp;·&nbsp; Digital Agency
+              </p>
+            </div>
+
+            {/* Bottom gradient fade */}
+            <div className="absolute bottom-0 inset-x-0 h-32 bg-gradient-to-t from-[#e6eaf0] to-transparent pointer-events-none" />
+          </section>
 
           {/* ── SERVICES ── */}
           <section id="services" className="max-w-6xl mx-auto pt-10 pb-32">
