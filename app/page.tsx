@@ -422,8 +422,7 @@ export default function MountainLanding() {
         /* Backdrop logo gentle float */
         const bdLogo = heroSectionRef.current.querySelector(".hero-backdrop-logo");
         if (bdLogo) {
-          gsap.to(bdLogo, { y: -18, duration: 4, ease: "sine.inOut", repeat: -1, yoyo: true });
-          gsap.to(bdLogo, { rotation: 2, duration: 6, ease: "sine.inOut", repeat: -1, yoyo: true });
+          // Logo movement removed - now steady
         }
 
         /* Orbital ring spin */
@@ -808,7 +807,7 @@ export default function MountainLanding() {
           <section ref={heroSectionRef} className="relative max-w-6xl mx-auto pt-10 pb-40 overflow-visible">
 
             {/* ── Backdrop Logo — large, low-opacity, offset left ── */}
-            <div className="hero-backdrop-logo absolute pointer-events-none select-none" style={{ top: "-12%", left: "-15%", width: "clamp(400px, 60vw, 700px)", height: "clamp(400px, 60vw, 700px)", opacity: 0.12, zIndex: 0 }}>
+            <div className="hero-backdrop-logo absolute pointer-events-none select-none" style={{ top: "-12%", left: "-15%", width: "clamp(600px, 90vw, 1000px)", height: "clamp(600px, 90vw, 1000px)", opacity: 0.156, zIndex: 0 }}>
               {/* Radial glow behind logo */}
               <div className="absolute inset-0 rounded-full" style={{ background: "radial-gradient(circle, rgba(147,51,234,0.06) 0%, rgba(236,72,153,0.03) 40%, transparent 70%)", transform: "scale(1.3)" }} />
               <img src="/images/main-bg.png" alt="" className="w-full h-full object-contain relative z-10" style={{ filter: "grayscale(0.2)" }} />
