@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import * as THREE from "three";
@@ -199,6 +199,12 @@ export default function MountainLanding() {
   const collabRef      = useRef<HTMLDivElement>(null);
   const collabWaveRef  = useRef<SVGPathElement>(null);
   const collabWave2Ref = useRef<SVGPathElement>(null);
+
+  // ─── Page-transition state ─────────────────────────────────────────────────
+  const router = useRouter();
+  const [transitioning, setTransitioning] = useState(false);
+  const [transitionLabel, setTransitionLabel] = useState("");
+  const transitionOverlayRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -560,9 +566,129 @@ export default function MountainLanding() {
   const orbShadow = "12px 12px 24px #c8d0e0, -12px -12px 24px #ffffff";
   const orbInnerShadow = "inset 6px 6px 12px #c8d0e0, inset -6px -6px 12px #ffffff";
 
+  /* -------------------------------------------------------------------------- */
+  /* MORPH PAGE TRANSITION                                                      */
+  /* -------------------------------------------------------------------------- */
+  const triggerTransition = (href: string, direction: "left" | "right") => {
+    if (transitioning) return;
+    setTransitioning(true);
+    setTransitionLabel(direction === "left" ? "Graphics" : "Video");
+
+    const overlay = transitionOverlayRef.current;
+    if (!overlay) { router.push(href); return; }
+
+    const blobs = gsap.utils.toArray(".morph-blob") as HTMLElement[];
+    const label = overlay.querySelector(".transition-label");
+    const arrow = overlay.querySelector(".transition-arrow");
+
+    // "slide left" → blobs enter from RIGHT;  "slide right" → from LEFT
+    const fromX = direction === "left" ? 120 : -120;
+    const rotDir = direction === "left" ? 1 : -1;
+
+    gsap.set(overlay, { display: "block", pointerEvents: "all" });
+
+    const tl = gsap.timeline({
+      onComplete: () => router.push(href),
+    });
+
+    // ── Sweep each blob with squash-stretch + organic border-radius morph ──
+    blobs.forEach((blob, i) => {
+      gsap.set(blob, {
+        xPercent: fromX,
+        yPercent: (i % 2 === 0 ? -1 : 1) * 6,
+        scaleY: 0.35 + i * 0.08,
+        scaleX: 1.6,
+        rotation: rotDir * (18 - i * 5),
+        borderRadius: "30% 70% 60% 40% / 55% 35% 65% 45%",
+        opacity: 0,
+      });
+
+      tl.to(blob, {
+        xPercent: 0,
+        yPercent: 0,
+        scaleY: 1,
+        scaleX: 1,
+        rotation: 0,
+        borderRadius: "0%",
+        opacity: 1,
+        duration: 0.65,
+        ease: "back.out(1.4)",
+      }, i * 0.09);
+    });
+
+    // ── Bouncy directional arrow ──
+    if (arrow) {
+      gsap.set(arrow, {
+        opacity: 0,
+        x: rotDir * -80,
+        scale: 0.3,
+        rotation: rotDir * 40,
+      });
+      tl.to(arrow, {
+        opacity: 1,
+        x: 0,
+        scale: 1,
+        rotation: 0,
+        duration: 0.5,
+        ease: "elastic.out(1, 0.55)",
+      }, 0.28);
+    }
+
+    // ── Label pops in ──
+    if (label) {
+      gsap.set(label, {
+        opacity: 0,
+        y: 40,
+        scale: 0.6,
+        rotation: rotDir * 12,
+      });
+      tl.to(label, {
+        opacity: 1,
+        y: 0,
+        scale: 1,
+        rotation: 0,
+        duration: 0.55,
+        ease: "back.out(3)",
+      }, 0.38);
+    }
+  };
+
   return (
     <>
       {!loaderDone && <TriangleLoader onComplete={handleLoaderComplete} />}
+
+      {/* ── MORPH PAGE-TRANSITION OVERLAY ── */}
+      <div
+        ref={transitionOverlayRef}
+        className="fixed inset-0 z-[250] pointer-events-none"
+        style={{ display: "none" }}
+      >
+        {/* Blob layers — staggered sweep */}
+        <div className="morph-blob absolute inset-0" style={{ background: "rgba(192, 132, 252, 0.95)" }} />
+        <div className="morph-blob absolute inset-0" style={{ background: "rgba(168, 85, 247, 0.96)" }} />
+        <div className="morph-blob absolute inset-0" style={{ background: "rgba(147, 51, 234, 0.97)" }} />
+        <div className="morph-blob absolute inset-0" style={{ background: "rgba(124, 58, 237, 1)" }} />
+
+        {/* Centered label + arrow */}
+        <div className="absolute inset-0 flex flex-col items-center justify-center z-10 pointer-events-none gap-4">
+          <div
+            className="transition-arrow w-16 h-16 rounded-full flex items-center justify-center"
+            style={{ background: "rgba(255,255,255,0.15)", backdropFilter: "blur(8px)" }}
+          >
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12" />
+              <polyline points="12 5 19 12 12 19" />
+            </svg>
+          </div>
+          <span
+            className="transition-label font-black tracking-[0.35em] uppercase text-white/90 select-none"
+            style={{ fontSize: "clamp(1.8rem, 5vw, 3.5rem)", textShadow: "0 4px 30px rgba(124,58,237,0.5)" }}
+          >
+            {transitionLabel}
+          </span>
+          <span className="text-white/40 text-[10px] tracking-[0.4em] uppercase font-bold">Navigating</span>
+        </div>
+      </div>
 
       <div className={`relative min-h-[300vh] bg-[#e6eaf0] font-sans selection:bg-fuchsia-500/30 ${showPage ? "opacity-100" : "opacity-0"} transition-opacity duration-1000`}>
 
@@ -868,15 +994,15 @@ export default function MountainLanding() {
 
                 {/* CTA Button — positioned right */}
                 <div className="flex flex-col items-end gap-3 shrink-0">
-                  <Link
-                    href="/graphics"
-                    className={`group/btn flex items-center gap-4 px-10 py-5 rounded-full text-sm ${neuButton}`}
+                  <button
+                    onClick={() => triggerTransition("/graphics", "left")}
+                    className={`group/btn flex items-center gap-4 px-10 py-5 rounded-full text-sm cursor-pointer ${neuButton}`}
                   >
                     <span>Start a Project</span>
                     <span className="w-6 h-6 rounded-full flex items-center justify-center bg-fuchsia-500 text-white text-xs shadow-[0_0_12px_rgba(168,85,247,0.5)] group-hover/btn:shadow-[0_0_20px_rgba(168,85,247,0.7)] transition-shadow duration-300">
                       →
                     </span>
-                  </Link>
+                  </button>
                   <span className="text-gray-400 text-[9px] tracking-widest uppercase font-medium">
                     Response within 24h
                   </span>
@@ -960,9 +1086,9 @@ export default function MountainLanding() {
 
                 {/* CTA Button — positioned left (row-reversed) */}
                 <div className="flex flex-col items-start gap-3 shrink-0">
-                  <Link
-                    href="/video"
-                    className={`group/btn flex items-center gap-4 px-10 py-5 rounded-full text-sm ${neuButton}`}
+                  <button
+                    onClick={() => triggerTransition("/video", "right")}
+                    className={`group/btn flex items-center gap-4 px-10 py-5 rounded-full text-sm cursor-pointer ${neuButton}`}
                   >
                     <span
                       className="w-6 h-6 rounded-full flex items-center justify-center bg-fuchsia-500 text-white text-xs shadow-[0_0_12px_rgba(168,85,247,0.5)] group-hover/btn:shadow-[0_0_20px_rgba(168,85,247,0.7)] transition-shadow duration-300"
@@ -970,7 +1096,7 @@ export default function MountainLanding() {
                       →
                     </span>
                     <span>Start a Project</span>
-                  </Link>
+                  </button>
                   <span className="text-gray-400 text-[9px] tracking-widest uppercase font-medium">
                     Response within 24h
                   </span>
