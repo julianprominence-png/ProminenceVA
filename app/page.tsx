@@ -194,6 +194,8 @@ export default function MountainLanding() {
   const toolsRef     = useRef<HTMLDivElement>(null);
   const projectsRef  = useRef<HTMLDivElement>(null);
   const ctaRef       = useRef<HTMLDivElement>(null);
+  const footerRef    = useRef<HTMLElement>(null);
+  const summitRef    = useRef<SVGSVGElement>(null);
 
   // ─── NEW: Collaboration section refs ───────────────────────────────────────
   const collabRef      = useRef<HTMLDivElement>(null);
@@ -547,6 +549,44 @@ export default function MountainLanding() {
         gsap.fromTo(ctaRef.current,
           { opacity: 0, scale: 0.9 },
           { opacity: 1, scale: 1,   duration: 1, ease: "power3.out", scrollTrigger: { trigger: ctaRef.current, start: "top 85%" } }
+        );
+      }
+
+      /* ─── FOOTER SUMMIT RISE ────────────────────────────────────────────── */
+      if (summitRef.current) {
+        gsap.fromTo(summitRef.current,
+          { yPercent: 60, opacity: 0 },
+          {
+            yPercent: 0,
+            opacity: 1,
+            duration: 1.4,
+            ease: "power2.out",
+            scrollTrigger: {
+              trigger: footerRef.current,
+              start: "top 95%",
+              end: "top 40%",
+              scrub: 1.5,
+            },
+          }
+        );
+      }
+
+      /* Footer content stagger */
+      if (footerRef.current) {
+        const footerEls = footerRef.current.querySelectorAll(".footer-animate");
+        gsap.fromTo(footerEls,
+          { opacity: 0, y: 30 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.8,
+            stagger: 0.1,
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: footerRef.current,
+              start: "top 70%",
+            },
+          }
         );
       }
     });
@@ -1132,17 +1172,191 @@ export default function MountainLanding() {
 
         </div>
 
-        {/* ── FOOTER ── */}
-        <footer className="relative z-30 py-12 text-center text-gray-500 text-[9px] tracking-[0.4em] uppercase bg-[#e6eaf0] border-t border-gray-300/40">
-          <div className="flex items-center justify-center gap-6 mb-6">
-            <div className={`w-2.5 h-2.5 rounded-full ${neuInner}`} />
-            <div className={`w-3.5 h-3.5 rounded-full flex items-center justify-center ${neuInner}`}>
-              <div className="w-1.5 h-1.5 rounded-full bg-fuchsia-500 animate-pulse shadow-[0_0_10px_rgba(217,70,239,0.5)]" />
+        {/* ══════════════════════════════════════════════════════════════════ */}
+        {/* FOOTER — SUMMIT SILHOUETTE                                        */}
+        {/* ══════════════════════════════════════════════════════════════════ */}
+        <footer ref={footerRef} className="relative z-30 bg-[#e6eaf0] overflow-hidden">
+
+          {/* ── Summit Silhouette SVG — rises on scroll ── */}
+          <svg
+            ref={summitRef}
+            className="w-full h-auto block"
+            viewBox="0 0 1440 320"
+            preserveAspectRatio="none"
+            style={{ marginBottom: "-4px" }}
+          >
+            <defs>
+              <linearGradient id="summitGrad1" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#7c3aed" stopOpacity="0.15" />
+                <stop offset="100%" stopColor="#1a1a2e" stopOpacity="0.95" />
+              </linearGradient>
+              <linearGradient id="summitGrad2" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#9333ea" stopOpacity="0.08" />
+                <stop offset="100%" stopColor="#0f0f1a" stopOpacity="0.85" />
+              </linearGradient>
+              <linearGradient id="summitGrad3" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#c084fc" stopOpacity="0.06" />
+                <stop offset="60%" stopColor="#1a1a2e" stopOpacity="0.5" />
+                <stop offset="100%" stopColor="#0a0a14" />
+              </linearGradient>
+              <linearGradient id="summitSky" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#e6eaf0" />
+                <stop offset="40%" stopColor="#d5d9e3" />
+                <stop offset="100%" stopColor="#1a1a2e" stopOpacity="0.3" />
+              </linearGradient>
+            </defs>
+            {/* Sky gradient backdrop */}
+            <rect width="1440" height="320" fill="url(#summitSky)" />
+            {/* Far range — subtle, misty */}
+            <path
+              d="M0,280 L80,240 L160,255 L240,210 L320,230 L400,185 L480,200 L560,160 L640,175 L680,140 L720,120 L760,140 L800,165 L880,190 L960,170 L1040,195 L1120,175 L1200,200 L1280,185 L1360,210 L1440,195 L1440,320 L0,320 Z"
+              fill="url(#summitGrad2)"
+              opacity="0.5"
+            />
+            {/* Mid range — defined peaks */}
+            <path
+              d="M0,290 L60,270 L120,280 L200,245 L280,260 L340,220 L420,235 L480,195 L540,210 L600,175 L660,155 L720,100 L780,155 L820,180 L880,200 L940,185 L1000,210 L1060,195 L1120,215 L1180,200 L1240,225 L1320,210 L1380,230 L1440,220 L1440,320 L0,320 Z"
+              fill="url(#summitGrad1)"
+              opacity="0.75"
+            />
+            {/* Foreground range — sharp, dark */}
+            <path
+              d="M0,300 L40,290 L100,295 L160,275 L220,285 L280,260 L340,270 L400,245 L440,255 L500,230 L560,240 L620,215 L680,195 L720,160 L760,195 L800,220 L840,235 L900,250 L960,240 L1020,255 L1060,245 L1120,260 L1180,250 L1240,265 L1300,255 L1360,270 L1400,260 L1440,265 L1440,320 L0,320 Z"
+              fill="url(#summitGrad3)"
+            />
+            {/* Snow caps accent */}
+            <path
+              d="M700,170 L720,100 L740,170"
+              fill="none"
+              stroke="rgba(255,255,255,0.2)"
+              strokeWidth="1.5"
+              strokeLinejoin="round"
+            />
+            <path
+              d="M710,140 L720,100 L730,140"
+              fill="rgba(255,255,255,0.08)"
+            />
+          </svg>
+
+          {/* ── Footer Content ── */}
+          <div style={{ background: "linear-gradient(to bottom, #0a0a14, #0d0d1a 40%, #111126)" }} className="relative">
+
+            {/* Faint grid overlay */}
+            <div
+              className="absolute inset-0 opacity-[0.025] pointer-events-none"
+              style={{
+                backgroundImage: "linear-gradient(rgba(255,255,255,1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,1) 1px, transparent 1px)",
+                backgroundSize: "60px 60px",
+              }}
+            />
+
+            <div className="relative z-10 max-w-6xl mx-auto px-6 sm:px-12 pt-16 pb-10">
+
+              {/* ── Top row: Brand + Contact ── */}
+              <div className="footer-animate flex flex-col lg:flex-row items-start lg:items-center justify-between gap-12 mb-16">
+
+                {/* Brand block */}
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-xl overflow-hidden flex items-center justify-center relative" style={{ background: "rgba(147,51,234,0.12)", boxShadow: "0 0 30px rgba(147,51,234,0.15), inset 0 1px 1px rgba(255,255,255,0.05)" }}>
+                    <img
+                      src="/images/icon-logo.png"
+                      alt="Prominence"
+                      className="w-full h-full object-cover"
+                      onError={(e) => (e.currentTarget.style.display = "none")}
+                    />
+                  </div>
+                  <div>
+                    <h4 className="font-black tracking-[0.25em] uppercase text-white/90 text-sm">Prominence</h4>
+                    <p className="text-[9px] tracking-[0.3em] uppercase text-purple-400/60 font-semibold mt-0.5">Virtual Assistance</p>
+                  </div>
+                </div>
+
+                {/* Contact links */}
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
+                  {/* Gmail */}
+                  <a
+                    href="mailto:prominence.va@gmail.com"
+                    className="group flex items-center gap-3 px-5 py-3 rounded-xl transition-all duration-300 hover:scale-[1.03]"
+                    style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.06)" }}
+                  >
+                    <div className="w-9 h-9 rounded-lg flex items-center justify-center" style={{ background: "rgba(234,67,53,0.12)" }}>
+                      <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="#ea4335" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <rect x="2" y="4" width="20" height="16" rx="2" />
+                        <path d="M22 4L12 13L2 4" />
+                      </svg>
+                    </div>
+                    <div>
+                      <p className="text-[8px] tracking-[0.3em] uppercase text-white/30 font-bold">Gmail</p>
+                      <p className="text-white/70 text-xs font-medium group-hover:text-white transition-colors">prominence.va@gmail.com</p>
+                    </div>
+                  </a>
+
+                  {/* WhatsApp */}
+                  <a
+                    href="https://wa.me/639560542898"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group flex items-center gap-3 px-5 py-3 rounded-xl transition-all duration-300 hover:scale-[1.03]"
+                    style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.06)" }}
+                  >
+                    <div className="w-9 h-9 rounded-lg flex items-center justify-center" style={{ background: "rgba(37,211,102,0.12)" }}>
+                      <svg className="w-4 h-4" viewBox="0 0 24 24" fill="#25d366">
+                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+                      </svg>
+                    </div>
+                    <div>
+                      <p className="text-[8px] tracking-[0.3em] uppercase text-white/30 font-bold">WhatsApp</p>
+                      <p className="text-white/70 text-xs font-medium group-hover:text-white transition-colors">09560542898</p>
+                    </div>
+                  </a>
+                </div>
+              </div>
+
+              {/* ── Divider ── */}
+              <div className="footer-animate w-full h-px mb-10" style={{ background: "linear-gradient(to right, transparent, rgba(147,51,234,0.25), rgba(255,255,255,0.06), rgba(147,51,234,0.25), transparent)" }} />
+
+              {/* ── Middle row: Quick links + Status ── */}
+              <div className="footer-animate flex flex-col md:flex-row items-start md:items-center justify-between gap-8 mb-10">
+                {/* Quick links */}
+                <nav className="flex flex-wrap items-center gap-6 text-[9px] tracking-[0.25em] uppercase font-bold">
+                  {["Services", "Team", "Stack", "Projects", "Contact"].map((link) => (
+                    <a
+                      key={link}
+                      href={`#${link === "Stack" ? "tools" : link === "Contact" ? "collab" : link.toLowerCase()}`}
+                      className="text-white/30 hover:text-purple-400 transition-colors duration-300"
+                    >
+                      {link}
+                    </a>
+                  ))}
+                </nav>
+
+                {/* Status indicator */}
+                <div className="flex items-center gap-3">
+                  <div className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_10px_rgba(52,211,153,0.6)] animate-pulse" />
+                  <span className="text-[9px] tracking-[0.25em] uppercase text-white/30 font-bold">Systems Operational</span>
+                </div>
+              </div>
+
+              {/* ── Bottom row: Copyright + Location ── */}
+              <div className="footer-animate flex flex-col sm:flex-row items-center justify-between gap-4 text-[9px] tracking-[0.3em] uppercase text-white/20 font-medium">
+                <p>© {new Date().getFullYear()} Prominence. All operational rights reserved.</p>
+                <div className="flex items-center gap-2">
+                  <svg className="w-3 h-3 text-purple-500/40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                    <circle cx="12" cy="10" r="3" />
+                  </svg>
+                  <span>Olongapo City, 2200</span>
+                </div>
+              </div>
+
             </div>
-            <div className={`w-2.5 h-2.5 rounded-full ${neuInner}`} />
+
+            {/* ── Bottom glow accent ── */}
+            <div
+              className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[600px] h-[2px] pointer-events-none"
+              style={{ background: "linear-gradient(to right, transparent, rgba(147,51,234,0.4), transparent)" }}
+            />
           </div>
-          <p className="font-bold">© {new Date().getFullYear()} Prominence. All operational rights reserved.</p>
-          <p className="mt-4 font-medium">Olongapo City, 2200</p>
         </footer>
       </div>
     </>
