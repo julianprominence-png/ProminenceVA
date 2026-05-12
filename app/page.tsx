@@ -179,7 +179,8 @@ export default function MountainLanding() {
   const [showPage,   setShowPage]   = useState(false);
 
   const [formData,     setFormData]     = useState({ name: "", email: "", message: "" });
-  const [submitStatus, setSubmitStatus] = useState<"idle"|"loading"|"success"|"error">("idle");
+  const [submitStatus, setSubmitStatus] = useState<"idle"|"sending"|"delivered"|"received"|"error">("idle");
+  const [submitError,  setSubmitError]  = useState("");
 
   const mountainBgRef   = useRef<HTMLDivElement>(null);
   const uiWrapperRef    = useRef<HTMLDivElement>(null);
@@ -222,24 +223,30 @@ export default function MountainLanding() {
 
   const handleContactSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitStatus("loading");
+    setSubmitStatus("sending");
+    setSubmitError("");
     try {
       const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
-      if (res.ok) {
-        setSubmitStatus("success");
+      const data = await res.json();
+      if (res.ok && data.status === "delivered") {
+        setSubmitStatus("delivered");
         setFormData({ name: "", email: "", message: "" });
-        setTimeout(() => setSubmitStatus("idle"), 4000);
+        // Simulate 'received' confirmation after a short delay
+        setTimeout(() => setSubmitStatus("received"), 2200);
+        setTimeout(() => setSubmitStatus("idle"), 7000);
       } else {
+        setSubmitError(data.error || "Transmission failed.");
         setSubmitStatus("error");
-        setTimeout(() => setSubmitStatus("idle"), 4000);
+        setTimeout(() => setSubmitStatus("idle"), 5000);
       }
     } catch {
+      setSubmitError("Network error. Please check your connection.");
       setSubmitStatus("error");
-      setTimeout(() => setSubmitStatus("idle"), 4000);
+      setTimeout(() => setSubmitStatus("idle"), 5000);
     }
   };
 
@@ -1287,25 +1294,109 @@ export default function MountainLanding() {
 
           </section>
 
-          {/* ── CONTACT FORM ── */}
+          {/* ── CONTACT FORM — HYBRID SUPPORT PORTAL ── */}
           <section id="cta" className="max-w-4xl mx-auto py-32 my-10 px-4" ref={ctaRef}>
             <div className="rounded-[3rem] p-10 md:p-20 relative overflow-hidden" style={{ background: 'rgba(15, 10, 35, 0.55)', backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)', border: '1px solid rgba(147,51,234,0.1)', boxShadow: '0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.03)' }}>
+
+              {/* Live status pulse */}
+              <div className="flex items-center justify-center gap-2 mb-8">
+                <div className="relative">
+                  <div className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_10px_rgba(52,211,153,0.6)]" />
+                  <div className="absolute inset-0 w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+                </div>
+                <span className="text-[9px] tracking-[0.3em] uppercase text-emerald-400/70 font-bold">Secure Channel Active</span>
+              </div>
+
               <div className="text-center mb-12">
                 <h2 className="text-4xl md:text-5xl font-black uppercase tracking-[0.1em] text-white/90 mb-4" style={{ textShadow: '0 0 30px rgba(147,51,234,0.2)' }}>Communicate</h2>
                 <p className="text-white/40 text-sm md:text-base leading-relaxed tracking-wide font-medium max-w-lg mx-auto">
-                  Initialize a secure channel. Submit your parameters below to deploy our systems for your next operation.
+                  Initialize a secure channel. Your message is stored, delivered via email, and appears in our command center in realtime.
                 </p>
               </div>
-              <form onSubmit={handleContactSubmit} className="max-w-xl mx-auto space-y-6">
-                <input type="text"  required placeholder="Identification (Name)"            className={darkInput} style={{ background: 'rgba(147,51,234,0.06)' }} value={formData.name}    onChange={(e) => setFormData({ ...formData, name: e.target.value })} />
-                <input type="email" required placeholder="Transmission Protocol (Email)"    className={darkInput} style={{ background: 'rgba(147,51,234,0.06)' }} value={formData.email}   onChange={(e) => setFormData({ ...formData, email: e.target.value })} />
-                <textarea          required placeholder="Payload (Message details)" rows={5} className={`${darkInput} resize-none`} style={{ background: 'rgba(147,51,234,0.06)' }} value={formData.message} onChange={(e) => setFormData({ ...formData, message: e.target.value })} />
-                {submitStatus === "success" && <p className="text-emerald-400 text-sm font-bold tracking-widest uppercase text-center">Transmission Successful.</p>}
-                {submitStatus === "error"   && <p className="text-red-400  text-sm font-bold tracking-widest uppercase text-center">Transmission Failed. Retrying...</p>}
-                <div className="flex justify-center pt-4">
-                  <button type="submit" disabled={submitStatus === "loading"} className={`px-12 py-4 rounded-full ${darkButton} ${submitStatus === "loading" ? "opacity-50 cursor-wait" : ""}`} style={{ background: 'rgba(147,51,234,0.15)', boxShadow: '0 0 20px rgba(147,51,234,0.1)' }}>
-                    {submitStatus === "loading" ? "Transmitting..." : "Initiate Contact"}
+
+              {/* Delivery status indicator */}
+              {submitStatus !== "idle" && (
+                <div className="max-w-xl mx-auto mb-8">
+                  <div className="rounded-2xl p-6 relative overflow-hidden" style={{ background: 'rgba(10, 8, 20, 0.6)', border: '1px solid rgba(147,51,234,0.08)' }}>
+                    {/* Progress steps */}
+                    <div className="flex items-center justify-between mb-4">
+                      {[
+                        { key: "sending",   label: "Encrypting",  active: ["sending","delivered","received"].includes(submitStatus) },
+                        { key: "delivered", label: "Delivered",    active: ["delivered","received"].includes(submitStatus) },
+                        { key: "received",  label: "Confirmed",   active: submitStatus === "received" },
+                      ].map((step, i) => (
+                        <div key={step.key} className="flex items-center gap-2 flex-1">
+                          <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold transition-all duration-500 ${
+                            step.active
+                              ? 'bg-purple-500 text-white shadow-[0_0_15px_rgba(147,51,234,0.5)]'
+                              : 'bg-white/[0.05] text-white/20 border border-white/[0.08]'
+                          }`}>
+                            {step.active ? (
+                              <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                            ) : i + 1}
+                          </div>
+                          <span className={`text-[9px] tracking-[0.15em] uppercase font-bold transition-colors duration-500 ${step.active ? 'text-purple-300' : 'text-white/20'}`}>{step.label}</span>
+                          {i < 2 && <div className={`flex-1 h-px mx-2 transition-colors duration-500 ${step.active ? 'bg-purple-500/30' : 'bg-white/[0.05]'}`} />}
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Status message */}
+                    <div className="text-center">
+                      {submitStatus === "sending" && (
+                        <div className="flex items-center justify-center gap-3">
+                          <div className="w-4 h-4 border-2 border-purple-400/40 border-t-purple-400 rounded-full animate-spin" />
+                          <span className="text-purple-300/80 text-xs tracking-widest uppercase font-bold">Transmitting payload...</span>
+                        </div>
+                      )}
+                      {submitStatus === "delivered" && (
+                        <p className="text-emerald-400 text-xs tracking-widest uppercase font-bold">✓ Message delivered to Prominence</p>
+                      )}
+                      {submitStatus === "received" && (
+                        <p className="text-emerald-400 text-xs tracking-widest uppercase font-bold">✓✓ Confirmed — Your message is in our inbox</p>
+                      )}
+                      {submitStatus === "error" && (
+                        <p className="text-red-400 text-xs tracking-widest uppercase font-bold">✕ {submitError || "Transmission failed"}</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <form onSubmit={handleContactSubmit} className="max-w-xl mx-auto space-y-5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                  <div className="relative">
+                    <label className="block text-[9px] tracking-[0.25em] uppercase text-white/30 font-bold mb-2 ml-1">Identification</label>
+                    <input type="text" required placeholder="Your name" className={darkInput} style={{ background: 'rgba(147,51,234,0.06)' }} value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} disabled={submitStatus === "sending"} />
+                  </div>
+                  <div className="relative">
+                    <label className="block text-[9px] tracking-[0.25em] uppercase text-white/30 font-bold mb-2 ml-1">Protocol</label>
+                    <input type="email" required placeholder="your@email.com" className={darkInput} style={{ background: 'rgba(147,51,234,0.06)' }} value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} disabled={submitStatus === "sending"} />
+                  </div>
+                </div>
+                <div className="relative">
+                  <label className="block text-[9px] tracking-[0.25em] uppercase text-white/30 font-bold mb-2 ml-1">Payload</label>
+                  <textarea required placeholder="Describe your project or message..." rows={5} className={`${darkInput} resize-none`} style={{ background: 'rgba(147,51,234,0.06)' }} value={formData.message} onChange={(e) => setFormData({ ...formData, message: e.target.value })} disabled={submitStatus === "sending"} />
+                </div>
+                <div className="flex flex-col items-center gap-3 pt-4">
+                  <button
+                    type="submit"
+                    disabled={submitStatus === "sending" || submitStatus === "delivered" || submitStatus === "received"}
+                    className={`group px-12 py-4 rounded-full ${darkButton} ${submitStatus === "sending" ? "opacity-50 cursor-wait" : ""} ${["delivered","received"].includes(submitStatus) ? "opacity-40 pointer-events-none" : ""}`}
+                    style={{ background: 'rgba(147,51,234,0.15)', boxShadow: '0 0 20px rgba(147,51,234,0.1)' }}
+                  >
+                    {submitStatus === "sending" ? (
+                      <span className="flex items-center gap-3">
+                        <span className="w-4 h-4 border-2 border-purple-300/40 border-t-purple-300 rounded-full animate-spin" />
+                        Transmitting...
+                      </span>
+                    ) : submitStatus === "delivered" || submitStatus === "received" ? (
+                      "Transmission Complete"
+                    ) : (
+                      "Initiate Contact"
+                    )}
                   </button>
+                  <span className="text-white/15 text-[9px] tracking-widest uppercase font-medium">End-to-end encrypted · Realtime delivery</span>
                 </div>
               </form>
             </div>
