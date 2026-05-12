@@ -472,54 +472,50 @@ export default function MountainLanding() {
           .to(bio,     { opacity: 1, height: "auto", duration: 0.4, ease: "power2.out" }, "-=0.2");
       });
 
-      /* ─── ORB-TO-CARD for TOOLS ──────────────────────────────────────────── */
+      /* ─── 3D REVOLVING CARD STACK for TOOLS ────────────────────────────────── */
       if (toolsRef.current) {
-        const orbCards = gsap.utils.toArray(".orb-tool-card") as HTMLElement[];
-        const masterTl = gsap.timeline({
+        const cards3d = gsap.utils.toArray(".tool-card-3d") as HTMLElement[];
+        const toolsHeader = toolsRef.current.querySelector(".tools-header");
+
+        // Set initial states — cards are behind the camera, rotated, invisible
+        gsap.set(toolsHeader, { opacity: 0, y: 50 });
+        cards3d.forEach((card, i) => {
+          gsap.set(card, {
+            z: -900 - i * 350,
+            rotateX: 18 + i * 6,
+            rotateY: (i - 1) * 25,
+            opacity: 0,
+            scale: 0.45,
+            transformPerspective: 1200,
+          });
+        });
+
+        const toolsTl = gsap.timeline({
           scrollTrigger: {
             trigger: toolsRef.current,
-            start: "top 72%",
-            toggleActions: "play none none reverse",
-          },
-          onComplete() {
-            // After cards are revealed, start the gentle float
-            gsap.to(".orb-tool-card", {
-              y: -14,
-              duration: 2.8,
-              ease: "sine.inOut",
-              stagger: 0.25,
-              repeat: -1,
-              yoyo: true,
-            });
+            start: "top top",
+            end: "+=2800",
+            pin: true,
+            scrub: 1.2,
+            anticipatePin: 1,
           },
         });
 
-        orbCards.forEach((card: any, i) => {
-          const face    = card.querySelector(".orb-face");
-          const content = card.querySelector(".orb-content");
+        // Header fades in first
+        toolsTl.to(toolsHeader, { opacity: 1, y: 0, duration: 0.2, ease: "power2.out" }, 0);
 
-          // Set initial orb state
-          gsap.set(card, {
-            borderRadius: "50%",
-            width:  140,
-            height: 140,
-          });
-          gsap.set(content, { opacity: 0 });
-          gsap.set(face,    { opacity: 1 });
-
-          const offset = i * 0.18;
-
-          masterTl
-            .to(card, {
-              // Compute real pixel target at call time so % works correctly
-              width:        () => (card.parentElement?.offsetWidth  ?? 360),
-              height:       380,
-              borderRadius: 32,
-              duration:     0.9,
-              ease:         "power3.inOut",
-            }, offset)
-            .to(face,    { opacity: 0, scale: 0.7, duration: 0.25 }, offset + 0.08)
-            .to(content, { opacity: 1,              duration: 0.50, ease: "power2.out" }, offset + 0.52);
+        // Cards fly in one-by-one with staggered timing
+        cards3d.forEach((card, i) => {
+          const start = 0.12 + i * 0.3;
+          toolsTl.to(card, {
+            z: 0,
+            rotateX: 0,
+            rotateY: 0,
+            opacity: 1,
+            scale: 1,
+            duration: 0.35,
+            ease: "power2.out",
+          }, start);
         });
       }
 
@@ -635,9 +631,10 @@ export default function MountainLanding() {
   const neuButton = "bg-[#e6eaf0] shadow-[6px_6px_12px_#c8d0e0,-6px_-6px_12px_#ffffff] hover:shadow-[8px_8px_16px_#c8d0e0,-8px_-8px_16px_#ffffff] active:shadow-[inset_4px_4px_8px_#c8d0e0,inset_-4px_-4px_8px_#ffffff] transition-all duration-300 text-fuchsia-600 font-bold uppercase tracking-widest";
   const neuInput  = "w-full bg-[#e6eaf0] shadow-[inset_6px_6px_12px_#c8d0e0,inset_-6px_-6px_12px_#ffffff] rounded-xl px-5 py-4 text-sm font-medium text-gray-700 outline-none focus:ring-2 focus:ring-fuchsia-500/30 transition-all border-none placeholder-gray-400";
 
-  /* ─── The inline-style shadow used by orb cards (mirrors neuOuter) ────── */
-  const orbShadow = "12px 12px 24px #c8d0e0, -12px -12px 24px #ffffff";
-  const orbInnerShadow = "inset 6px 6px 12px #c8d0e0, inset -6px -6px 12px #ffffff";
+  /* ─── Dark glass helpers for sections in the dark gradient zone ────── */
+  const darkGlass  = "backdrop-blur-2xl border border-white/[0.08]";
+  const darkButton = "backdrop-blur-xl border border-purple-500/20 hover:border-purple-400/40 active:scale-[0.98] transition-all duration-300 text-purple-300 font-bold uppercase tracking-widest";
+  const darkInput  = "w-full rounded-xl px-5 py-4 text-sm font-medium text-white/80 outline-none focus:ring-2 focus:ring-purple-500/30 transition-all border border-white/[0.08] placeholder-white/30";
 
   /* -------------------------------------------------------------------------- */
   /* MORPH PAGE TRANSITION                                                      */
@@ -799,7 +796,9 @@ export default function MountainLanding() {
         {/* ════════════════════════════════════════════════════════════════════ */}
         {/* MAIN CONTENT                                                        */}
         {/* ════════════════════════════════════════════════════════════════════ */}
-        <div className="relative z-30 w-full bg-[#e6eaf0] rounded-t-[3rem] -mt-10 pt-24 pb-32 px-6 sm:px-12 shadow-[0_-20px_40px_rgba(230,234,240,1)] overflow-hidden">
+        <div className="relative z-30 w-full rounded-t-[3rem] -mt-10 pt-24 pb-32 px-6 sm:px-12" style={{ background: 'linear-gradient(180deg, #e6eaf0 0%, #e6eaf0 15%, #ddd8e8 22%, #c4bbd8 28%, #8b7faa 36%, #5a4e80 43%, #3a3060 50%, #262050 56%, #1e1a3a 62%, #161330 70%, #100e24 80%, #0c0a1a 90%, #0a0814 100%)', overflowX: 'clip' }}>
+          {/* Starfield — fades in over the dark gradient zone */}
+          <div className="starfield" style={{ top: '30%', maskImage: 'linear-gradient(to bottom, transparent 0%, black 15%)', WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 15%)' }} />
 
           {/* ══════════════════════════════════════════════════════════════════ */}
           {/* HERO — OUR STORY                                                 */}
@@ -990,131 +989,115 @@ export default function MountainLanding() {
           </section>
 
           {/* ══════════════════════════════════════════════════════════════════ */}
-          {/* TOOLS  —  ORB-TO-CARD MORPH                                      */}
+          {/* TOOLS  —  3D REVOLVING CARD STACK                                */}
           {/* ══════════════════════════════════════════════════════════════════ */}
-          <section id="tools" className="max-w-6xl mx-auto py-32 border-t border-gray-300/30" ref={toolsRef}>
-            <div className="text-center mb-24">
-              <h2 className="text-3xl md:text-5xl font-black uppercase tracking-[0.2em] text-gray-800 mb-6 drop-shadow-sm">Ecosystem</h2>
-              <p className="text-gray-500 text-sm tracking-widest uppercase font-medium">The tools that forge our systems.</p>
-            </div>
+          <section id="tools" className="relative" ref={toolsRef}>
+            <div className="min-h-screen flex flex-col items-center justify-center py-20 px-4 sm:px-12">
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-10 px-4">
-
-              {/* ── ENGINEERING ── */}
-              <div className="flex justify-center items-start">
-                <div
-                  className="orb-tool-card relative overflow-hidden bg-[#e6eaf0]"
-                  style={{ width: 140, height: 140, borderRadius: "50%", boxShadow: orbShadow }}
-                >
-                  {/* Orb face */}
-                  <div className="orb-face absolute inset-0 flex flex-col items-center justify-center gap-2 z-10 pointer-events-none">
-                    <div className="w-14 h-14 rounded-full flex items-center justify-center bg-[#e6eaf0]" style={{ boxShadow: orbInnerShadow }}>
-                      <svg className="w-6 h-6 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>
-                      </svg>
-                    </div>
-                    <span className="text-[9px] font-black tracking-[0.2em] uppercase text-fuchsia-600">Engineering</span>
-                  </div>
-                  {/* Card content */}
-                  <div className="orb-content absolute inset-0 p-9">
-                    <h3 className="text-fuchsia-600 font-black tracking-widest text-xs uppercase mb-7 border-b border-gray-300/50 pb-4">Engineering</h3>
-                    <ul className="space-y-5 text-sm font-bold text-gray-600 tracking-wide">
-                      {[
-                        { label: "Next.js",  color: "text-gray-700",  icon: <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 22h20L12 2zm0 3.5L18.5 19h-13L12 5.5z"/></svg> },
-                        { label: "VS Code",  color: "text-blue-500",  icon: <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg> },
-                        { label: "Firebase", color: "text-orange-400",icon: <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M11.5 2L7.5 10l-4 3 8 8 9-18-9-1z"/></svg> },
-                        { label: "Vercel",   color: "text-gray-800",  icon: <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M24 22.525H0l12-21.05 12 21.05z"/></svg> },
-                      ].map((t) => (
-                        <li key={t.label} className="flex items-center gap-4">
-                          <div className={`p-2 rounded-lg bg-[#e6eaf0] ${t.color}`} style={{ boxShadow: orbInnerShadow }}>{t.icon}</div>
-                          {t.label}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
+              {/* Section header */}
+              <div className="tools-header text-center mb-16 relative z-10">
+                <p className="text-purple-400/60 text-[9px] tracking-[0.5em] uppercase font-black mb-6">Our Arsenal</p>
+                <h2 className="text-3xl md:text-5xl font-black uppercase tracking-[0.2em] text-white/90 mb-6" style={{ textShadow: '0 0 40px rgba(147,51,234,0.3)' }}>Ecosystem</h2>
+                <p className="text-white/35 text-sm tracking-widest uppercase font-medium">The tools that forge our systems.</p>
               </div>
 
-              {/* ── POST-PRODUCTION ── */}
-              <div className="flex justify-center items-start">
-                <div
-                  className="orb-tool-card relative overflow-hidden bg-[#e6eaf0]"
-                  style={{ width: 140, height: 140, borderRadius: "50%", boxShadow: orbShadow }}
-                >
-                  <div className="orb-face absolute inset-0 flex flex-col items-center justify-center gap-2 z-10 pointer-events-none">
-                    <div className="w-14 h-14 rounded-full flex items-center justify-center bg-[#e6eaf0]" style={{ boxShadow: orbInnerShadow }}>
-                      <svg className="w-6 h-6 text-purple-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"/>
-                        <line x1="7"  y1="2"  x2="7"  y2="22"/><line x1="17" y1="2"  x2="17" y2="22"/>
-                        <line x1="2"  y1="12" x2="22" y2="12"/><line x1="2"  y1="7"  x2="7"  y2="7"/>
-                        <line x1="2"  y1="17" x2="7"  y2="17"/><line x1="17" y1="17" x2="22" y2="17"/>
-                        <line x1="17" y1="7"  x2="22" y2="7"/>
-                      </svg>
+              {/* 3D Stage */}
+              <div className="tools-3d-stage w-full max-w-6xl mx-auto">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+
+                  {/* ── ENGINEERING ── */}
+                  <div className="tool-card-3d">
+                    <div className="relative overflow-hidden rounded-[24px] p-8 md:p-10" style={{ background: 'rgba(15, 10, 35, 0.7)', backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)', border: '1px solid rgba(147, 51, 234, 0.15)', boxShadow: '0 8px 32px rgba(0,0,0,0.4), 0 0 80px rgba(147,51,234,0.06), inset 0 1px 0 rgba(255,255,255,0.05)', minHeight: '380px' }}>
+                      {/* Glow accent */}
+                      <div className="absolute -top-20 -right-20 w-40 h-40 rounded-full pointer-events-none" style={{ background: 'radial-gradient(circle, rgba(147,51,234,0.12) 0%, transparent 70%)' }} />
+                      <div className="flex items-center gap-4 mb-8 relative z-10">
+                        <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ background: 'rgba(147,51,234,0.15)', boxShadow: '0 0 20px rgba(147,51,234,0.1)' }}>
+                          <svg className="w-6 h-6 text-purple-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                        </div>
+                        <h3 className="text-white/90 font-black tracking-widest text-xs uppercase">Engineering</h3>
+                      </div>
+                      <div className="w-full h-px mb-7 relative z-10" style={{ background: 'linear-gradient(to right, rgba(147,51,234,0.3), transparent)' }} />
+                      <ul className="space-y-5 text-sm font-bold text-white/60 tracking-wide relative z-10">
+                        {[
+                          { label: "Next.js",  color: "text-white/80",   icon: <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 22h20L12 2zm0 3.5L18.5 19h-13L12 5.5z"/></svg> },
+                          { label: "VS Code",  color: "text-blue-400",   icon: <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg> },
+                          { label: "Firebase", color: "text-orange-400",  icon: <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M11.5 2L7.5 10l-4 3 8 8 9-18-9-1z"/></svg> },
+                          { label: "Vercel",   color: "text-white/70",    icon: <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M24 22.525H0l12-21.05 12 21.05z"/></svg> },
+                        ].map((t) => (
+                          <li key={t.label} className="flex items-center gap-4">
+                            <div className={`p-2 rounded-lg ${t.color}`} style={{ background: 'rgba(147,51,234,0.1)', boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.05)' }}>{t.icon}</div>
+                            {t.label}
+                          </li>
+                        ))}
+                      </ul>
                     </div>
-                    <span className="text-[9px] font-black tracking-[0.2em] uppercase text-fuchsia-600">Post-Prod</span>
                   </div>
-                  <div className="orb-content absolute inset-0 p-9">
-                    <h3 className="text-fuchsia-600 font-black tracking-widest text-xs uppercase mb-7 border-b border-gray-300/50 pb-4">Post-Production</h3>
-                    <ul className="space-y-5 text-sm font-bold text-gray-600 tracking-wide">
-                      {[
-                        { label: "CapCut",          color: "text-purple-500", icon: <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/></svg> },
-                        { label: "Adobe Premiere",  color: "text-blue-600",   icon: <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> },
-                        { label: "DaVinci Resolve", color: "text-teal-500",   icon: <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg> },
-                      ].map((t) => (
-                        <li key={t.label} className="flex items-center gap-4">
-                          <div className={`p-2 rounded-lg bg-[#e6eaf0] ${t.color}`} style={{ boxShadow: orbInnerShadow }}>{t.icon}</div>
-                          {t.label}
-                        </li>
-                      ))}
-                    </ul>
+
+                  {/* ── POST-PRODUCTION ── */}
+                  <div className="tool-card-3d">
+                    <div className="relative overflow-hidden rounded-[24px] p-8 md:p-10" style={{ background: 'rgba(15, 10, 35, 0.7)', backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)', border: '1px solid rgba(168, 85, 247, 0.15)', boxShadow: '0 8px 32px rgba(0,0,0,0.4), 0 0 80px rgba(168,85,247,0.06), inset 0 1px 0 rgba(255,255,255,0.05)', minHeight: '380px' }}>
+                      <div className="absolute -top-20 -left-20 w-40 h-40 rounded-full pointer-events-none" style={{ background: 'radial-gradient(circle, rgba(168,85,247,0.12) 0%, transparent 70%)' }} />
+                      <div className="flex items-center gap-4 mb-8 relative z-10">
+                        <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ background: 'rgba(168,85,247,0.15)', boxShadow: '0 0 20px rgba(168,85,247,0.1)' }}>
+                          <svg className="w-6 h-6 text-purple-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/></svg>
+                        </div>
+                        <h3 className="text-white/90 font-black tracking-widest text-xs uppercase">Post-Production</h3>
+                      </div>
+                      <div className="w-full h-px mb-7 relative z-10" style={{ background: 'linear-gradient(to right, rgba(168,85,247,0.3), transparent)' }} />
+                      <ul className="space-y-5 text-sm font-bold text-white/60 tracking-wide relative z-10">
+                        {[
+                          { label: "CapCut",          color: "text-purple-400",  icon: <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/></svg> },
+                          { label: "Adobe Premiere",  color: "text-blue-400",    icon: <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> },
+                          { label: "DaVinci Resolve", color: "text-teal-400",    icon: <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg> },
+                        ].map((t) => (
+                          <li key={t.label} className="flex items-center gap-4">
+                            <div className={`p-2 rounded-lg ${t.color}`} style={{ background: 'rgba(168,85,247,0.1)', boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.05)' }}>{t.icon}</div>
+                            {t.label}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
                   </div>
+
+                  {/* ── GRAPHICS ── */}
+                  <div className="tool-card-3d">
+                    <div className="relative overflow-hidden rounded-[24px] p-8 md:p-10" style={{ background: 'rgba(15, 10, 35, 0.7)', backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)', border: '1px solid rgba(192, 132, 252, 0.15)', boxShadow: '0 8px 32px rgba(0,0,0,0.4), 0 0 80px rgba(192,132,252,0.06), inset 0 1px 0 rgba(255,255,255,0.05)', minHeight: '380px' }}>
+                      <div className="absolute -bottom-16 -right-16 w-40 h-40 rounded-full pointer-events-none" style={{ background: 'radial-gradient(circle, rgba(192,132,252,0.12) 0%, transparent 70%)' }} />
+                      <div className="flex items-center gap-4 mb-8 relative z-10">
+                        <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ background: 'rgba(192,132,252,0.15)', boxShadow: '0 0 20px rgba(192,132,252,0.1)' }}>
+                          <svg className="w-6 h-6 text-purple-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/></svg>
+                        </div>
+                        <h3 className="text-white/90 font-black tracking-widest text-xs uppercase">Graphics</h3>
+                      </div>
+                      <div className="w-full h-px mb-7 relative z-10" style={{ background: 'linear-gradient(to right, rgba(192,132,252,0.3), transparent)' }} />
+                      <ul className="space-y-5 text-sm font-bold text-white/60 tracking-wide relative z-10">
+                        {[
+                          { label: "Canva",        color: "text-blue-400",    icon: <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><line x1="21.17" y1="8" x2="12" y2="8"/><line x1="3.95" y1="6.06" x2="8.54" y2="14"/><line x1="10.88" y1="21.94" x2="15.46" y2="14"/></svg> },
+                          { label: "Photoshop",    color: "text-indigo-400",  icon: <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg> },
+                          { label: "Illustrator",  color: "text-orange-400",  icon: <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/></svg> },
+                        ].map((t) => (
+                          <li key={t.label} className="flex items-center gap-4">
+                            <div className={`p-2 rounded-lg ${t.color}`} style={{ background: 'rgba(192,132,252,0.1)', boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.05)' }}>{t.icon}</div>
+                            {t.label}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+
                 </div>
               </div>
-
-              {/* ── GRAPHICS ── */}
-              <div className="flex justify-center items-start">
-                <div
-                  className="orb-tool-card relative overflow-hidden bg-[#e6eaf0]"
-                  style={{ width: 140, height: 140, borderRadius: "50%", boxShadow: orbShadow }}
-                >
-                  <div className="orb-face absolute inset-0 flex flex-col items-center justify-center gap-2 z-10 pointer-events-none">
-                    <div className="w-14 h-14 rounded-full flex items-center justify-center bg-[#e6eaf0]" style={{ boxShadow: orbInnerShadow }}>
-                      <svg className="w-6 h-6 text-indigo-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/>
-                        <path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/>
-                      </svg>
-                    </div>
-                    <span className="text-[9px] font-black tracking-[0.2em] uppercase text-fuchsia-600">Graphics</span>
-                  </div>
-                  <div className="orb-content absolute inset-0 p-9">
-                    <h3 className="text-fuchsia-600 font-black tracking-widest text-xs uppercase mb-7 border-b border-gray-300/50 pb-4">Graphics</h3>
-                    <ul className="space-y-5 text-sm font-bold text-gray-600 tracking-wide">
-                      {[
-                        { label: "Canva",        color: "text-blue-400",   icon: <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><line x1="21.17" y1="8" x2="12" y2="8"/><line x1="3.95" y1="6.06" x2="8.54" y2="14"/><line x1="10.88" y1="21.94" x2="15.46" y2="14"/></svg> },
-                        { label: "Photoshop",    color: "text-indigo-500", icon: <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg> },
-                        { label: "Illustrator",  color: "text-orange-500", icon: <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/></svg> },
-                      ].map((t) => (
-                        <li key={t.label} className="flex items-center gap-4">
-                          <div className={`p-2 rounded-lg bg-[#e6eaf0] ${t.color}`} style={{ boxShadow: orbInnerShadow }}>{t.icon}</div>
-                          {t.label}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-              </div>
-
             </div>
           </section>
 
           {/* ── PROJECTS ── */}
-          <section id="projects" className="max-w-6xl mx-auto py-32 border-t border-gray-300/30">
-            <h2 className="text-3xl md:text-5xl font-black uppercase tracking-[0.2em] text-gray-800 mb-20 text-center drop-shadow-sm">Selected Work</h2>
-            <div ref={projectsRef} className="grid grid-cols-1 md:grid-cols-2 gap-10 px-4">
+          <section id="projects" className="max-w-6xl mx-auto py-32 border-t border-white/[0.06]">
+            <h2 className="text-3xl md:text-5xl font-black uppercase tracking-[0.2em] text-white/90 mb-20 text-center" style={{ textShadow: '0 0 30px rgba(147,51,234,0.2)' }}>Selected Work</h2>
+            <div ref={projectsRef} className="grid grid-cols-1 md:grid-cols-2 gap-8 px-4">
               {[1, 2, 3, 4].map((item) => (
-                <div key={item} className={`project-card h-80 rounded-[2.5rem] flex flex-col items-center justify-center group cursor-pointer overflow-hidden relative ${neuOuter}`}>
-                  <div className={`absolute inset-6 rounded-[2rem] transition-transform duration-500 ${neuInner}`} />
-                  <p className="text-gray-500 font-bold tracking-widest uppercase text-sm z-10">Project 0{item}</p>
+                <div key={item} className="project-card h-80 rounded-[2rem] flex flex-col items-center justify-center group cursor-pointer overflow-hidden relative" style={{ background: 'rgba(15, 10, 35, 0.5)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)', border: '1px solid rgba(147,51,234,0.1)', boxShadow: '0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.03)' }}>
+                  <div className="absolute inset-6 rounded-[1.5rem] transition-transform duration-500" style={{ background: 'rgba(147,51,234,0.04)', border: '1px solid rgba(147,51,234,0.06)' }} />
+                  <p className="text-white/40 font-bold tracking-widest uppercase text-sm z-10">Project 0{item}</p>
                 </div>
               ))}
             </div>
@@ -1126,13 +1109,13 @@ export default function MountainLanding() {
           <section
             id="collab"
             ref={collabRef}
-            className="max-w-6xl mx-auto py-32 border-t border-gray-300/30 px-4"
+            className="max-w-6xl mx-auto py-32 border-t border-white/[0.06] px-4"
           >
             {/* Headline */}
             <div className="collab-headline text-center mb-16 select-none">
               <p className="text-fuchsia-500 text-[9px] tracking-[0.5em] uppercase font-black mb-6">Ready to Collaborate</p>
               <h2
-                className="font-black uppercase leading-[0.82] text-gray-800"
+                className="font-black uppercase leading-[0.82] text-white/90"
                 style={{ fontSize: "clamp(3.2rem, 9vw, 7.5rem)", letterSpacing: "-0.025em" }}
               >
                 Let's Work
@@ -1145,21 +1128,25 @@ export default function MountainLanding() {
 
             {/* ─── Panel 1: Graphics Design ─────────────────────────────────── */}
             <div
-              className="collab-panel-1 relative overflow-hidden bg-[#e6eaf0]"
+              className="collab-panel-1 relative overflow-hidden"
               style={{
                 borderRadius: "40px",
-                boxShadow: orbShadow,
+                background: 'rgba(15, 10, 35, 0.6)',
+                backdropFilter: 'blur(20px)',
+                WebkitBackdropFilter: 'blur(20px)',
+                border: '1px solid rgba(147,51,234,0.12)',
+                boxShadow: '0 8px 32px rgba(0,0,0,0.3), 0 0 60px rgba(147,51,234,0.05), inset 0 1px 0 rgba(255,255,255,0.04)',
                 minHeight: "260px",
               }}
             >
               {/* Decorative floating orb accent */}
               <div
                 className="absolute -right-16 -top-16 w-72 h-72 rounded-full pointer-events-none"
-                style={{ boxShadow: "inset 18px 18px 36px #c8d0e0, inset -18px -18px 36px #ffffff", opacity: 0.6 }}
+                style={{ background: 'radial-gradient(circle, rgba(147,51,234,0.1) 0%, transparent 70%)', opacity: 0.6 }}
               />
               <div
                 className="absolute -right-8 -top-8 w-48 h-48 rounded-full pointer-events-none"
-                style={{ boxShadow: "inset 12px 12px 24px #c8d0e0, inset -12px -12px 24px #ffffff", opacity: 0.4 }}
+                style={{ background: 'radial-gradient(circle, rgba(168,85,247,0.08) 0%, transparent 70%)', opacity: 0.4 }}
               />
 
               <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-10 p-12 md:p-16">
@@ -1168,14 +1155,14 @@ export default function MountainLanding() {
                     01 / Creative Direction
                   </p>
                   <h3
-                    className="font-black uppercase text-gray-800 leading-none"
+                    className="font-black uppercase text-white/90 leading-none"
                     style={{ fontSize: "clamp(2rem, 5vw, 3.8rem)", letterSpacing: "-0.02em" }}
                   >
                     Graphics
                     <br />
                     Design
                   </h3>
-                  <p className="text-gray-400 text-[10px] tracking-[0.3em] uppercase mt-4 font-semibold">
+                  <p className="text-white/30 text-[10px] tracking-[0.3em] uppercase mt-4 font-semibold">
                     Branding · Identity · Print · Digital
                   </p>
                 </div>
@@ -1184,14 +1171,15 @@ export default function MountainLanding() {
                 <div className="flex flex-col items-end gap-3 shrink-0">
                   <button
                     onClick={() => triggerTransition("/graphics", "left")}
-                    className={`group/btn flex items-center gap-4 px-10 py-5 rounded-full text-sm cursor-pointer ${neuButton}`}
+                    className={`group/btn flex items-center gap-4 px-10 py-5 rounded-full text-sm cursor-pointer ${darkButton}`}
+                    style={{ background: 'rgba(147,51,234,0.12)', boxShadow: '0 0 20px rgba(147,51,234,0.1)' }}
                   >
                     <span>Start a Project</span>
                     <span className="w-6 h-6 rounded-full flex items-center justify-center bg-fuchsia-500 text-white text-xs shadow-[0_0_12px_rgba(168,85,247,0.5)] group-hover/btn:shadow-[0_0_20px_rgba(168,85,247,0.7)] transition-shadow duration-300">
                       →
                     </span>
                   </button>
-                  <span className="text-gray-400 text-[9px] tracking-widest uppercase font-medium">
+                  <span className="text-white/25 text-[9px] tracking-widest uppercase font-medium">
                     Response within 24h
                   </span>
                 </div>
@@ -1228,7 +1216,7 @@ export default function MountainLanding() {
                 <path
                   d="M0,28 Q250,14 500,28 Q750,42 1000,28"
                   fill="none"
-                  stroke="rgba(255,255,255,0.5)"
+                  stroke="rgba(255,255,255,0.12)"
                   strokeWidth="1"
                   strokeLinecap="round"
                 />
@@ -1237,21 +1225,25 @@ export default function MountainLanding() {
 
             {/* ─── Panel 2: Video Editing ────────────────────────────────────── */}
             <div
-              className="collab-panel-2 relative overflow-hidden bg-[#e6eaf0]"
+              className="collab-panel-2 relative overflow-hidden"
               style={{
                 borderRadius: "40px",
-                boxShadow: orbShadow,
+                background: 'rgba(15, 10, 35, 0.6)',
+                backdropFilter: 'blur(20px)',
+                WebkitBackdropFilter: 'blur(20px)',
+                border: '1px solid rgba(168,85,247,0.12)',
+                boxShadow: '0 8px 32px rgba(0,0,0,0.3), 0 0 60px rgba(168,85,247,0.05), inset 0 1px 0 rgba(255,255,255,0.04)',
                 minHeight: "260px",
               }}
             >
               {/* Decorative orb accent — mirrored, bottom-left */}
               <div
                 className="absolute -left-16 -bottom-16 w-72 h-72 rounded-full pointer-events-none"
-                style={{ boxShadow: "inset 18px 18px 36px #c8d0e0, inset -18px -18px 36px #ffffff", opacity: 0.6 }}
+                style={{ background: 'radial-gradient(circle, rgba(168,85,247,0.1) 0%, transparent 70%)', opacity: 0.6 }}
               />
               <div
                 className="absolute -left-8 -bottom-8 w-48 h-48 rounded-full pointer-events-none"
-                style={{ boxShadow: "inset 12px 12px 24px #c8d0e0, inset -12px -12px 24px #ffffff", opacity: 0.4 }}
+                style={{ background: 'radial-gradient(circle, rgba(147,51,234,0.08) 0%, transparent 70%)', opacity: 0.4 }}
               />
 
               <div className="relative z-10 flex flex-col md:flex-row-reverse items-center justify-between gap-10 p-12 md:p-16">
@@ -1260,14 +1252,14 @@ export default function MountainLanding() {
                     02 / Post-Production
                   </p>
                   <h3
-                    className="font-black uppercase text-gray-800 leading-none"
+                    className="font-black uppercase text-white/90 leading-none"
                     style={{ fontSize: "clamp(2rem, 5vw, 3.8rem)", letterSpacing: "-0.02em" }}
                   >
                     Video
                     <br />
                     Editing
                   </h3>
-                  <p className="text-gray-400 text-[10px] tracking-[0.3em] uppercase mt-4 font-semibold">
+                  <p className="text-white/30 text-[10px] tracking-[0.3em] uppercase mt-4 font-semibold">
                     Reels · Shorts · Films · Motion
                   </p>
                 </div>
@@ -1276,7 +1268,8 @@ export default function MountainLanding() {
                 <div className="flex flex-col items-start gap-3 shrink-0">
                   <button
                     onClick={() => triggerTransition("/video", "right")}
-                    className={`group/btn flex items-center gap-4 px-10 py-5 rounded-full text-sm cursor-pointer ${neuButton}`}
+                    className={`group/btn flex items-center gap-4 px-10 py-5 rounded-full text-sm cursor-pointer ${darkButton}`}
+                    style={{ background: 'rgba(168,85,247,0.12)', boxShadow: '0 0 20px rgba(168,85,247,0.1)' }}
                   >
                     <span
                       className="w-6 h-6 rounded-full flex items-center justify-center bg-fuchsia-500 text-white text-xs shadow-[0_0_12px_rgba(168,85,247,0.5)] group-hover/btn:shadow-[0_0_20px_rgba(168,85,247,0.7)] transition-shadow duration-300"
@@ -1285,7 +1278,7 @@ export default function MountainLanding() {
                     </span>
                     <span>Start a Project</span>
                   </button>
-                  <span className="text-gray-400 text-[9px] tracking-widest uppercase font-medium">
+                  <span className="text-white/25 text-[9px] tracking-widest uppercase font-medium">
                     Response within 24h
                   </span>
                 </div>
@@ -1296,21 +1289,21 @@ export default function MountainLanding() {
 
           {/* ── CONTACT FORM ── */}
           <section id="cta" className="max-w-4xl mx-auto py-32 my-10 px-4" ref={ctaRef}>
-            <div className={`rounded-[3rem] p-10 md:p-20 relative overflow-hidden ${neuOuter}`}>
+            <div className="rounded-[3rem] p-10 md:p-20 relative overflow-hidden" style={{ background: 'rgba(15, 10, 35, 0.55)', backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)', border: '1px solid rgba(147,51,234,0.1)', boxShadow: '0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.03)' }}>
               <div className="text-center mb-12">
-                <h2 className="text-4xl md:text-5xl font-black uppercase tracking-[0.1em] text-gray-800 mb-4 drop-shadow-sm">Communicate</h2>
-                <p className="text-gray-500 text-sm md:text-base leading-relaxed tracking-wide font-medium max-w-lg mx-auto">
+                <h2 className="text-4xl md:text-5xl font-black uppercase tracking-[0.1em] text-white/90 mb-4" style={{ textShadow: '0 0 30px rgba(147,51,234,0.2)' }}>Communicate</h2>
+                <p className="text-white/40 text-sm md:text-base leading-relaxed tracking-wide font-medium max-w-lg mx-auto">
                   Initialize a secure channel. Submit your parameters below to deploy our systems for your next operation.
                 </p>
               </div>
               <form onSubmit={handleContactSubmit} className="max-w-xl mx-auto space-y-6">
-                <input type="text"  required placeholder="Identification (Name)"            className={neuInput} value={formData.name}    onChange={(e) => setFormData({ ...formData, name: e.target.value })} />
-                <input type="email" required placeholder="Transmission Protocol (Email)"    className={neuInput} value={formData.email}   onChange={(e) => setFormData({ ...formData, email: e.target.value })} />
-                <textarea          required placeholder="Payload (Message details)" rows={5} className={`${neuInput} resize-none`} value={formData.message} onChange={(e) => setFormData({ ...formData, message: e.target.value })} />
-                {submitStatus === "success" && <p className="text-green-600 text-sm font-bold tracking-widest uppercase text-center">Transmission Successful.</p>}
-                {submitStatus === "error"   && <p className="text-red-500  text-sm font-bold tracking-widest uppercase text-center">Transmission Failed. Retrying...</p>}
+                <input type="text"  required placeholder="Identification (Name)"            className={darkInput} style={{ background: 'rgba(147,51,234,0.06)' }} value={formData.name}    onChange={(e) => setFormData({ ...formData, name: e.target.value })} />
+                <input type="email" required placeholder="Transmission Protocol (Email)"    className={darkInput} style={{ background: 'rgba(147,51,234,0.06)' }} value={formData.email}   onChange={(e) => setFormData({ ...formData, email: e.target.value })} />
+                <textarea          required placeholder="Payload (Message details)" rows={5} className={`${darkInput} resize-none`} style={{ background: 'rgba(147,51,234,0.06)' }} value={formData.message} onChange={(e) => setFormData({ ...formData, message: e.target.value })} />
+                {submitStatus === "success" && <p className="text-emerald-400 text-sm font-bold tracking-widest uppercase text-center">Transmission Successful.</p>}
+                {submitStatus === "error"   && <p className="text-red-400  text-sm font-bold tracking-widest uppercase text-center">Transmission Failed. Retrying...</p>}
                 <div className="flex justify-center pt-4">
-                  <button type="submit" disabled={submitStatus === "loading"} className={`px-12 py-4 rounded-full ${neuButton} ${submitStatus === "loading" ? "opacity-50 cursor-wait" : ""}`}>
+                  <button type="submit" disabled={submitStatus === "loading"} className={`px-12 py-4 rounded-full ${darkButton} ${submitStatus === "loading" ? "opacity-50 cursor-wait" : ""}`} style={{ background: 'rgba(147,51,234,0.15)', boxShadow: '0 0 20px rgba(147,51,234,0.1)' }}>
                     {submitStatus === "loading" ? "Transmitting..." : "Initiate Contact"}
                   </button>
                 </div>
@@ -1323,7 +1316,7 @@ export default function MountainLanding() {
         {/* ══════════════════════════════════════════════════════════════════ */}
         {/* FOOTER — SUMMIT SILHOUETTE                                        */}
         {/* ══════════════════════════════════════════════════════════════════ */}
-        <footer ref={footerRef} className="relative z-30 bg-[#e6eaf0] overflow-hidden">
+        <footer ref={footerRef} className="relative z-30 overflow-hidden" style={{ background: '#0a0814' }}>
 
           {/* ── Summit Silhouette SVG — rises on scroll ── */}
           <svg
@@ -1348,8 +1341,8 @@ export default function MountainLanding() {
                 <stop offset="100%" stopColor="#0a0a14" />
               </linearGradient>
               <linearGradient id="summitSky" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#e6eaf0" />
-                <stop offset="40%" stopColor="#d5d9e3" />
+                <stop offset="0%" stopColor="#0a0814" />
+                <stop offset="40%" stopColor="#0d0b1a" />
                 <stop offset="100%" stopColor="#1a1a2e" stopOpacity="0.3" />
               </linearGradient>
             </defs>

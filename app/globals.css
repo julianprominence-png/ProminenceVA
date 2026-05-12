@@ -11,7 +11,7 @@ html {
   scroll-behavior: smooth;
   background-color: var(--bg-deep);
   color: #ffffff;
-  overflow-x: hidden; /* Allow vertical but prevent horizontal */
+  overflow-x: hidden;
 }
 
 body {
@@ -21,7 +21,6 @@ body {
   position: relative;
 }
 
-/* Prevent horizontal scroll from cloud overflow */
 body, #__next {
   max-width: 100vw;
   overflow-x: hidden;
@@ -44,7 +43,6 @@ body, #__next {
   @apply bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-purple-600;
 }
 
-/* Ethereal glow animation for clouds */
 @keyframes pulse-glow {
   0%, 100% { opacity: 0.4; }
   50% { opacity: 0.7; }
@@ -54,7 +52,6 @@ body, #__next {
   animation: pulse-glow 6s ease-in-out infinite;
 }
 
-/* Floating animation */
 @keyframes float {
   0%, 100% { transform: translateY(0px); }
   50% { transform: translateY(-10px); }
@@ -64,7 +61,6 @@ body, #__next {
   animation: float 6s ease-in-out infinite;
 }
 
-/* Subtle shimmer for light elements */
 @keyframes shimmer {
   0% { opacity: 0.5; }
   50% { opacity: 1; }
@@ -75,7 +71,6 @@ body, #__next {
   animation: shimmer 4s ease-in-out infinite;
 }
 
-/* Cinematic fade */
 @keyframes cinematic-fade {
   from { opacity: 0; transform: translateY(20px); }
   to { opacity: 1; transform: translateY(0); }
@@ -85,21 +80,91 @@ body, #__next {
   animation: cinematic-fade 1.2s ease-out forwards;
 }
 
-/* Performance optimization for 3D transforms */
 .will-change-transform {
   will-change: transform;
 }
 
-/* Smooth scrolling for immersive experience */
 @media (prefers-reduced-motion: no-preference) {
   html {
     scroll-behavior: smooth;
   }
 }
 
-/* GPU acceleration for smooth animations */
 .gpu-accelerated {
   transform: translateZ(0);
   backface-visibility: hidden;
   perspective: 1000px;
-} 
+}
+
+/* ─── STARFIELD ─── procedural tiling stars via radial-gradient ─── */
+.starfield {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.starfield::before,
+.starfield::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.starfield::before {
+  background-image:
+    radial-gradient(1px 1px at 47px 78px, rgba(255,255,255,0.5), transparent),
+    radial-gradient(1px 1px at 132px 210px, rgba(255,255,255,0.35), transparent),
+    radial-gradient(1.2px 1.2px at 265px 55px, rgba(255,255,255,0.55), transparent),
+    radial-gradient(0.8px 0.8px at 310px 340px, rgba(255,255,255,0.3), transparent),
+    radial-gradient(1px 1px at 90px 400px, rgba(255,255,255,0.4), transparent),
+    radial-gradient(1.5px 1.5px at 420px 120px, rgba(255,255,255,0.65), transparent),
+    radial-gradient(0.7px 0.7px at 180px 290px, rgba(255,255,255,0.25), transparent),
+    radial-gradient(1px 1px at 380px 450px, rgba(255,255,255,0.45), transparent),
+    radial-gradient(0.9px 0.9px at 230px 160px, rgba(255,255,255,0.3), transparent),
+    radial-gradient(1.2px 1.2px at 470px 280px, rgba(255,255,255,0.5), transparent),
+    radial-gradient(1px 1px at 55px 490px, rgba(255,255,255,0.35), transparent),
+    radial-gradient(0.8px 0.8px at 340px 35px, rgba(255,255,255,0.4), transparent),
+    radial-gradient(1.3px 1.3px at 150px 440px, rgba(255,255,255,0.55), transparent),
+    radial-gradient(1px 1px at 490px 380px, rgba(255,255,255,0.3), transparent),
+    radial-gradient(0.6px 0.6px at 280px 500px, rgba(255,255,255,0.2), transparent);
+  background-size: 520px 540px;
+}
+
+.starfield::after {
+  background-image:
+    radial-gradient(1px 1px at 67px 148px, rgba(255,255,255,0.4), transparent),
+    radial-gradient(0.8px 0.8px at 220px 80px, rgba(255,255,255,0.3), transparent),
+    radial-gradient(1.4px 1.4px at 350px 230px, rgba(255,255,255,0.55), transparent),
+    radial-gradient(0.9px 0.9px at 110px 350px, rgba(255,255,255,0.35), transparent),
+    radial-gradient(1px 1px at 450px 60px, rgba(255,255,255,0.45), transparent),
+    radial-gradient(1.1px 1.1px at 30px 260px, rgba(255,255,255,0.5), transparent),
+    radial-gradient(0.7px 0.7px at 400px 420px, rgba(255,255,255,0.25), transparent),
+    radial-gradient(1.3px 1.3px at 175px 15px, rgba(255,255,255,0.6), transparent),
+    radial-gradient(1px 1px at 500px 310px, rgba(255,255,255,0.35), transparent),
+    radial-gradient(0.8px 0.8px at 70px 470px, rgba(255,255,255,0.3), transparent),
+    radial-gradient(1.5px 1.5px at 300px 150px, rgba(255,255,255,0.5), transparent),
+    radial-gradient(0.6px 0.6px at 440px 490px, rgba(255,255,255,0.2), transparent);
+  background-size: 580px 500px;
+  animation: twinkle-stars 6s ease-in-out infinite alternate;
+}
+
+@keyframes twinkle-stars {
+  0% { opacity: 0.6; }
+  50% { opacity: 1; }
+  100% { opacity: 0.7; }
+}
+
+/* ─── 3D Tool Cards ─── */
+.tool-card-3d {
+  transform-style: preserve-3d;
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+}
+
+.tools-3d-stage {
+  perspective: 1200px;
+  perspective-origin: 50% 50%;
+  transform-style: preserve-3d;
+}
