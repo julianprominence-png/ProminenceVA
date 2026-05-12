@@ -479,51 +479,24 @@ export default function MountainLanding() {
           .to(bio,     { opacity: 1, height: "auto", duration: 0.4, ease: "power2.out" }, "-=0.2");
       });
 
-      /* ─── 3D REVOLVING CARD STACK for TOOLS ────────────────────────────────── */
+      /* ─── TOOLS — CLEAN STAGGER REVEAL ─────────────────────────────────────── */
       if (toolsRef.current) {
-        const cards3d = gsap.utils.toArray(".tool-card-3d") as HTMLElement[];
         const toolsHeader = toolsRef.current.querySelector(".tools-header");
+        const toolCards = gsap.utils.toArray(".tool-card-neu") as HTMLElement[];
 
-        // Set initial states — cards are behind the camera, rotated, invisible
-        gsap.set(toolsHeader, { opacity: 0, y: 50 });
-        cards3d.forEach((card, i) => {
-          gsap.set(card, {
-            z: -900 - i * 350,
-            rotateX: 18 + i * 6,
-            rotateY: (i - 1) * 25,
-            opacity: 0,
-            scale: 0.45,
-            transformPerspective: 1200,
-          });
-        });
+        if (toolsHeader) {
+          gsap.fromTo(toolsHeader,
+            { opacity: 0, yPercent: 30 },
+            { opacity: 1, yPercent: 0, duration: 1, ease: "power4.out",
+              scrollTrigger: { trigger: toolsRef.current, start: "top 80%" } }
+          );
+        }
 
-        const toolsTl = gsap.timeline({
-          scrollTrigger: {
-            trigger: toolsRef.current,
-            start: "top top",
-            end: "+=2800",
-            pin: true,
-            scrub: 1.2,
-            anticipatePin: 1,
-          },
-        });
-
-        // Header fades in first
-        toolsTl.to(toolsHeader, { opacity: 1, y: 0, duration: 0.2, ease: "power2.out" }, 0);
-
-        // Cards fly in one-by-one with staggered timing
-        cards3d.forEach((card, i) => {
-          const start = 0.12 + i * 0.3;
-          toolsTl.to(card, {
-            z: 0,
-            rotateX: 0,
-            rotateY: 0,
-            opacity: 1,
-            scale: 1,
-            duration: 0.35,
-            ease: "power2.out",
-          }, start);
-        });
+        gsap.fromTo(toolCards,
+          { opacity: 0, yPercent: 20 },
+          { opacity: 1, yPercent: 0, duration: 1.2, stagger: 0.15, ease: "power4.out",
+            scrollTrigger: { trigger: toolsRef.current, start: "top 75%" } }
+        );
       }
 
       /* ─── PROJECTS ───────────────────────────────────────────────────────── */
@@ -808,26 +781,37 @@ export default function MountainLanding() {
           <div className="starfield" style={{ top: '30%', maskImage: 'linear-gradient(to bottom, transparent 0%, black 15%)', WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 15%)' }} />
 
           {/* ══════════════════════════════════════════════════════════════════ */}
-          {/* HERO — OUR STORY                                                 */}
+          {/* HERO — CONVERTING LANDING                                          */}
           {/* ══════════════════════════════════════════════════════════════════ */}
           <section ref={heroSectionRef} className="relative max-w-6xl mx-auto pt-10 pb-40 overflow-visible">
 
-            {/* ── Backdrop Logo — large, low-opacity, offset left ── */}
-            <div className="hero-backdrop-logo absolute pointer-events-none select-none" style={{ top: "-12%", left: "-15%", width: "clamp(600px, 90vw, 1000px)", height: "clamp(600px, 90vw, 1000px)", opacity: 0.156, zIndex: 0 }}>
-              {/* Radial glow behind logo */}
-              <div className="absolute inset-0 rounded-full" style={{ background: "radial-gradient(circle, rgba(147,51,234,0.06) 0%, rgba(236,72,153,0.03) 40%, transparent 70%)", transform: "scale(1.3)" }} />
-              <img src="/images/main-bg.png" alt="" className="w-full h-full object-contain relative z-10" style={{ filter: "grayscale(0.2)" }} />
-              {/* Orbital rings around logo */}
-              <svg className="orbital-ring absolute inset-0 w-full h-full" viewBox="0 0 200 200" fill="none" style={{ transform: "scale(1.15)" }}>
-                <ellipse cx="100" cy="100" rx="95" ry="95" stroke="rgba(147,51,234,0.35)" strokeWidth="1.2" strokeDasharray="8 6" />
-                <circle cx="100" cy="5" r="2.5" fill="rgba(147,51,234,0.5)" />
-              </svg>
-              <svg className="orbital-ring absolute inset-0 w-full h-full" viewBox="0 0 200 200" fill="none" style={{ transform: "rotate(60deg) scale(1.05)" }}>
-                <ellipse cx="100" cy="100" rx="82" ry="82" stroke="rgba(236,72,153,0.3)" strokeWidth="1" strokeDasharray="5 10" />
-                <circle cx="182" cy="100" r="2" fill="rgba(236,72,153,0.45)" />
-              </svg>
-              <svg className="orbital-ring absolute inset-0 w-full h-full" viewBox="0 0 200 200" fill="none" style={{ transform: "rotate(-30deg) scale(1.25)" }}>
-                <ellipse cx="100" cy="100" rx="98" ry="98" stroke="rgba(168,85,247,0.15)" strokeWidth="0.8" strokeDasharray="3 14" />
+            {/* ── Soft lavender radial spotlight ── */}
+            <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse 70% 60% at 50% 40%, rgba(192,132,252,0.10) 0%, rgba(168,85,247,0.04) 40%, transparent 70%)" }} />
+
+            {/* ── Abstract dotted rings — blurred background depth ── */}
+            <svg className="orbital-ring absolute pointer-events-none select-none" style={{ top: "-8%", left: "-12%", width: "clamp(500px, 75vw, 900px)", height: "clamp(500px, 75vw, 900px)", opacity: 0.12, filter: "blur(1.5px)" }} viewBox="0 0 200 200" fill="none">
+              <ellipse cx="100" cy="100" rx="95" ry="95" stroke="rgba(147,51,234,0.5)" strokeWidth="0.8" strokeDasharray="3 8" />
+              <circle cx="100" cy="5" r="2" fill="rgba(147,51,234,0.35)" />
+            </svg>
+            <svg className="orbital-ring absolute pointer-events-none select-none" style={{ top: "5%", right: "-8%", width: "clamp(400px, 55vw, 700px)", height: "clamp(400px, 55vw, 700px)", opacity: 0.09, filter: "blur(2px)" }} viewBox="0 0 200 200" fill="none">
+              <ellipse cx="100" cy="100" rx="90" ry="90" stroke="rgba(236,72,153,0.4)" strokeWidth="0.6" strokeDasharray="2 12" />
+              <circle cx="190" cy="100" r="1.5" fill="rgba(236,72,153,0.3)" />
+            </svg>
+            <svg className="orbital-ring absolute pointer-events-none select-none" style={{ bottom: "10%", left: "10%", width: "clamp(300px, 40vw, 550px)", height: "clamp(300px, 40vw, 550px)", opacity: 0.07, filter: "blur(2.5px)" }} viewBox="0 0 200 200" fill="none">
+              <ellipse cx="100" cy="100" rx="85" ry="85" stroke="rgba(168,85,247,0.3)" strokeWidth="0.5" strokeDasharray="4 10" />
+            </svg>
+
+            {/* ── Geometric mountain/triangle shapes — midground ── */}
+            <div className="absolute inset-x-0 bottom-12 pointer-events-none select-none flex justify-center" style={{ zIndex: 1 }}>
+              <svg width="100%" height="260" viewBox="0 0 1200 260" preserveAspectRatio="xMidYMax meet" fill="none" className="max-w-5xl">
+                <polygon points="600,10 380,240 820,240" fill="rgba(147,51,234,0.04)" stroke="rgba(147,51,234,0.08)" strokeWidth="1" />
+                <polygon points="440,60 280,240 600,240" fill="rgba(168,85,247,0.03)" stroke="rgba(168,85,247,0.06)" strokeWidth="0.8" />
+                <polygon points="760,50 620,240 920,240" fill="rgba(192,132,252,0.03)" stroke="rgba(192,132,252,0.06)" strokeWidth="0.8" />
+                <polygon points="600,30 500,140 700,140" fill="rgba(147,51,234,0.02)" stroke="rgba(147,51,234,0.05)" strokeWidth="0.6" />
+                {/* Snow caps */}
+                <polygon points="600,10 580,40 620,40" fill="rgba(255,255,255,0.15)" />
+                <polygon points="440,60 425,82 455,82" fill="rgba(255,255,255,0.10)" />
+                <polygon points="760,50 746,72 774,72" fill="rgba(255,255,255,0.10)" />
               </svg>
             </div>
 
@@ -838,96 +822,91 @@ export default function MountainLanding() {
             <div className="hero-particle absolute w-1 h-1 rounded-full bg-purple-500/20 pointer-events-none" style={{ top: "25%", right: "12%" }} />
             <div className="hero-particle absolute w-1.5 h-1.5 rounded-full bg-pink-400/15 pointer-events-none" style={{ top: "70%", right: "8%" }} />
 
-            {/* ── Low-poly Flowers — LEFT ── */}
-            <div className="absolute left-0 bottom-0 w-32 md:w-48 h-full pointer-events-none select-none" style={{ transform: "translateX(-30%)" }}>
-              <svg className="flower-stem absolute bottom-8 left-4" width="40" height="180" viewBox="0 0 40 180" fill="none">
-                <path d="M20,180 L20,60 L15,50 L20,35 L25,50 L20,60" stroke="rgba(34,197,94,0.35)" strokeWidth="2" fill="none" />
-                <polygon points="20,35 12,15 20,0 28,15" fill="rgba(168,85,247,0.2)" />
-                <polygon points="20,25 14,10 20,0 26,10" fill="rgba(192,132,252,0.25)" />
-                <path d="M20,80 L8,65" stroke="rgba(34,197,94,0.25)" strokeWidth="1.5" />
-                <polygon points="8,65 0,55 8,50 12,60" fill="rgba(34,197,94,0.15)" />
-                <path d="M20,110 L32,95" stroke="rgba(34,197,94,0.25)" strokeWidth="1.5" />
-                <polygon points="32,95 40,85 32,80 28,90" fill="rgba(34,197,94,0.15)" />
+            {/* ── Minimal geometric floral accents — faint background ── */}
+            <div className="absolute left-0 bottom-0 w-32 md:w-44 h-full pointer-events-none select-none" style={{ transform: "translateX(-20%)", opacity: 0.5, filter: "blur(0.5px)" }}>
+              <svg className="flower-stem absolute bottom-8 left-4" width="40" height="160" viewBox="0 0 40 160" fill="none">
+                <path d="M20,160 L20,55 L15,46 L20,32 L25,46 L20,55" stroke="rgba(34,197,94,0.3)" strokeWidth="1.5" fill="none" />
+                <polygon points="20,32 13,14 20,0 27,14" fill="rgba(168,85,247,0.15)" />
+                <path d="M20,80 L10,68" stroke="rgba(34,197,94,0.2)" strokeWidth="1" />
+                <polygon points="10,68 3,58 10,54 13,64" fill="rgba(34,197,94,0.1)" />
               </svg>
-              <svg className="flower-stem absolute bottom-4 left-16" width="35" height="140" viewBox="0 0 35 140" fill="none">
-                <path d="M17,140 L17,50 L12,40 L17,25 L22,40 L17,50" stroke="rgba(34,197,94,0.3)" strokeWidth="1.5" fill="none" />
-                <polygon points="17,25 10,8 17,0 24,8" fill="rgba(236,72,153,0.18)" />
-                <polygon points="17,18 12,6 17,0 22,6" fill="rgba(244,114,182,0.22)" />
-                <path d="M17,70 L7,58" stroke="rgba(34,197,94,0.2)" strokeWidth="1" />
-                <polygon points="7,58 0,50 7,46 10,54" fill="rgba(34,197,94,0.12)" />
+              <svg className="flower-stem absolute bottom-4 left-14" width="30" height="110" viewBox="0 0 30 110" fill="none">
+                <path d="M15,110 L15,40 L11,32 L15,20 L19,32 L15,40" stroke="rgba(34,197,94,0.25)" strokeWidth="1.5" fill="none" />
+                <polygon points="15,20 9,6 15,0 21,6" fill="rgba(236,72,153,0.12)" />
               </svg>
-              <svg className="flower-stem absolute bottom-12 left-8" width="30" height="100" viewBox="0 0 30 100" fill="none">
-                <path d="M15,100 L15,35 L11,28 L15,18 L19,28 L15,35" stroke="rgba(34,197,94,0.25)" strokeWidth="1.5" fill="none" />
-                <polygon points="15,18 9,5 15,0 21,5" fill="rgba(147,51,234,0.15)" />
-                <path d="M15,60 L25,50" stroke="rgba(34,197,94,0.2)" strokeWidth="1" />
-                <polygon points="25,50 30,42 24,38 22,46" fill="rgba(34,197,94,0.1)" />
+            </div>
+            <div className="absolute right-0 bottom-0 w-32 md:w-44 h-full pointer-events-none select-none" style={{ transform: "translateX(20%)", opacity: 0.5, filter: "blur(0.5px)" }}>
+              <svg className="flower-stem absolute bottom-6 right-6" width="40" height="150" viewBox="0 0 40 150" fill="none">
+                <path d="M20,150 L20,50 L15,42 L20,28 L25,42 L20,50" stroke="rgba(34,197,94,0.3)" strokeWidth="1.5" fill="none" />
+                <polygon points="20,28 13,10 20,0 27,10" fill="rgba(192,132,252,0.15)" />
+                <path d="M20,80 L30,68" stroke="rgba(34,197,94,0.2)" strokeWidth="1" />
+                <polygon points="30,68 37,58 30,54 27,64" fill="rgba(34,197,94,0.1)" />
+              </svg>
+              <svg className="flower-stem absolute bottom-10 right-14" width="28" height="100" viewBox="0 0 28 100" fill="none">
+                <path d="M14,100 L14,35 L10,28 L14,16 L18,28 L14,35" stroke="rgba(34,197,94,0.25)" strokeWidth="1.5" fill="none" />
+                <polygon points="14,16 8,5 14,0 20,5" fill="rgba(147,51,234,0.12)" />
               </svg>
             </div>
 
-            {/* ── Low-poly Flowers — RIGHT ── */}
-            <div className="absolute right-0 bottom-0 w-32 md:w-48 h-full pointer-events-none select-none" style={{ transform: "translateX(30%)" }}>
-              <svg className="flower-stem absolute bottom-6 right-6" width="40" height="160" viewBox="0 0 40 160" fill="none">
-                <path d="M20,160 L20,55 L15,45 L20,30 L25,45 L20,55" stroke="rgba(34,197,94,0.35)" strokeWidth="2" fill="none" />
-                <polygon points="20,30 12,12 20,0 28,12" fill="rgba(244,114,182,0.2)" />
-                <polygon points="20,22 14,8 20,0 26,8" fill="rgba(236,72,153,0.25)" />
-                <path d="M20,85 L30,72" stroke="rgba(34,197,94,0.25)" strokeWidth="1.5" />
-                <polygon points="30,72 38,62 30,58 26,68" fill="rgba(34,197,94,0.15)" />
-                <path d="M20,115 L10,100" stroke="rgba(34,197,94,0.25)" strokeWidth="1.5" />
-                <polygon points="10,100 2,90 10,86 14,96" fill="rgba(34,197,94,0.15)" />
-              </svg>
-              <svg className="flower-stem absolute bottom-10 right-16" width="35" height="130" viewBox="0 0 35 130" fill="none">
-                <path d="M17,130 L17,45 L12,36 L17,22 L22,36 L17,45" stroke="rgba(34,197,94,0.3)" strokeWidth="1.5" fill="none" />
-                <polygon points="17,22 10,7 17,0 24,7" fill="rgba(168,85,247,0.2)" />
-                <polygon points="17,15 12,5 17,0 22,5" fill="rgba(192,132,252,0.25)" />
-                <path d="M17,65 L27,55" stroke="rgba(34,197,94,0.2)" strokeWidth="1" />
-                <polygon points="27,55 35,47 27,43 24,51" fill="rgba(34,197,94,0.12)" />
-              </svg>
-              <svg className="flower-stem absolute bottom-2 right-10" width="28" height="95" viewBox="0 0 28 95" fill="none">
-                <path d="M14,95 L14,32 L10,25 L14,15 L18,25 L14,32" stroke="rgba(34,197,94,0.25)" strokeWidth="1.5" fill="none" />
-                <polygon points="14,15 8,4 14,0 20,4" fill="rgba(147,51,234,0.18)" />
-                <path d="M14,55 L5,45" stroke="rgba(34,197,94,0.2)" strokeWidth="1" />
-                <polygon points="5,45 0,38 6,34 8,42" fill="rgba(34,197,94,0.1)" />
-              </svg>
-            </div>
-
-            {/* ── Content — right-aligned on desktop ── */}
-            <div className="relative z-10 flex flex-col items-center md:items-end px-4 md:px-0 md:ml-auto md:max-w-[55%]">
+            {/* ── Content — centered, high-converting layout ── */}
+            <div className="relative z-10 flex flex-col items-center px-4 text-center">
 
               {/* Overline */}
-              <p className="hero-fade-in text-fuchsia-500/70 text-[9px] tracking-[0.5em] uppercase font-black mb-8">
+              <p className="hero-fade-in text-fuchsia-500/60 text-[9px] tracking-[0.5em] uppercase font-black mb-6">
                 Isaiah 60 — 61
               </p>
 
-              {/* Title with Astron font */}
+              {/* Headline — large, bold, high-contrast */}
               <h1
-                className="hero-fade-in mb-8 text-center md:text-right"
+                className="hero-fade-in mb-5"
                 style={{
                   fontFamily: "'Astron', sans-serif",
-                  fontSize: "clamp(2.4rem, 7vw, 5.5rem)",
-                  letterSpacing: "0.12em",
-                  lineHeight: 1,
-                  color: "#1f2937",
-                  textShadow: "0 2px 20px rgba(147,51,234,0.08)",
+                  fontSize: "clamp(3rem, 9vw, 7rem)",
+                  letterSpacing: "0.14em",
+                  lineHeight: 0.95,
+                  color: "#1a1a2e",
+                  filter: "drop-shadow(0 4px 25px rgba(147,51,234,0.12))",
                 }}
               >
                 PROMINENCE
               </h1>
 
-              {/* Decorative accent line */}
-              <div className="hero-fade-in flex items-center gap-4 mb-10">
-                <div className="w-16 h-px bg-gradient-to-r from-transparent to-fuchsia-400/40" />
-                <div className="w-1.5 h-1.5 rounded-full bg-fuchsia-500/40" />
-                <div className="w-8 h-px bg-gradient-to-l from-transparent to-fuchsia-400/40" />
-              </div>
-
-              {/* Story text */}
-              <p className="hero-fade-in text-gray-500 text-sm md:text-base leading-[2] font-medium max-w-lg text-center md:text-right" style={{ textWrap: "pretty" }}>
-                Founded through faith and inspired by Isaiah 60 to 61, Prominence Virtual Assistance was built from a small beginning with nothing but vision, purpose, and the courage to keep going. What started as a simple step of faith grew into a creative digital agency dedicated to helping businesses rise, shine, and bring their vision into prominence.
+              {/* Sub-headline — clear hierarchy */}
+              <p className="hero-fade-in text-gray-600 text-xs md:text-sm tracking-[0.35em] uppercase font-bold mb-10">
+                Virtual Assistance &nbsp;·&nbsp; Creative Studio &nbsp;·&nbsp; Digital Agency
               </p>
 
-              {/* Subtle tagline */}
-              <p className="hero-fade-in text-fuchsia-600/40 text-[9px] tracking-[0.4em] uppercase font-bold mt-10">
-                Virtual Assistance &nbsp;·&nbsp; Creative Studio &nbsp;·&nbsp; Digital Agency
+              {/* Decorative accent line */}
+              <div className="hero-fade-in flex items-center gap-4 mb-10">
+                <div className="w-20 h-px bg-gradient-to-r from-transparent to-fuchsia-400/40" />
+                <div className="w-2 h-2 rounded-full bg-fuchsia-500/30 shadow-[0_0_8px_rgba(147,51,234,0.2)]" />
+                <div className="w-20 h-px bg-gradient-to-l from-transparent to-fuchsia-400/40" />
+              </div>
+
+              {/* Description */}
+              <p className="hero-fade-in text-gray-500 text-sm md:text-base leading-[2] font-medium max-w-xl mb-12" style={{ textWrap: "pretty" }}>
+                Helping businesses rise, shine, and bring their vision into prominence. Built on faith, driven by purpose.
+              </p>
+
+              {/* CTA Button — prominent, deep purple */}
+              <a
+                href="#collab"
+                className="hero-fade-in group relative inline-flex items-center gap-3 px-10 py-4 rounded-full text-white font-bold text-sm tracking-[0.2em] uppercase transition-all duration-500 hover:scale-105 hover:shadow-[0_8px_40px_rgba(147,51,234,0.4)]"
+                style={{
+                  background: "linear-gradient(135deg, #7c3aed, #9333ea, #a855f7)",
+                  boxShadow: "0 6px 30px rgba(147,51,234,0.3), inset 0 1px 0 rgba(255,255,255,0.15)",
+                  filter: "drop-shadow(0 4px 20px rgba(147,51,234,0.25))",
+                }}
+              >
+                <span>Work With Us</span>
+                <span className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center group-hover:bg-white/30 transition-colors">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                </span>
+              </a>
+
+              {/* Trust line */}
+              <p className="hero-fade-in text-gray-400/50 text-[9px] tracking-[0.3em] uppercase font-medium mt-6">
+                Trusted by brands worldwide
               </p>
             </div>
 
@@ -996,104 +975,79 @@ export default function MountainLanding() {
           </section>
 
           {/* ══════════════════════════════════════════════════════════════════ */}
-          {/* TOOLS  —  3D REVOLVING CARD STACK                                */}
+          {/* TOOLS — DARK NEUMORPHIC ECOSYSTEM                                 */}
           {/* ══════════════════════════════════════════════════════════════════ */}
-          <section id="tools" className="relative" ref={toolsRef}>
-            <div className="min-h-screen flex flex-col items-center justify-center py-20 px-4 sm:px-12">
+          <section id="tools" className="relative py-32 px-4 sm:px-12" ref={toolsRef}>
+            {/* Glow isolation mask — prevents bleed from lighter section above */}
+            <div className="absolute inset-x-0 -top-20 h-40 pointer-events-none" style={{ background: 'linear-gradient(to bottom, transparent, #1e1a3a)' }} />
 
-              {/* Section header */}
-              <div className="tools-header text-center mb-16 relative z-10">
-                <p className="text-purple-400/60 text-[9px] tracking-[0.5em] uppercase font-black mb-6">Our Arsenal</p>
-                <h2 className="text-3xl md:text-5xl font-black uppercase tracking-[0.2em] text-white/90 mb-6" style={{ textShadow: '0 0 40px rgba(147,51,234,0.3)' }}>Ecosystem</h2>
-                <p className="text-white/35 text-sm tracking-widest uppercase font-medium">The tools that forge our systems.</p>
-              </div>
+            {/* Section header */}
+            <div className="tools-header text-center mb-20 relative z-10">
+              <p className="text-purple-400/50 text-[9px] tracking-[0.4em] uppercase font-black mb-5">Our Arsenal</p>
+              <h2 className="text-3xl md:text-5xl font-black uppercase tracking-[0.08em] text-white/90 mb-5" style={{ textShadow: '0 0 40px rgba(147,51,234,0.25)' }}>Ecosystem</h2>
+              <p className="text-white/30 text-xs tracking-[0.2em] uppercase font-medium">The tools that forge our systems.</p>
+            </div>
 
-              {/* 3D Stage */}
-              <div className="tools-3d-stage w-full max-w-6xl mx-auto">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {/* Cards grid */}
+            <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 relative z-10">
 
-                  {/* ── ENGINEERING ── */}
-                  <div className="tool-card-3d">
-                    <div className="relative overflow-hidden rounded-[24px] p-8 md:p-10" style={{ background: 'rgba(15, 10, 35, 0.7)', backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)', border: '1px solid rgba(147, 51, 234, 0.15)', boxShadow: '0 8px 32px rgba(0,0,0,0.4), 0 0 80px rgba(147,51,234,0.06), inset 0 1px 0 rgba(255,255,255,0.05)', minHeight: '380px' }}>
-                      {/* Glow accent */}
-                      <div className="absolute -top-20 -right-20 w-40 h-40 rounded-full pointer-events-none" style={{ background: 'radial-gradient(circle, rgba(147,51,234,0.12) 0%, transparent 70%)' }} />
-                      <div className="flex items-center gap-4 mb-8 relative z-10">
-                        <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ background: 'rgba(147,51,234,0.15)', boxShadow: '0 0 20px rgba(147,51,234,0.1)' }}>
-                          <svg className="w-6 h-6 text-purple-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
-                        </div>
-                        <h3 className="text-white/90 font-black tracking-widest text-xs uppercase">Engineering</h3>
-                      </div>
-                      <div className="w-full h-px mb-7 relative z-10" style={{ background: 'linear-gradient(to right, rgba(147,51,234,0.3), transparent)' }} />
-                      <ul className="space-y-5 text-sm font-bold text-white/60 tracking-wide relative z-10">
-                        {[
-                          { label: "Next.js",  color: "text-white/80",   icon: <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 22h20L12 2zm0 3.5L18.5 19h-13L12 5.5z"/></svg> },
-                          { label: "VS Code",  color: "text-blue-400",   icon: <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg> },
-                          { label: "Firebase", color: "text-orange-400",  icon: <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M11.5 2L7.5 10l-4 3 8 8 9-18-9-1z"/></svg> },
-                          { label: "Vercel",   color: "text-white/70",    icon: <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M24 22.525H0l12-21.05 12 21.05z"/></svg> },
-                        ].map((t) => (
-                          <li key={t.label} className="flex items-center gap-4">
-                            <div className={`p-2 rounded-lg ${t.color}`} style={{ background: 'rgba(147,51,234,0.1)', boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.05)' }}>{t.icon}</div>
-                            {t.label}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
+              {/* ── ENGINEERING ── */}
+              <div className="tool-card-neu rounded-2xl p-6" style={{ background: '#161330', boxShadow: '-6px -6px 14px rgba(255,255,255,0.03), 6px 6px 18px rgba(0,0,0,0.5)' }}>
+                <div className="flex items-center gap-3 mb-5">
+                  <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: '#161330', boxShadow: 'inset -2px -2px 6px rgba(255,255,255,0.04), inset 2px 2px 6px rgba(0,0,0,0.5)' }}>
+                    <svg className="w-5 h-5 text-purple-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
                   </div>
-
-                  {/* ── POST-PRODUCTION ── */}
-                  <div className="tool-card-3d">
-                    <div className="relative overflow-hidden rounded-[24px] p-8 md:p-10" style={{ background: 'rgba(15, 10, 35, 0.7)', backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)', border: '1px solid rgba(168, 85, 247, 0.15)', boxShadow: '0 8px 32px rgba(0,0,0,0.4), 0 0 80px rgba(168,85,247,0.06), inset 0 1px 0 rgba(255,255,255,0.05)', minHeight: '380px' }}>
-                      <div className="absolute -top-20 -left-20 w-40 h-40 rounded-full pointer-events-none" style={{ background: 'radial-gradient(circle, rgba(168,85,247,0.12) 0%, transparent 70%)' }} />
-                      <div className="flex items-center gap-4 mb-8 relative z-10">
-                        <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ background: 'rgba(168,85,247,0.15)', boxShadow: '0 0 20px rgba(168,85,247,0.1)' }}>
-                          <svg className="w-6 h-6 text-purple-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/></svg>
-                        </div>
-                        <h3 className="text-white/90 font-black tracking-widest text-xs uppercase">Post-Production</h3>
-                      </div>
-                      <div className="w-full h-px mb-7 relative z-10" style={{ background: 'linear-gradient(to right, rgba(168,85,247,0.3), transparent)' }} />
-                      <ul className="space-y-5 text-sm font-bold text-white/60 tracking-wide relative z-10">
-                        {[
-                          { label: "CapCut",          color: "text-purple-400",  icon: <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/></svg> },
-                          { label: "Adobe Premiere",  color: "text-blue-400",    icon: <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> },
-                          { label: "DaVinci Resolve", color: "text-teal-400",    icon: <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg> },
-                        ].map((t) => (
-                          <li key={t.label} className="flex items-center gap-4">
-                            <div className={`p-2 rounded-lg ${t.color}`} style={{ background: 'rgba(168,85,247,0.1)', boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.05)' }}>{t.icon}</div>
-                            {t.label}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </div>
-
-                  {/* ── GRAPHICS ── */}
-                  <div className="tool-card-3d">
-                    <div className="relative overflow-hidden rounded-[24px] p-8 md:p-10" style={{ background: 'rgba(15, 10, 35, 0.7)', backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)', border: '1px solid rgba(192, 132, 252, 0.15)', boxShadow: '0 8px 32px rgba(0,0,0,0.4), 0 0 80px rgba(192,132,252,0.06), inset 0 1px 0 rgba(255,255,255,0.05)', minHeight: '380px' }}>
-                      <div className="absolute -bottom-16 -right-16 w-40 h-40 rounded-full pointer-events-none" style={{ background: 'radial-gradient(circle, rgba(192,132,252,0.12) 0%, transparent 70%)' }} />
-                      <div className="flex items-center gap-4 mb-8 relative z-10">
-                        <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ background: 'rgba(192,132,252,0.15)', boxShadow: '0 0 20px rgba(192,132,252,0.1)' }}>
-                          <svg className="w-6 h-6 text-purple-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/></svg>
-                        </div>
-                        <h3 className="text-white/90 font-black tracking-widest text-xs uppercase">Graphics</h3>
-                      </div>
-                      <div className="w-full h-px mb-7 relative z-10" style={{ background: 'linear-gradient(to right, rgba(192,132,252,0.3), transparent)' }} />
-                      <ul className="space-y-5 text-sm font-bold text-white/60 tracking-wide relative z-10">
-                        {[
-                          { label: "Canva",        color: "text-blue-400",    icon: <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><line x1="21.17" y1="8" x2="12" y2="8"/><line x1="3.95" y1="6.06" x2="8.54" y2="14"/><line x1="10.88" y1="21.94" x2="15.46" y2="14"/></svg> },
-                          { label: "Photoshop",    color: "text-indigo-400",  icon: <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg> },
-                          { label: "Illustrator",  color: "text-orange-400",  icon: <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/></svg> },
-                        ].map((t) => (
-                          <li key={t.label} className="flex items-center gap-4">
-                            <div className={`p-2 rounded-lg ${t.color}`} style={{ background: 'rgba(192,132,252,0.1)', boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.05)' }}>{t.icon}</div>
-                            {t.label}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </div>
-
+                  <h3 className="text-white/90 font-black tracking-[0.15em] text-[11px] uppercase">Engineering</h3>
                 </div>
+                <div className="w-full h-px mb-5" style={{ background: 'linear-gradient(to right, rgba(147,51,234,0.25), transparent)' }} />
+                <ul className="space-y-2">
+                  {[{l:"Next.js",c:"text-white/80"},{l:"VS Code",c:"text-blue-400"},{l:"Firebase",c:"text-orange-400"},{l:"Vercel",c:"text-white/70"}].map(t=>(
+                    <li key={t.l} className="flex items-center gap-3 rounded-xl px-3 py-2.5 transition-all duration-300 cursor-default hover:scale-[0.98]" style={{ background: '#161330', boxShadow: 'inset -2px -2px 5px rgba(255,255,255,0.03), inset 2px 2px 5px rgba(0,0,0,0.4)' }}>
+                      <div className={`w-1.5 h-1.5 rounded-full ${t.c} opacity-60`} style={{ boxShadow: '0 0 6px currentColor' }} />
+                      <span className="text-sm font-bold text-white/65 tracking-wide">{t.l}</span>
+                    </li>
+                  ))}
+                </ul>
               </div>
+
+              {/* ── POST-PRODUCTION ── */}
+              <div className="tool-card-neu rounded-2xl p-6" style={{ background: '#161330', boxShadow: '-6px -6px 14px rgba(255,255,255,0.03), 6px 6px 18px rgba(0,0,0,0.5)' }}>
+                <div className="flex items-center gap-3 mb-5">
+                  <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: '#161330', boxShadow: 'inset -2px -2px 6px rgba(255,255,255,0.04), inset 2px 2px 6px rgba(0,0,0,0.5)' }}>
+                    <svg className="w-5 h-5 text-purple-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/></svg>
+                  </div>
+                  <h3 className="text-white/90 font-black tracking-[0.15em] text-[11px] uppercase">Post-Production</h3>
+                </div>
+                <div className="w-full h-px mb-5" style={{ background: 'linear-gradient(to right, rgba(168,85,247,0.25), transparent)' }} />
+                <ul className="space-y-2">
+                  {[{l:"CapCut",c:"text-purple-400"},{l:"Adobe Premiere",c:"text-blue-400"},{l:"DaVinci Resolve",c:"text-teal-400"}].map(t=>(
+                    <li key={t.l} className="flex items-center gap-3 rounded-xl px-3 py-2.5 transition-all duration-300 cursor-default hover:scale-[0.98]" style={{ background: '#161330', boxShadow: 'inset -2px -2px 5px rgba(255,255,255,0.03), inset 2px 2px 5px rgba(0,0,0,0.4)' }}>
+                      <div className={`w-1.5 h-1.5 rounded-full ${t.c} opacity-60`} style={{ boxShadow: '0 0 6px currentColor' }} />
+                      <span className="text-sm font-bold text-white/65 tracking-wide">{t.l}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* ── GRAPHICS ── */}
+              <div className="tool-card-neu rounded-2xl p-6" style={{ background: '#161330', boxShadow: '-6px -6px 14px rgba(255,255,255,0.03), 6px 6px 18px rgba(0,0,0,0.5)' }}>
+                <div className="flex items-center gap-3 mb-5">
+                  <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: '#161330', boxShadow: 'inset -2px -2px 6px rgba(255,255,255,0.04), inset 2px 2px 6px rgba(0,0,0,0.5)' }}>
+                    <svg className="w-5 h-5 text-purple-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/></svg>
+                  </div>
+                  <h3 className="text-white/90 font-black tracking-[0.15em] text-[11px] uppercase">Graphics</h3>
+                </div>
+                <div className="w-full h-px mb-5" style={{ background: 'linear-gradient(to right, rgba(192,132,252,0.25), transparent)' }} />
+                <ul className="space-y-2">
+                  {[{l:"Canva",c:"text-blue-400"},{l:"Photoshop",c:"text-indigo-400"},{l:"Illustrator",c:"text-orange-400"}].map(t=>(
+                    <li key={t.l} className="flex items-center gap-3 rounded-xl px-3 py-2.5 transition-all duration-300 cursor-default hover:scale-[0.98]" style={{ background: '#161330', boxShadow: 'inset -2px -2px 5px rgba(255,255,255,0.03), inset 2px 2px 5px rgba(0,0,0,0.4)' }}>
+                      <div className={`w-1.5 h-1.5 rounded-full ${t.c} opacity-60`} style={{ boxShadow: '0 0 6px currentColor' }} />
+                      <span className="text-sm font-bold text-white/65 tracking-wide">{t.l}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
             </div>
           </section>
 
