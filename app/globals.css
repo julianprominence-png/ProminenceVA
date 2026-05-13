@@ -168,3 +168,46 @@ body, #__next {
   perspective-origin: 50% 50%;
   transform-style: preserve-3d;
 }
+
+/* ─── Tools ScrollVelocity Marquee ─── */
+.tool-parallax {
+  position: relative;
+  overflow: hidden;
+  padding: 0.75rem 0;
+}
+
+.tool-scroller {
+  display: flex;
+  white-space: nowrap;
+  text-align: center;
+  font-family: inherit;
+  font-size: 1.5rem;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  filter: drop-shadow(0 0 12px rgba(147, 51, 234, 0.15));
+}
+
+.tool-scroller span {
+  flex-shrink: 0;
+}
+
+.tool-velocity-text {
+  color: rgba(255, 255, 255, 0.08);
+  background: linear-gradient(
+    90deg,
+    rgba(168, 85, 247, 0.18) 0%,
+    rgba(255, 255, 255, 0.12) 50%,
+    rgba(168, 85, 247, 0.18) 100%
+  );
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+@media (min-width: 768px) {
+  .tool-scroller {
+    font-size: 3rem;
+    line-height: 3.5rem;
+  }
+}

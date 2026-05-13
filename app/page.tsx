@@ -5,6 +5,13 @@ import { useRouter } from "next/navigation";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import * as THREE from "three";
+import ScrollVelocity from "./components/ScrollVelocity/ScrollVelocity";
+import dynamic from "next/dynamic";
+
+const CircularGallery = dynamic(
+  () => import("./components/CircularGallery/CircularGallery"),
+  { ssr: false }
+);
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
@@ -17,18 +24,25 @@ const teamData = {
   ceo: {
     name: "Vien Abache",
     role: "CEO & Founder",
+    image: "/images/team-vien.png",
     about:
       "Visionary leader driving innovation and pushing the boundaries of digital architecture. Orchestrating the intersection of design and robust engineering to build systems that scale.",
   },
   members: [
-    { name: "Vinz Iligan",       role: "Lead Engineer",    about: "Architecting scalable backend systems and ensuring seamless data pipelines." },
-    { name: "Julian Tolentino",  role: "Frontend Wizard",  about: "Crafting pixel-perfect, interactive user interfaces with modern frameworks." },
-    { name: "Giervan Sabalbero", role: "Fullstack Dev",    about: "Bridging the gap between intuitive frontends and powerful server logic." },
-    { name: "Andrea Turalba",    role: "UI/UX Dev",        about: "Translating complex user journeys into elegant, accessible web experiences." },
-    { name: "Gian Cruz",         role: "Senior Editor",    about: "Transforming raw concepts into cinematic, narrative-driven visual stories." },
-    { name: "Russel Minimo",     role: "Motion Graphics",  about: "Breathing life into static assets through fluid motion and dynamic effects." },
+    { name: "Vinz Iligan",       role: "Lead Engineer",    image: "/images/team-vinz.png",    about: "Architecting scalable backend systems and ensuring seamless data pipelines." },
+    { name: "Julian Tolentino",  role: "Frontend Wizard",  image: "/images/team-julian.png",  about: "Crafting pixel-perfect, interactive user interfaces with modern frameworks." },
+    { name: "Giervan Sabalbero", role: "Fullstack Dev",    image: "/images/team-giervan.png", about: "Bridging the gap between intuitive frontends and powerful server logic." },
+    { name: "Andrea Turalba",    role: "UI/UX Dev",        image: "/images/team-andrea.png",  about: "Translating complex user journeys into elegant, accessible web experiences." },
+    { name: "Gian Cruz",         role: "Senior Editor",    image: "/images/team-gian.png",    about: "Transforming raw concepts into cinematic, narrative-driven visual stories." },
+    { name: "Russel Minimo",     role: "Motion Graphics",  image: "/images/team-russel.png",  about: "Breathing life into static assets through fluid motion and dynamic effects." },
   ],
 };
+
+/* Gallery items derived from team data for CircularGallery */
+const teamGalleryItems = [
+  { image: teamData.ceo.image, text: `${teamData.ceo.name} — ${teamData.ceo.role}` },
+  ...teamData.members.map(m => ({ image: m.image, text: `${m.name} — ${m.role}` })),
+];
 
 /* -------------------------------------------------------------------------- */
 /* PROCEDURAL CLOUD DENSITY MAP                                               */
@@ -419,40 +433,23 @@ export default function MountainLanding() {
       if (heroSectionRef.current) {
         const heroEls = heroSectionRef.current.querySelectorAll(".hero-fade-in");
         gsap.fromTo(heroEls,
-          { opacity: 0, y: 50 },
+          { opacity: 0, y: 30 },
           {
-            opacity: 1, y: 0, duration: 1, stagger: 0.15, ease: "power3.out",
-            scrollTrigger: { trigger: heroSectionRef.current, start: "top 80%" },
+            opacity: 1, y: 0, duration: 1.2, stagger: 0.1, ease: "power3.out",
+            scrollTrigger: { trigger: heroSectionRef.current, start: "top 85%" },
           }
         );
 
-        /* Backdrop logo gentle float */
-        const bdLogo = heroSectionRef.current.querySelector(".hero-backdrop-logo");
-        if (bdLogo) {
-          // Logo movement removed - now steady
-        }
-
-        /* Orbital ring spin */
-        const rings = heroSectionRef.current.querySelectorAll(".orbital-ring");
-        rings.forEach((ring, i) => {
-          gsap.to(ring, { rotation: 360, duration: 20 + i * 8, ease: "none", repeat: -1, transformOrigin: "center center" });
-        });
-
-        /* Low-poly flowers grow upward */
-        const flowers = heroSectionRef.current.querySelectorAll(".flower-stem");
-        gsap.fromTo(flowers,
-          { scaleY: 0, transformOrigin: "bottom center" },
+        /* Title Morphing Entrance */
+        const titleLetters = heroSectionRef.current.querySelectorAll(".hero-title-letter");
+        gsap.fromTo(titleLetters,
+          { filter: "blur(20px)", scale: 1.5, opacity: 0, y: 50, rotationX: 45 },
           {
-            scaleY: 1, duration: 1.6, stagger: 0.12, ease: "elastic.out(1, 0.4)",
-            scrollTrigger: { trigger: heroSectionRef.current, start: "top 70%" },
+            filter: "blur(0px)", scale: 1, opacity: 1, y: 0, rotationX: 0,
+            duration: 1.2, stagger: 0.08, ease: "power4.out",
+            scrollTrigger: { trigger: heroSectionRef.current, start: "top 80%" }
           }
         );
-
-        /* Floating particles drift */
-        const particles = heroSectionRef.current.querySelectorAll(".hero-particle");
-        particles.forEach((p, i) => {
-          gsap.to(p, { y: -30 - i * 10, x: (i % 2 === 0 ? 15 : -15), duration: 3 + i * 0.8, ease: "sine.inOut", repeat: -1, yoyo: true });
-        });
       }
 
       if (servicesRef.current) {
@@ -462,22 +459,6 @@ export default function MountainLanding() {
         );
       }
 
-      /* ─── TEAM MORPH CARDS ───────────────────────────────────────────────── */
-      const teamCards = gsap.utils.toArray(".team-card") as HTMLElement[];
-      teamCards.forEach((card) => {
-        const content = card.querySelector(".team-content");
-        const img     = card.querySelector(".team-img");
-        const bio     = card.querySelector(".team-bio");
-        gsap.set(card,    { width: "120px", height: "120px", borderRadius: "50%" });
-        gsap.set(content, { opacity: 0, y: 20 });
-        gsap.set(bio,     { opacity: 0, height: 0 });
-        gsap.set(img,     { scale: 1.2 });
-        const tl = gsap.timeline({ scrollTrigger: { trigger: card, start: "top 80%", toggleActions: "play none none reverse" } });
-        tl.to(card,    { width: "100%", height: "360px", borderRadius: "24px", duration: 0.8, ease: "power3.inOut" })
-          .to(img,     { scale: 1,   duration: 0.8, ease: "power3.inOut" }, "<")
-          .to(content, { opacity: 1, y: 0,          duration: 0.4, ease: "power2.out"  }, "-=0.3")
-          .to(bio,     { opacity: 1, height: "auto", duration: 0.4, ease: "power2.out" }, "-=0.2");
-      });
 
       /* Tools section animations */
       if (toolsRef.current) {
@@ -778,7 +759,7 @@ export default function MountainLanding() {
         {/* ════════════════════════════════════════════════════════════════════ */}
         <div className="relative z-30 w-full rounded-t-[3rem] -mt-10 pt-24 pb-32 px-6 sm:px-12" style={{ background: 'linear-gradient(180deg, #e6eaf0 0%, #e6eaf0 15%, #ddd8e8 22%, #c4bbd8 28%, #8b7faa 36%, #5a4e80 43%, #3a3060 50%, #262050 56%, #1e1a3a 62%, #161330 70%, #100e24 80%, #0c0a1a 90%, #0a0814 100%)', overflowX: 'clip' }}>
           {/* Starfield — fades in over the dark gradient zone */}
-          <div className="starfield" style={{ top: '30%', maskImage: 'linear-gradient(to bottom, transparent 0%, black 15%)', WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 15%)' }} />
+          <div className="starfield" style={{ top: '0', maskImage: 'linear-gradient(to bottom, transparent 0%, transparent 40%, black 70%)', WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, transparent 40%, black 70%)' }} />
 
           {/* ══════════════════════════════════════════════════════════════════ */}
           {/* HERO — CONVERTING LANDING                                          */}
@@ -788,66 +769,6 @@ export default function MountainLanding() {
             {/* ── Soft lavender radial spotlight ── */}
             <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse 70% 60% at 50% 40%, rgba(192,132,252,0.10) 0%, rgba(168,85,247,0.04) 40%, transparent 70%)" }} />
 
-            {/* ── Abstract dotted rings — blurred background depth ── */}
-            <svg className="orbital-ring absolute pointer-events-none select-none" style={{ top: "-8%", left: "-12%", width: "clamp(500px, 75vw, 900px)", height: "clamp(500px, 75vw, 900px)", opacity: 0.12, filter: "blur(1.5px)" }} viewBox="0 0 200 200" fill="none">
-              <ellipse cx="100" cy="100" rx="95" ry="95" stroke="rgba(147,51,234,0.5)" strokeWidth="0.8" strokeDasharray="3 8" />
-              <circle cx="100" cy="5" r="2" fill="rgba(147,51,234,0.35)" />
-            </svg>
-            <svg className="orbital-ring absolute pointer-events-none select-none" style={{ top: "5%", right: "-8%", width: "clamp(400px, 55vw, 700px)", height: "clamp(400px, 55vw, 700px)", opacity: 0.09, filter: "blur(2px)" }} viewBox="0 0 200 200" fill="none">
-              <ellipse cx="100" cy="100" rx="90" ry="90" stroke="rgba(236,72,153,0.4)" strokeWidth="0.6" strokeDasharray="2 12" />
-              <circle cx="190" cy="100" r="1.5" fill="rgba(236,72,153,0.3)" />
-            </svg>
-            <svg className="orbital-ring absolute pointer-events-none select-none" style={{ bottom: "10%", left: "10%", width: "clamp(300px, 40vw, 550px)", height: "clamp(300px, 40vw, 550px)", opacity: 0.07, filter: "blur(2.5px)" }} viewBox="0 0 200 200" fill="none">
-              <ellipse cx="100" cy="100" rx="85" ry="85" stroke="rgba(168,85,247,0.3)" strokeWidth="0.5" strokeDasharray="4 10" />
-            </svg>
-
-            {/* ── Geometric mountain/triangle shapes — midground ── */}
-            <div className="absolute inset-x-0 bottom-12 pointer-events-none select-none flex justify-center" style={{ zIndex: 1 }}>
-              <svg width="100%" height="260" viewBox="0 0 1200 260" preserveAspectRatio="xMidYMax meet" fill="none" className="max-w-5xl">
-                <polygon points="600,10 380,240 820,240" fill="rgba(147,51,234,0.04)" stroke="rgba(147,51,234,0.08)" strokeWidth="1" />
-                <polygon points="440,60 280,240 600,240" fill="rgba(168,85,247,0.03)" stroke="rgba(168,85,247,0.06)" strokeWidth="0.8" />
-                <polygon points="760,50 620,240 920,240" fill="rgba(192,132,252,0.03)" stroke="rgba(192,132,252,0.06)" strokeWidth="0.8" />
-                <polygon points="600,30 500,140 700,140" fill="rgba(147,51,234,0.02)" stroke="rgba(147,51,234,0.05)" strokeWidth="0.6" />
-                {/* Snow caps */}
-                <polygon points="600,10 580,40 620,40" fill="rgba(255,255,255,0.15)" />
-                <polygon points="440,60 425,82 455,82" fill="rgba(255,255,255,0.10)" />
-                <polygon points="760,50 746,72 774,72" fill="rgba(255,255,255,0.10)" />
-              </svg>
-            </div>
-
-            {/* ── Floating decorative particles ── */}
-            <div className="hero-particle absolute w-1.5 h-1.5 rounded-full bg-fuchsia-400/20 pointer-events-none" style={{ top: "15%", left: "20%" }} />
-            <div className="hero-particle absolute w-1 h-1 rounded-full bg-purple-400/25 pointer-events-none" style={{ top: "35%", left: "8%" }} />
-            <div className="hero-particle absolute w-2 h-2 rounded-full bg-fuchsia-300/15 pointer-events-none" style={{ top: "60%", left: "15%" }} />
-            <div className="hero-particle absolute w-1 h-1 rounded-full bg-purple-500/20 pointer-events-none" style={{ top: "25%", right: "12%" }} />
-            <div className="hero-particle absolute w-1.5 h-1.5 rounded-full bg-pink-400/15 pointer-events-none" style={{ top: "70%", right: "8%" }} />
-
-            {/* ── Minimal geometric floral accents — faint background ── */}
-            <div className="absolute left-0 bottom-0 w-32 md:w-44 h-full pointer-events-none select-none" style={{ transform: "translateX(-20%)", opacity: 0.5, filter: "blur(0.5px)" }}>
-              <svg className="flower-stem absolute bottom-8 left-4" width="40" height="160" viewBox="0 0 40 160" fill="none">
-                <path d="M20,160 L20,55 L15,46 L20,32 L25,46 L20,55" stroke="rgba(34,197,94,0.3)" strokeWidth="1.5" fill="none" />
-                <polygon points="20,32 13,14 20,0 27,14" fill="rgba(168,85,247,0.15)" />
-                <path d="M20,80 L10,68" stroke="rgba(34,197,94,0.2)" strokeWidth="1" />
-                <polygon points="10,68 3,58 10,54 13,64" fill="rgba(34,197,94,0.1)" />
-              </svg>
-              <svg className="flower-stem absolute bottom-4 left-14" width="30" height="110" viewBox="0 0 30 110" fill="none">
-                <path d="M15,110 L15,40 L11,32 L15,20 L19,32 L15,40" stroke="rgba(34,197,94,0.25)" strokeWidth="1.5" fill="none" />
-                <polygon points="15,20 9,6 15,0 21,6" fill="rgba(236,72,153,0.12)" />
-              </svg>
-            </div>
-            <div className="absolute right-0 bottom-0 w-32 md:w-44 h-full pointer-events-none select-none" style={{ transform: "translateX(20%)", opacity: 0.5, filter: "blur(0.5px)" }}>
-              <svg className="flower-stem absolute bottom-6 right-6" width="40" height="150" viewBox="0 0 40 150" fill="none">
-                <path d="M20,150 L20,50 L15,42 L20,28 L25,42 L20,50" stroke="rgba(34,197,94,0.3)" strokeWidth="1.5" fill="none" />
-                <polygon points="20,28 13,10 20,0 27,10" fill="rgba(192,132,252,0.15)" />
-                <path d="M20,80 L30,68" stroke="rgba(34,197,94,0.2)" strokeWidth="1" />
-                <polygon points="30,68 37,58 30,54 27,64" fill="rgba(34,197,94,0.1)" />
-              </svg>
-              <svg className="flower-stem absolute bottom-10 right-14" width="28" height="100" viewBox="0 0 28 100" fill="none">
-                <path d="M14,100 L14,35 L10,28 L14,16 L18,28 L14,35" stroke="rgba(34,197,94,0.25)" strokeWidth="1.5" fill="none" />
-                <polygon points="14,16 8,5 14,0 20,5" fill="rgba(147,51,234,0.12)" />
-              </svg>
-            </div>
-
             {/* ── Content — centered, high-converting layout ── */}
             <div className="relative z-10 flex flex-col items-center px-4 text-center">
 
@@ -856,19 +777,31 @@ export default function MountainLanding() {
                 Isaiah 60 — 61
               </p>
 
-              {/* Headline — large, bold, high-contrast */}
+              {/* Headline — large, bold, high-contrast, 3D effect */}
               <h1
-                className="hero-fade-in mb-5"
+                className="mb-5 flex justify-center gap-[2px]"
                 style={{
                   fontFamily: "'Astron', sans-serif",
                   fontSize: "clamp(3rem, 9vw, 7rem)",
-                  letterSpacing: "0.14em",
+                  letterSpacing: "0.05em",
                   lineHeight: 0.95,
                   color: "#1a1a2e",
-                  filter: "drop-shadow(0 4px 25px rgba(147,51,234,0.12))",
+                  perspective: "1000px"
                 }}
               >
-                PROMINENCE
+                {"PROMINENCE".split("").map((letter, i) => (
+                  <span
+                    key={i}
+                    className="hero-title-letter"
+                    style={{
+                      display: "inline-block",
+                      willChange: "transform, filter, opacity",
+                      textShadow: "1px 1px 0 #d8b4fe, 2px 2px 0 #c084fc, 3px 3px 0 #a855f7, 4px 4px 0 #9333ea, 0 10px 20px rgba(147,51,234,0.4)"
+                    }}
+                  >
+                    {letter}
+                  </span>
+                ))}
               </h1>
 
               {/* Sub-headline — clear hierarchy */}
@@ -939,38 +872,21 @@ export default function MountainLanding() {
 
           {/* ── TEAM ── */}
           <section id="team" className="max-w-6xl mx-auto py-32 border-t border-gray-300/30" ref={teamRef}>
-            <h2 className="text-3xl md:text-5xl font-black uppercase tracking-[0.2em] text-gray-800 mb-20 text-center drop-shadow-sm">The Engine</h2>
-            {/* CEO */}
-            <div className="flex justify-center mb-24 px-4">
-              <div className={`relative w-full max-w-4xl rounded-[2.5rem] p-8 md:p-12 flex flex-col md:flex-row items-center gap-10 overflow-hidden group transition-shadow duration-500 ${neuOuter}`}>
-                <div className={`w-full md:w-5/12 h-[340px] rounded-[2rem] overflow-hidden relative flex-shrink-0 ${neuInner}`}>
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="text-gray-400 text-xs tracking-widest uppercase font-bold">Image_Placeholder</span>
-                  </div>
-                </div>
-                <div className="w-full md:w-7/12 text-left z-10">
-                  <div className={`inline-block px-5 py-2 rounded-full mb-6 ${neuInner}`}>
-                    <p className="text-fuchsia-600 font-black tracking-[0.2em] uppercase text-[10px]">{teamData.ceo.role}</p>
-                  </div>
-                  <h3 className="text-4xl md:text-5xl font-black text-gray-800 tracking-wider uppercase mb-6 drop-shadow-sm">{teamData.ceo.name}</h3>
-                  <p className="text-gray-500 leading-relaxed text-sm md:text-base font-medium border-l-2 border-fuchsia-300 pl-6">{teamData.ceo.about}</p>
-                </div>
-              </div>
-            </div>
-            {/* Team grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-12 px-4">
-              {teamData.members.map((member, i) => (
-                <div key={i} className={`team-card relative overflow-hidden flex flex-col items-center justify-end mx-auto group ${neuOuter}`}>
-                  <div className={`absolute inset-0 team-img transition-transform duration-700 ${neuInner} m-4 rounded-[1.5rem]`} />
-                  <div className="team-content absolute bottom-0 inset-x-0 p-6 text-center flex flex-col justify-end bg-gradient-to-t from-[#e6eaf0] via-[#e6eaf0]/90 to-transparent">
-                    <h3 className="text-gray-800 font-black tracking-wider uppercase text-sm mb-1">{member.name}</h3>
-                    <p className="text-fuchsia-600 text-[10px] tracking-widest font-bold uppercase">{member.role}</p>
-                    <div className="team-bio overflow-hidden mt-3">
-                      <p className="text-gray-500 text-xs leading-relaxed font-medium">{member.about}</p>
-                    </div>
-                  </div>
-                </div>
-              ))}
+            <h2 className="text-3xl md:text-5xl font-black uppercase tracking-[0.2em] text-gray-800 mb-6 text-center drop-shadow-sm">The Engine</h2>
+            <p className="text-gray-400 text-xs tracking-[0.25em] uppercase font-medium text-center mb-16">Drag or scroll to explore the team</p>
+
+            {/* ── Circular Gallery — all team members including CEO ── */}
+            <div className="relative w-full mb-12 overflow-hidden" style={{ height: 'clamp(400px, 55vh, 650px)', maskImage: 'linear-gradient(to right, transparent 0%, black 15%, black 85%, transparent 100%)', WebkitMaskImage: 'linear-gradient(to right, transparent 0%, black 15%, black 85%, transparent 100%)' }}>
+
+              <CircularGallery
+                items={teamGalleryItems}
+                bend={3}
+                textColor="#a855f7"
+                borderRadius={0.05}
+                font="bold 16px sans-serif"
+                scrollSpeed={2}
+                scrollEase={0.03}
+              />
             </div>
           </section>
 
@@ -978,76 +894,102 @@ export default function MountainLanding() {
           {/* TOOLS — DARK NEUMORPHIC ECOSYSTEM                                 */}
           {/* ══════════════════════════════════════════════════════════════════ */}
           <section id="tools" className="relative py-32 px-4 sm:px-12" ref={toolsRef}>
-            {/* Glow isolation mask — prevents bleed from lighter section above */}
-            <div className="absolute inset-x-0 -top-20 h-40 pointer-events-none" style={{ background: 'linear-gradient(to bottom, transparent, #1e1a3a)' }} />
-
             {/* Section header */}
-            <div className="tools-header text-center mb-20 relative z-10">
+            <div className="tools-header text-center mb-16 relative z-10">
               <p className="text-purple-400/50 text-[9px] tracking-[0.4em] uppercase font-black mb-5">Our Arsenal</p>
               <h2 className="text-3xl md:text-5xl font-black uppercase tracking-[0.08em] text-white/90 mb-5" style={{ textShadow: '0 0 40px rgba(147,51,234,0.25)' }}>Ecosystem</h2>
               <p className="text-white/30 text-xs tracking-[0.2em] uppercase font-medium">The tools that forge our systems.</p>
             </div>
 
-            {/* Cards grid */}
-            <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 relative z-10">
+            {/* ── ScrollVelocity marquee bands ── */}
+            <div className="relative z-10 mb-20 overflow-hidden" style={{ maskImage: 'linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%)', WebkitMaskImage: 'linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%)' }}>
+              <ScrollVelocity
+                texts={[
+                  'Next.js · VS Code · Firebase · Vercel · CapCut · Premiere · DaVinci',
+                  'Canva · Photoshop · Illustrator · Figma · After Effects · ',
+                ]}
+                velocity={40}
+                className="tool-velocity-text"
+                numCopies={4}
+                damping={50}
+                stiffness={400}
+                parallaxClassName="tool-parallax"
+                scrollerClassName="tool-scroller"
+              />
+            </div>
 
-              {/* ── ENGINEERING ── */}
-              <div className="tool-card-neu rounded-2xl p-6" style={{ background: '#161330', boxShadow: '-6px -6px 14px rgba(255,255,255,0.03), 6px 6px 18px rgba(0,0,0,0.5)' }}>
-                <div className="flex items-center gap-3 mb-5">
-                  <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: '#161330', boxShadow: 'inset -2px -2px 6px rgba(255,255,255,0.04), inset 2px 2px 6px rgba(0,0,0,0.5)' }}>
-                    <svg className="w-5 h-5 text-purple-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+            {/* ── Individual floating tool cards ── */}
+            <div className="max-w-6xl mx-auto relative z-10">
+
+              {/* Category labels */}
+              {[
+                { category: 'Engineering', icon: (<svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>), tools: [{name:'Next.js',color:'#ffffff'},{name:'VS Code',color:'#007ACC'},{name:'Firebase',color:'#FFA000'},{name:'Vercel',color:'#cccccc'}] },
+                { category: 'Post-Production', icon: (<svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/></svg>), tools: [{name:'CapCut',color:'#a855f7'},{name:'Adobe Premiere',color:'#9999FF'},{name:'DaVinci Resolve',color:'#2dd4bf'}] },
+                { category: 'Graphics', icon: (<svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/></svg>), tools: [{name:'Canva',color:'#00C4CC'},{name:'Photoshop',color:'#31A8FF'},{name:'Illustrator',color:'#FF9A00'}] },
+              ].map((group, gi) => (
+                <div key={gi} className="mb-12 last:mb-0">
+                  {/* Category header */}
+                  <div className="flex items-center gap-3 mb-6 pl-1">
+                    <div className="w-8 h-8 rounded-lg flex items-center justify-center text-purple-400" style={{ background: '#161330', boxShadow: 'inset -2px -2px 5px rgba(255,255,255,0.04), inset 2px 2px 5px rgba(0,0,0,0.5)' }}>
+                      {group.icon}
+                    </div>
+                    <h3 className="text-white/80 font-black tracking-[0.18em] text-[10px] uppercase">{group.category}</h3>
+                    <div className="flex-1 h-px" style={{ background: 'linear-gradient(to right, rgba(147,51,234,0.2), transparent)' }} />
                   </div>
-                  <h3 className="text-white/90 font-black tracking-[0.15em] text-[11px] uppercase">Engineering</h3>
-                </div>
-                <div className="w-full h-px mb-5" style={{ background: 'linear-gradient(to right, rgba(147,51,234,0.25), transparent)' }} />
-                <ul className="space-y-2">
-                  {[{l:"Next.js",c:"text-white/80"},{l:"VS Code",c:"text-blue-400"},{l:"Firebase",c:"text-orange-400"},{l:"Vercel",c:"text-white/70"}].map(t=>(
-                    <li key={t.l} className="flex items-center gap-3 rounded-xl px-3 py-2.5 transition-all duration-300 cursor-default hover:scale-[0.98]" style={{ background: '#161330', boxShadow: 'inset -2px -2px 5px rgba(255,255,255,0.03), inset 2px 2px 5px rgba(0,0,0,0.4)' }}>
-                      <div className={`w-1.5 h-1.5 rounded-full ${t.c} opacity-60`} style={{ boxShadow: '0 0 6px currentColor' }} />
-                      <span className="text-sm font-bold text-white/65 tracking-wide">{t.l}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
 
-              {/* ── POST-PRODUCTION ── */}
-              <div className="tool-card-neu rounded-2xl p-6" style={{ background: '#161330', boxShadow: '-6px -6px 14px rgba(255,255,255,0.03), 6px 6px 18px rgba(0,0,0,0.5)' }}>
-                <div className="flex items-center gap-3 mb-5">
-                  <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: '#161330', boxShadow: 'inset -2px -2px 6px rgba(255,255,255,0.04), inset 2px 2px 6px rgba(0,0,0,0.5)' }}>
-                    <svg className="w-5 h-5 text-purple-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/></svg>
+                  {/* Tool cards row */}
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                    {group.tools.map((tool, ti) => (
+                      <div
+                        key={ti}
+                        className="tool-card-neu group relative rounded-2xl p-5 flex flex-col items-center gap-3 cursor-default transition-all duration-500 hover:translate-y-[-4px]"
+                        style={{
+                          background: '#161330',
+                          boxShadow: '-6px -6px 14px rgba(255,255,255,0.03), 6px 6px 18px rgba(0,0,0,0.5)',
+                        }}
+                      >
+                        {/* Glow accent on hover */}
+                        <div
+                          className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+                          style={{
+                            boxShadow: `0 0 30px ${tool.color}15, inset 0 0 20px ${tool.color}08`,
+                            border: `1px solid ${tool.color}20`,
+                          }}
+                        />
+
+                        {/* Tool icon dot */}
+                        <div
+                          className="w-10 h-10 rounded-xl flex items-center justify-center relative z-10 transition-transform duration-500 group-hover:scale-110"
+                          style={{
+                            background: '#161330',
+                            boxShadow: 'inset -3px -3px 6px rgba(255,255,255,0.04), inset 3px 3px 6px rgba(0,0,0,0.5)',
+                          }}
+                        >
+                          <div
+                            className="w-3 h-3 rounded-full transition-all duration-500 group-hover:scale-125"
+                            style={{
+                              background: tool.color,
+                              boxShadow: `0 0 10px ${tool.color}60, 0 0 20px ${tool.color}20`,
+                              opacity: 0.7,
+                            }}
+                          />
+                        </div>
+
+                        {/* Tool name */}
+                        <span className="text-white/60 text-xs font-bold tracking-[0.12em] uppercase relative z-10 text-center group-hover:text-white/85 transition-colors duration-500">
+                          {tool.name}
+                        </span>
+
+                        {/* Subtle category accent line */}
+                        <div
+                          className="w-8 h-[2px] rounded-full opacity-30 group-hover:opacity-60 group-hover:w-12 transition-all duration-500"
+                          style={{ background: `linear-gradient(to right, ${tool.color}, transparent)` }}
+                        />
+                      </div>
+                    ))}
                   </div>
-                  <h3 className="text-white/90 font-black tracking-[0.15em] text-[11px] uppercase">Post-Production</h3>
                 </div>
-                <div className="w-full h-px mb-5" style={{ background: 'linear-gradient(to right, rgba(168,85,247,0.25), transparent)' }} />
-                <ul className="space-y-2">
-                  {[{l:"CapCut",c:"text-purple-400"},{l:"Adobe Premiere",c:"text-blue-400"},{l:"DaVinci Resolve",c:"text-teal-400"}].map(t=>(
-                    <li key={t.l} className="flex items-center gap-3 rounded-xl px-3 py-2.5 transition-all duration-300 cursor-default hover:scale-[0.98]" style={{ background: '#161330', boxShadow: 'inset -2px -2px 5px rgba(255,255,255,0.03), inset 2px 2px 5px rgba(0,0,0,0.4)' }}>
-                      <div className={`w-1.5 h-1.5 rounded-full ${t.c} opacity-60`} style={{ boxShadow: '0 0 6px currentColor' }} />
-                      <span className="text-sm font-bold text-white/65 tracking-wide">{t.l}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              {/* ── GRAPHICS ── */}
-              <div className="tool-card-neu rounded-2xl p-6" style={{ background: '#161330', boxShadow: '-6px -6px 14px rgba(255,255,255,0.03), 6px 6px 18px rgba(0,0,0,0.5)' }}>
-                <div className="flex items-center gap-3 mb-5">
-                  <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: '#161330', boxShadow: 'inset -2px -2px 6px rgba(255,255,255,0.04), inset 2px 2px 6px rgba(0,0,0,0.5)' }}>
-                    <svg className="w-5 h-5 text-purple-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/></svg>
-                  </div>
-                  <h3 className="text-white/90 font-black tracking-[0.15em] text-[11px] uppercase">Graphics</h3>
-                </div>
-                <div className="w-full h-px mb-5" style={{ background: 'linear-gradient(to right, rgba(192,132,252,0.25), transparent)' }} />
-                <ul className="space-y-2">
-                  {[{l:"Canva",c:"text-blue-400"},{l:"Photoshop",c:"text-indigo-400"},{l:"Illustrator",c:"text-orange-400"}].map(t=>(
-                    <li key={t.l} className="flex items-center gap-3 rounded-xl px-3 py-2.5 transition-all duration-300 cursor-default hover:scale-[0.98]" style={{ background: '#161330', boxShadow: 'inset -2px -2px 5px rgba(255,255,255,0.03), inset 2px 2px 5px rgba(0,0,0,0.4)' }}>
-                      <div className={`w-1.5 h-1.5 rounded-full ${t.c} opacity-60`} style={{ boxShadow: '0 0 6px currentColor' }} />
-                      <span className="text-sm font-bold text-white/65 tracking-wide">{t.l}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
+              ))}
             </div>
           </section>
 
