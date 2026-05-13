@@ -479,7 +479,7 @@ export default function MountainLanding() {
           .to(bio,     { opacity: 1, height: "auto", duration: 0.4, ease: "power2.out" }, "-=0.2");
       });
 
-      /* ─── TOOLS — CLEAN STAGGER REVEAL ─────────────────────────────────────── */
+      /* Tools section animations */
       if (toolsRef.current) {
         const toolsHeader = toolsRef.current.querySelector(".tools-header");
         const toolCards = gsap.utils.toArray(".tool-card-neu") as HTMLElement[];
