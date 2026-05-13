@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface Ripple {
@@ -27,13 +27,72 @@ interface WorkItem {
   gradient: string;
 }
 
+interface SubTab {
+  label: string;
+  content: string;
+}
+
+interface ProcessStep {
+  n: string;
+  title: string;
+  desc: string;
+  subTabs: SubTab[];
+  time: string;
+  deliverable: string;
+  visual: string;
+}
+
 // ─── Static Data ──────────────────────────────────────────────────────────────
+// Massively expanded, hand-curated array to densely populate the entire page (y: 0 to 1400)
 const LILY_PADS: LilyPad[] = [
-  { id: 0, x: 6,  y: 18, size: 75, rotation: 22,  depth: 0.3, delay: 0   },
-  { id: 1, x: 88, y: 12, size: 62, rotation: -18, depth: 0.5, delay: 0.5 },
-  { id: 2, x: 92, y: 72, size: 82, rotation: 14,  depth: 0.6, delay: 0.2 },
-  { id: 3, x: 4,  y: 80, size: 58, rotation: -35, depth: 0.4, delay: 0.8 },
-  { id: 4, x: 50, y: 88, size: 52, rotation: 50,  depth: 0.7, delay: 0.4 },
+  // Hero (0-100)
+  { id: 0, x: 10, y: 15, size: 75, rotation: 22,  depth: 0.3, delay: 0   },
+  { id: 1, x: 85, y: 25, size: 62, rotation: -18, depth: 0.5, delay: 0.5 },
+  { id: 2, x: 88, y: 75, size: 82, rotation: 14,  depth: 0.6, delay: 0.2 },
+  { id: 3, x: 12, y: 85, size: 58, rotation: -35, depth: 0.4, delay: 0.8 },
+  { id: 4, x: 45, y: 40, size: 45, rotation: 110, depth: 0.8, delay: 0.3 },
+  
+  // Transition to Reel (100-250)
+  { id: 5, x: 50, y: 120, size: 52, rotation: 50,  depth: 0.7, delay: 0.4 },
+  { id: 6, x: 15, y: 160, size: 65, rotation: 45,  depth: 0.4, delay: 0.1 },
+  { id: 7, x: 85, y: 210, size: 90, rotation: -20, depth: 0.8, delay: 0.6 },
+  { id: 8, x: 35, y: 240, size: 45, rotation: 80,  depth: 0.3, delay: 0.3 },
+  { id: 9, x: 92, y: 140, size: 50, rotation: 15,  depth: 0.5, delay: 0.7 },
+  
+  // Services (250-450)
+  { id: 10, x: 75, y: 280, size: 70, rotation: -50, depth: 0.5, delay: 0.7 },
+  { id: 11, x: 10, y: 320, size: 85, rotation: 15,  depth: 0.6, delay: 0.2 },
+  { id: 12, x: 90, y: 360, size: 55, rotation: -10, depth: 0.4, delay: 0.9 },
+  { id: 13, x: 25, y: 390, size: 75, rotation: 35,  depth: 0.7, delay: 0.4 },
+  { id: 14, x: 80, y: 440, size: 60, rotation: -40, depth: 0.5, delay: 0.1 },
+  { id: 15, x: 40, y: 300, size: 95, rotation: 115, depth: 0.8, delay: 0.5 },
+
+  // Process (450-750)
+  { id: 16, x: 45, y: 490, size: 95, rotation: 5,   depth: 0.8, delay: 0.8 },
+  { id: 17, x: 15, y: 530, size: 65, rotation: 65,  depth: 0.4, delay: 0.3 },
+  { id: 18, x: 88, y: 580, size: 80, rotation: -25, depth: 0.6, delay: 0.5 },
+  { id: 19, x: 30, y: 630, size: 50, rotation: 15,  depth: 0.3, delay: 0.2 },
+  { id: 20, x: 75, y: 680, size: 75, rotation: -15, depth: 0.5, delay: 0.7 },
+  { id: 21, x: 10, y: 730, size: 85, rotation: 40,  depth: 0.7, delay: 0.4 },
+  { id: 22, x: 55, y: 560, size: 45, rotation: 180, depth: 0.5, delay: 0.1 },
+
+  // Tools & Portfolio extensions (750-1050)
+  { id: 23, x: 85, y: 780, size: 55, rotation: -5,  depth: 0.4, delay: 0.1 },
+  { id: 24, x: 40, y: 830, size: 70, rotation: 25,  depth: 0.6, delay: 0.6 },
+  { id: 25, x: 20, y: 880, size: 90, rotation: -30, depth: 0.8, delay: 0.3 },
+  { id: 26, x: 88, y: 920, size: 60, rotation: 45,  depth: 0.5, delay: 0.8 },
+  { id: 27, x: 15, y: 970, size: 85, rotation: 12,  depth: 0.7, delay: 0.2 },
+  { id: 28, x: 70, y: 1020, size: 50, rotation: -40, depth: 0.4, delay: 0.5 },
+  { id: 29, x: 45, y: 1050, size: 75, rotation: 80,  depth: 0.6, delay: 0.7 },
+
+  // Contact / Deep Footer (1050-1400)
+  { id: 30, x: 10, y: 1100, size: 65, rotation: 20,  depth: 0.5, delay: 0.4 },
+  { id: 31, x: 85, y: 1150, size: 95, rotation: -15, depth: 0.8, delay: 0.9 },
+  { id: 32, x: 35, y: 1200, size: 55, rotation: 65,  depth: 0.3, delay: 0.1 },
+  { id: 33, x: 75, y: 1250, size: 80, rotation: -35, depth: 0.6, delay: 0.6 },
+  { id: 34, x: 20, y: 1300, size: 70, rotation: 10,  depth: 0.5, delay: 0.2 },
+  { id: 35, x: 90, y: 1350, size: 85, rotation: -25, depth: 0.7, delay: 0.8 },
+  { id: 36, x: 50, y: 1380, size: 60, rotation: 90,  depth: 0.4, delay: 0.5 },
 ];
 
 const WORKS: WorkItem[] = [
@@ -56,55 +115,119 @@ const SERVICES = [
   { num: "06", name: "Motion Graphics",    price: "₱5,500",  unit: "project", desc: "Titles, lower thirds, animated logos, and transitions. Clean motion design integrated directly into your edit.", icon: "M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" },
 ];
 
-const PROCESS_STEPS = [
-  { n: "01", title: "Brief & Discovery",    desc: "We align on your vision, references, deadlines, and deliverables before a single frame is touched." },
-  { n: "02", title: "Rough Assembly",       desc: "A full rough cut shaped for story and pacing. You see the bones before the polish begins." },
-  { n: "03", title: "Refinement Rounds",    desc: "Up to three revision passes. Feedback is taken seriously — this is a collaborative craft." },
-  { n: "04", title: "Colour & Sound",       desc: "Final grade, audio mix, and finishing. Every detail dialled in before delivery." },
-  { n: "05", title: "Delivery",             desc: "Exported in your required specs — broadcast, web, or archival. Files delivered clean and on time." },
+const PROCESS_STEPS: ProcessStep[] = [
+  { 
+    n: "01", 
+    title: "Brief & Discovery",    
+    desc: "We align on your vision, references, deadlines, and deliverables before a single frame is touched.", 
+    time: "1-2 Days",
+    deliverable: "Project Roadmap",
+    visual: "BRIEF &\nDISCOVER",
+    subTabs: [
+      { label: "Strategy", content: "Initial consultation to discuss the creative direction, target audience, and core message of the piece." },
+      { label: "Assets",   content: "Ingesting and reviewing raw footage, brand guidelines, audio files, and provided reference links." },
+      { label: "Specs",    content: "Defining aspect ratios, safe zones, required output formats, and distribution platforms." },
+    ]
+  },
+  { 
+    n: "02", 
+    title: "Rough Assembly",       
+    desc: "A full rough cut shaped for story and pacing. You see the bones before the polish begins.", 
+    time: "3-5 Days",
+    deliverable: "V1 Rough Cut",
+    visual: "ROUGH\nASSEMBLY",
+    subTabs: [
+      { label: "Ingest",     content: "Transcoding raw media, creating proxies for fluid editing, and perfectly syncing multi-cam audio." },
+      { label: "String-out", content: "Sifting through hours of footage, removing dead air, and isolating the absolute best takes." },
+      { label: "Structure",  content: "Building the narrative spine. Arranging the selected clips to establish the core rhythm and flow." },
+    ]
+  },
+  { 
+    n: "03", 
+    title: "Refinement Rounds",    
+    desc: "Up to three revision passes. Feedback is taken seriously — this is a collaborative craft.", 
+    time: "2-4 Days",
+    deliverable: "Picture Lock",
+    visual: "REFINE\nROUNDS",
+    subTabs: [
+      { label: "Pacing", content: "Micro-trimming frames, smoothing transitions, and utilizing J/L cuts to make the edit feel invisible." },
+      { label: "B-Roll", content: "Layering supporting visuals and cutaways to enhance context and visual engagement." },
+      { label: "VFX",    content: "Adding necessary motion graphics, lower thirds, tracking markers, and placeholder composites." },
+    ]
+  },
+  { 
+    n: "04", 
+    title: "Colour & Sound",       
+    desc: "Final grade, audio mix, and finishing. Every detail dialled in before delivery.", 
+    time: "2-3 Days",
+    deliverable: "Finished Master",
+    visual: "COLOUR\n& SOUND",
+    subTabs: [
+      { label: "Grade", content: "Primary color correction, precise shot matching, and crafting a unique cinematic look development." },
+      { label: "Foley", content: "Layering high-fidelity sound effects and environmental audio textures to build an immersive world." },
+      { label: "Mix",   content: "Dialogue cleanup, parametric EQ, compression, and final audio mastering to strict LUFS broadcast standards." },
+    ]
+  },
+  { 
+    n: "05", 
+    title: "Delivery",             
+    desc: "Exported in your required specs — broadcast, web, or archival. Files delivered clean and on time.", 
+    time: "1 Day",
+    deliverable: "Asset Handover",
+    visual: "FINAL\nDELIVERY",
+    subTabs: [
+      { label: "Export",  content: "Rendering high-resolution master files and highly optimized compressed versions for social media." },
+      { label: "Alt Cuts", content: "Generating clean textless versions, 9:16 vertical crops, and looping 15-second teaser formats." },
+      { label: "Archive", content: "Packaging final stems, XMLs, LUTs, and project files for secure long-term cold storage." },
+    ]
+  },
 ];
 
 const TOOLS = [
-  { logo: "CC", name: "CapCut",          color: "#00d2ff", borderColor: "rgba(0,210,255,0.2)",       url: "https://www.capcut.com",                                              desc: "Fast, fluid editing for social-first content. Mobile and desktop. Perfect for quick-turn Reels and TikTok." },
-  { logo: "Pr", name: "Adobe Premiere",  color: "#9999ff", borderColor: "rgba(153,153,255,0.2)",     url: "https://www.adobe.com/products/premiere.html",                        desc: "Industry-standard NLE for cinematic storytelling. Deep integration with the Adobe ecosystem." },
-  { logo: "DR", name: "DaVinci Resolve", color: "#ff6b6b", borderColor: "rgba(255,107,107,0.2)",     url: "https://www.blackmagicdesign.com/products/davinciresolve",             desc: "Professional colour grading and post-production suite. Where the grade lives and breathes." },
+  { logo: "CC", name: "CapCut",          color: "#00f5d4", borderColor: "rgba(0,245,212,0.2)",     url: "https://www.capcut.com",                                      desc: "Fast, fluid editing for social-first content. Mobile and desktop. Perfect for quick-turn Reels and TikTok." },
+  { logo: "Pr", name: "Adobe Premiere",  color: "#9b5de5", borderColor: "rgba(155,93,229,0.2)",   url: "https://www.adobe.com/products/premiere.html",                desc: "Industry-standard NLE for cinematic storytelling. Deep integration with the Adobe ecosystem." },
+  { logo: "DR", name: "DaVinci Resolve", color: "#52b788", borderColor: "rgba(82,183,136,0.2)",   url: "https://www.blackmagicdesign.com/products/davinciresolve",    desc: "Professional colour grading and post-production suite. Where the grade lives and breathes." },
 ];
 
-// ─── Rounding helper — prevents SSR/client floating-point hydration mismatches
 const r = (n: number, decimals = 4) => parseFloat(n.toFixed(decimals));
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 export default function VideoEditPage() {
   const [scrollY, setScrollY]     = useState(0);
+  const [vh, setVh]               = useState(1000); 
   const [mousePos, setMousePos]   = useState({ x: 0, y: 0 });
   const [ripples, setRipples]     = useState<Ripple[]>([]);
   const [carouselIdx, setCarouselIdx] = useState(0);
+  
+  // Tab State & Auto-play
+  const [activeProcessStep, setActiveProcessStep] = useState(0);
+  const [activeSubTabs, setActiveSubTabs]         = useState<number[]>(new Array(PROCESS_STEPS.length).fill(0));
+  const [isProcessHovered, setIsProcessHovered]   = useState(false);
+  
   const [formState, setFormState] = useState({ name: "", email: "", subject: "", message: "" });
   const [submitted, setSubmitted] = useState(false);
   const [cursorPos, setCursorPos] = useState({ x: 0, y: 0 });
   const [ringPos, setRingPos]     = useState({ x: 0, y: 0 });
   const [cursorBig, setCursorBig] = useState(false);
 
-  const rippleId    = useRef(0);
-  const autoTimer   = useRef<ReturnType<typeof setInterval> | null>(null);
-  const ringRef     = useRef({ x: 0, y: 0 });
-  const targetRef   = useRef({ x: 0, y: 0 });
-  const rafRef      = useRef<number | null>(null);
-  // ── Refs for coordinate conversion
-  const waterSvgRef = useRef<SVGSVGElement | null>(null);
-  const lilySvgRef  = useRef<SVGSVGElement | null>(null);
+  const rippleId     = useRef(0);
+  const autoTimer    = useRef<ReturnType<typeof setInterval> | null>(null);
+  const processTimer = useRef<ReturnType<typeof setInterval> | null>(null);
+  const ringRef      = useRef({ x: 0, y: 0 });
+  const targetRef    = useRef({ x: 0, y: 0 });
+  const rafRef       = useRef<number | null>(null);
+  
+  const waterSvgRef  = useRef<SVGSVGElement | null>(null);
 
-  // ── Convert screen pixel coords → SVG viewBox coords (0–100 space)
-  const svgToViewBox = useCallback((svgEl: SVGSVGElement, clientX: number, clientY: number) => {
-    const rect = svgEl.getBoundingClientRect();
-    const vb   = svgEl.viewBox.baseVal; // width:100, height:100
-    return {
-      x: ((clientX - rect.left) / rect.width)  * vb.width,
-      y: ((clientY - rect.top)  / rect.height) * vb.height,
-    };
+  // Measure initial screen height for parallax math
+  useEffect(() => {
+    const handleResize = () => setVh(window.innerHeight);
+    requestAnimationFrame(() => handleResize());
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // ── Scroll
+  // ── Scroll & Render Loop
   useEffect(() => {
     let ticking = false;
     const onScroll = () => {
@@ -117,7 +240,6 @@ export default function VideoEditPage() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // ── Mouse
   useEffect(() => {
     const onMove = (e: MouseEvent) => {
       targetRef.current = { x: e.clientX, y: e.clientY };
@@ -154,7 +276,7 @@ export default function VideoEditPage() {
     return () => io.disconnect();
   }, []);
 
-  // ── Carousel auto
+  // ── Carousel auto (Works Reel)
   const goTo = useCallback((idx: number) => {
     setCarouselIdx(((idx % WORKS.length) + WORKS.length) % WORKS.length);
   }, []);
@@ -170,37 +292,72 @@ export default function VideoEditPage() {
     return () => { if (autoTimer.current) clearInterval(autoTimer.current); };
   }, []);
 
-  // ── Ripple — takes SVG viewBox coords directly
-  const addRipple = (x: number, y: number) => {
+  // ── Process Tabs auto-play ──
+  useEffect(() => {
+    if (isProcessHovered) {
+      if (processTimer.current) clearInterval(processTimer.current);
+      return;
+    }
+    processTimer.current = setInterval(() => {
+      setActiveProcessStep(prev => (prev + 1) % PROCESS_STEPS.length);
+    }, 6000);
+
+    return () => { if (processTimer.current) clearInterval(processTimer.current); };
+  }, [isProcessHovered]);
+
+  const handleSetSubTab = (stepIndex: number, subIndex: number) => {
+    setActiveSubTabs(prev => {
+      const next = [...prev];
+      next[stepIndex] = subIndex;
+      return next;
+    });
+  };
+
+  const handlePrev = useCallback(() => resetAuto(carouselIdx - 1), [carouselIdx, resetAuto]);
+  const handleNext = useCallback(() => resetAuto(carouselIdx + 1), [carouselIdx, resetAuto]);
+
+  // ── Global Ripple Spawner
+  const addRipple = useCallback((x: number, y: number) => {
     const id = rippleId.current++;
     setRipples(prev => [...prev, { id, x, y }]);
     setTimeout(() => setRipples(prev => prev.filter(r => r.id !== id)), 2200);
-  };
+  }, []);
 
-  // ── Handle click anywhere on the hero section → convert to viewBox coords
-  const handleHeroClick = useCallback((e: React.MouseEvent<SVGSVGElement>) => {
+  // Attach click listener to global wrapper so clicking ANYWHERE triggers the pond ripples
+  const handleGlobalClick = useCallback((e: React.MouseEvent) => {
     if (!waterSvgRef.current) return;
-    const { x, y } = svgToViewBox(waterSvgRef.current, e.clientX, e.clientY);
+    const rect = waterSvgRef.current.getBoundingClientRect();
+    const vb = waterSvgRef.current.viewBox.baseVal;
+    const x = ((e.clientX - rect.left) / rect.width) * vb.width;
+    const y = ((e.clientY - rect.top) / rect.height) * vb.height;
     addRipple(x, y);
-  }, [svgToViewBox]);
+  }, [addRipple]);
 
-  // ── Handle lily pad click → use lily SVG for accurate conversion
-  const handleLilyClick = useCallback((e: React.MouseEvent<SVGGElement>) => {
-    e.stopPropagation(); // prevent double-firing with water layer
-    if (!lilySvgRef.current) return;
-    const { x, y } = svgToViewBox(lilySvgRef.current, e.clientX, e.clientY);
-    addRipple(x, y);
-  }, [svgToViewBox]);
-
-  // ── Lily pad parallax transform
+  // Parallax transform mapping depth and scroll
   const padTransform = (pad: LilyPad) => {
     const mouseX = mousePos.x * pad.depth * 9;
     const mouseY = mousePos.y * pad.depth * 6;
-    const scrollShift = scrollY * pad.depth * 0.06;
-    return `translate(${mouseX}px, ${mouseY - scrollShift}px)`;
+    
+    // Deep parallax mapping (higher depth = faster upward movement)
+    const parallax = 0.6 + pad.depth * 0.8; 
+    const scrollShift = (scrollY / (vh || 1000)) * 100 * parallax;
+    
+    const currentX = pad.x + mouseX;
+    const currentY = pad.y - scrollShift + mouseY;
+
+    // Culling off-screen pads for optimization (buffer of -100 to 200)
+    if (currentY < -100 || currentY > 200) return { display: 'none' };
+
+    return {
+      transform: `translate(${currentX}px, ${currentY}px)`,
+      animationDelay: `${pad.delay}s`,
+      animationDuration: `${5 + pad.depth * 4}s`,
+      animation: `float ${5 + pad.depth * 4}s ease-in-out ${pad.delay}s infinite`,
+      opacity: 0.35 + pad.depth * 0.55,
+      willChange: "transform",
+    };
   };
 
-  // ── Submit
   const handleSubmit = () => {
     if (formState.name && formState.email && formState.message) setSubmitted(true);
   };
@@ -208,27 +365,27 @@ export default function VideoEditPage() {
   const allWorks = [...WORKS, ...WORKS];
 
   return (
-    <>
+    <main onClick={handleGlobalClick} style={{ position: "relative", width: "100%", overflowX: "hidden" }}>
       {/* ─── Global Styles ───────────────────────────────────────────────── */}
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Syne:wght@400;600;700;800&display=swap');
 
         :root {
-          --bg: #080808;
-          --bg2: #0d0d0d;
-          --surface: #111111;
-          --surface2: #171717;
-          --border: rgba(255,255,255,0.07);
+          /* Everything is fully transparent to let the global canvas show through */
+          --border: rgba(82, 183, 136, 0.15); 
+          --surface: rgba(8, 16, 20, 0.45);
+          
           --purple: #9b5de5;
           --purple-light: #c084fc;
-          --purple-dark: #6d28d9;
           --purple-glow: rgba(155,93,229,0.22);
+          
+          /* Cyber-Pond Accents */
+          --teal: #00f5d4;
+          --emerald: #52b788;
+          
           --text: #f0f0f0;
-          --text-muted: #5a5a5a;
-          --text-dim: #2a2a2a;
-          --lily-green: #2d6a4f;
-          --lily-light: #52b788;
-          --flower-pink: #f4a5b8;
+          --text-muted: #8899a6;
+          --text-dim: #445566;
         }
 
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -236,24 +393,24 @@ export default function VideoEditPage() {
 
         body {
           font-family: 'Syne', sans-serif;
-          background: var(--bg);
+          background: #020608;
           color: var(--text);
           overflow-x: hidden;
           cursor: none;
         }
 
         ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-track { background: var(--bg); }
-        ::-webkit-scrollbar-thumb { background: var(--purple-dark); border-radius: 2px; }
+        ::-webkit-scrollbar-track { background: #020608; }
+        ::-webkit-scrollbar-thumb { background: var(--teal); border-radius: 2px; }
 
-        /* Grain */
+        /* Grain Overlay */
         body::before {
           content: '';
           position: fixed;
           inset: 0;
           z-index: 9990;
           pointer-events: none;
-          opacity: 0.025;
+          opacity: 0.035;
           background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
           background-size: 200px 200px;
           animation: grain 0.5s steps(1) infinite;
@@ -280,16 +437,19 @@ export default function VideoEditPage() {
 
         /* Water + lily animations */
         @keyframes shimmer {
-          0%,100%{opacity:0.25} 50%{opacity:0.65}
+          0%,100%{opacity:0.2} 50%{opacity:0.55}
         }
         @keyframes float {
           0%,100%{transform:translateY(0px) rotate(0deg)}
           33%{transform:translateY(-7px) rotate(0.8deg)}
           66%{transform:translateY(-3px) rotate(-0.5deg)}
         }
-        @keyframes rippleOut  { 0%{r:1;stroke-opacity:.9} 100%{r:55;stroke-opacity:0} }
-        @keyframes rippleOut2 { 0%{r:1;stroke-opacity:.6} 100%{r:80;stroke-opacity:0} }
-        @keyframes rippleOut3 { 0%{r:1;stroke-opacity:.3} 100%{r:110;stroke-opacity:0} }
+        
+        /* Multi-layered Cyber Ripple */
+        @keyframes rippleOut  { 0%{r:1;stroke-opacity:0.9} 100%{r:55;stroke-opacity:0} }
+        @keyframes rippleOut2 { 0%{r:1;stroke-opacity:0.7} 100%{r:80;stroke-opacity:0} }
+        @keyframes rippleOut3 { 0%{r:1;stroke-opacity:0.5} 100%{r:110;stroke-opacity:0} }
+        @keyframes rippleOut4 { 0%{r:1;stroke-opacity:0.3} 100%{r:140;stroke-opacity:0} }
 
         /* Scroll indicator */
         @keyframes scrollLine {
@@ -305,23 +465,22 @@ export default function VideoEditPage() {
           50%{box-shadow:0 0 0 8px transparent}
         }
 
-        /* Film strip hole */
-        @keyframes rotatePulse {
-          from{transform:rotate(0deg)} to{transform:rotate(360deg)}
+        /* Base section styles to allow fixed canvas through */
+        section { 
+          position: relative; 
+          z-index: 10;
         }
 
-        /* Section base */
-        section { position: relative; overflow: hidden; }
-
-        /* Label */
+        /* Typography */
         .section-label {
           font-family: 'Syne', sans-serif;
           font-size: 0.68rem;
           font-weight: 700;
           letter-spacing: 0.45em;
           text-transform: uppercase;
-          color: var(--purple);
+          color: var(--teal);
           margin-bottom: 0.8rem;
+          text-shadow: 0 0 12px rgba(0,245,212,0.3);
         }
         .section-title {
           font-family: 'Bebas Neue', sans-serif;
@@ -332,8 +491,9 @@ export default function VideoEditPage() {
         }
         .accent-dash {
           width: 44px; height: 2px;
-          background: var(--purple);
+          background: var(--teal);
           margin: 1.4rem 0;
+          box-shadow: 0 0 10px var(--teal);
         }
 
         /* Buttons */
@@ -351,14 +511,18 @@ export default function VideoEditPage() {
           cursor: pointer;
           text-decoration: none;
           clip-path: polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,12px 100%,0 calc(100% - 12px));
-          transition: background 0.3s, transform 0.2s;
+          transition: background 0.3s, transform 0.2s, box-shadow 0.3s;
         }
-        .btn-primary:hover { background: var(--purple-light); transform: translateY(-2px); }
+        .btn-primary:hover { 
+          background: var(--purple-light); 
+          transform: translateY(-2px); 
+          box-shadow: 0 10px 20px rgba(155,93,229,0.3);
+        }
 
         .btn-ghost {
           display: inline-block;
           padding: 0.88rem 2.4rem;
-          background: transparent;
+          background: rgba(0,0,0,0.4);
           color: var(--text-muted);
           border: 1px solid var(--border);
           font-family: 'Syne', sans-serif;
@@ -369,40 +533,50 @@ export default function VideoEditPage() {
           cursor: pointer;
           text-decoration: none;
           transition: border-color 0.3s, color 0.3s, transform 0.2s;
+          backdrop-filter: blur(8px);
         }
-        .btn-ghost:hover { border-color: var(--purple); color: var(--purple); transform: translateY(-2px); }
+        .btn-ghost:hover { border-color: var(--teal); color: var(--teal); transform: translateY(-2px); }
 
-        /* ── Film strip ── */
+        /* ── Film strip Carousel ── */
+        .reel-container {
+          mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+          -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+          padding: 16px 0;
+          overflow: hidden;
+        }
+
         .film-card {
           flex: 0 0 340px;
           position: relative;
           background: var(--surface);
-          border-left: 1px solid #191919;
-          border-right: 1px solid #191919;
+          backdrop-filter: blur(12px);
+          border-left: 1px solid rgba(255,255,255,0.05);
+          border-right: 1px solid rgba(255,255,255,0.05);
           cursor: pointer;
           transition: transform 0.4s ease;
           user-select: none;
         }
         .film-card:hover { transform: scale(1.025); z-index: 5; }
         .film-card:hover .film-frame-bg { transform: scale(1.06); filter: brightness(0.42) saturate(0.9); }
-        .film-card:hover .play-circle { transform: translate(-50%,-50%) scale(1.12); background: var(--purple); }
+        .film-card:hover .play-circle { transform: translate(-50%,-50%) scale(1.12); background: var(--purple); border-color: var(--teal); }
 
         .film-holes {
           height: 26px;
-          background: #080808;
+          background: rgba(0,0,0,0.6);
           display: flex;
           align-items: center;
           padding: 0 16px;
           gap: 14px;
-          border-top: 1px solid #1a1a1a;
-          border-bottom: 1px solid #1a1a1a;
+          border-top: 1px solid rgba(255,255,255,0.05);
+          border-bottom: 1px solid rgba(255,255,255,0.05);
         }
         .hole {
           width: 13px; height: 9px;
-          background: #030303;
+          background: transparent;
           border-radius: 2px;
-          border: 1px solid #161616;
+          border: 1px solid rgba(255,255,255,0.1);
           flex-shrink: 0;
+          box-shadow: inset 0 0 4px rgba(0,0,0,0.8);
         }
 
         .film-frame {
@@ -435,7 +609,7 @@ export default function VideoEditPage() {
           border-radius: 50%;
           display: flex; align-items: center; justify-content: center;
           z-index: 5;
-          transition: transform 0.3s, background 0.3s;
+          transition: transform 0.3s, background 0.3s, border-color 0.3s;
           backdrop-filter: blur(4px);
         }
 
@@ -450,15 +624,16 @@ export default function VideoEditPage() {
           display: grid;
           grid-template-columns: repeat(3, 1fr);
           gap: 1px;
-          background: var(--border);
-          border: 1px solid var(--border);
+          background: transparent;
           margin-top: 4rem;
         }
         @media (max-width: 900px) { .services-grid { grid-template-columns: 1fr 1fr; } }
         @media (max-width: 580px) { .services-grid { grid-template-columns: 1fr; } }
 
         .service-item {
-          background: var(--bg);
+          background: rgba(2, 6, 8, 0.45);
+          backdrop-filter: blur(12px);
+          border: 1px solid rgba(255,255,255,0.05);
           padding: 2.8rem 2.2rem;
           position: relative;
           overflow: hidden;
@@ -470,18 +645,19 @@ export default function VideoEditPage() {
           position: absolute;
           bottom: 0; left: 0; right: 0;
           height: 2px;
-          background: var(--purple);
+          background: var(--teal);
           transform: scaleX(0);
           transform-origin: left;
           transition: transform 0.5s cubic-bezier(0.16,1,0.3,1);
         }
-        .service-item:hover { background: var(--surface); }
+        .service-item:hover { background: rgba(8, 16, 20, 0.65); }
         .service-item:hover::after { transform: scaleX(1); }
 
         /* ── Tool cards ── */
         .tool-card {
           border: 1px solid var(--border);
-          background: var(--surface);
+          background: rgba(2, 6, 8, 0.45);
+          backdrop-filter: blur(12px);
           padding: 2.5rem 2rem;
           position: relative;
           overflow: hidden;
@@ -489,48 +665,189 @@ export default function VideoEditPage() {
           text-decoration: none;
           display: block;
           cursor: pointer;
+          border-radius: 8px;
         }
         .tool-card::before {
           content: '';
           position: absolute;
           top: 0; left: 0; right: 0;
           height: 1px;
-          background: var(--purple);
+          background: var(--teal);
           transform: scaleX(0);
           transform-origin: left;
           transition: transform 0.5s cubic-bezier(0.16,1,0.3,1);
         }
-        .tool-card:hover { border-color: rgba(155,93,229,0.35); transform: translateY(-5px); }
+        .tool-card:hover { border-color: rgba(0,245,212,0.35); transform: translateY(-5px); }
         .tool-card:hover::before { transform: scaleX(1); }
 
-        /* ── Process step ── */
+        /* ── Process Step Tabs ── */
+        @keyframes fillProgress {
+          from { transform: scaleY(0); }
+          to { transform: scaleY(1); }
+        }
+
         .process-step {
-          padding: 2rem 0;
+          padding: 2rem 1rem 2rem 24px;
           border-bottom: 1px solid var(--border);
           display: flex;
           gap: 2rem;
           align-items: flex-start;
-          cursor: default;
-          transition: padding-left 0.3s ease;
+          cursor: pointer;
+          position: relative;
+          opacity: 0.35;
+          transition: padding-left 0.6s cubic-bezier(0.16,1,0.3,1), opacity 0.5s ease;
+          border-radius: 8px 8px 0 0;
         }
         .process-step:first-child { border-top: 1px solid var(--border); }
-        .process-step:hover { padding-left: 0.7rem; }
-        .process-step:hover .step-num { color: var(--purple); }
+        .process-step:hover { opacity: 0.7; padding-left: 32px; }
+        
+        .process-step.active {
+          opacity: 1;
+          padding-left: 38px;
+        }
+        
+        /* The un-filled background line */
+        .process-step::before {
+          content: '';
+          position: absolute;
+          left: 0; top: 0; bottom: 0;
+          width: 2px;
+          background: var(--border);
+        }
+
+        /* The animated filled progress line */
+        .process-step::after {
+          content: '';
+          position: absolute;
+          left: 0; top: 0; bottom: 0;
+          width: 2px;
+          background: var(--teal);
+          transform: scaleY(0);
+          transform-origin: top;
+          box-shadow: 0 0 8px var(--teal);
+        }
+        
+        /* Auto-play progress ONLY activates when it's actively playing and not hovered */
+        .process-wrapper:not(:hover) .process-step.active::after {
+          animation: fillProgress 6s linear forwards;
+        }
+        /* Keep it full when hovered to pause */
+        .process-wrapper:hover .process-step.active::after {
+          transform: scaleY(1);
+          transition: transform 0.2s ease;
+        }
+
+        .process-step.active .step-num { color: var(--teal); text-shadow: 0 0 10px rgba(0,245,212,0.3); }
+
         .step-num {
           font-family: 'Bebas Neue', sans-serif;
           font-size: 2.4rem;
           color: var(--text-dim);
           line-height: 1;
           min-width: 44px;
-          transition: color 0.3s;
+          transition: color 0.5s, text-shadow 0.5s;
+        }
+        
+        /* ── Process Accordion Details (Nested Sub-tabs) ── */
+        .step-accordion {
+          display: grid;
+          grid-template-rows: 0fr;
+          opacity: 0;
+          transition: grid-template-rows 0.6s cubic-bezier(0.16,1,0.3,1), opacity 0.4s ease;
+        }
+        .process-step.active .step-accordion {
+          grid-template-rows: 1fr;
+          opacity: 1;
+          margin-top: 1.2rem;
+        }
+        .step-accordion-inner {
+          overflow: hidden;
+        }
+        
+        /* Sub-tabs UI */
+        .sub-tabs-container {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 0.6rem;
+          margin-bottom: 1rem;
+        }
+        .sub-tab-btn {
+          background: rgba(0, 0, 0, 0.4);
+          backdrop-filter: blur(4px);
+          border: 1px solid var(--border);
+          color: var(--text-muted);
+          padding: 0.35rem 0.85rem;
+          font-family: 'Syne', sans-serif;
+          font-size: 0.72rem;
+          font-weight: 600;
+          letter-spacing: 0.05em;
+          border-radius: 20px;
+          cursor: pointer;
+          transition: all 0.3s ease;
+        }
+        .sub-tab-btn:hover {
+          border-color: rgba(0, 245, 212, 0.4);
+          color: #fff;
+        }
+        .sub-tab-btn.active {
+          border-color: var(--teal);
+          color: var(--teal);
+          background: rgba(0, 245, 212, 0.08);
+          box-shadow: 0 0 10px rgba(0, 245, 212, 0.2);
+        }
+
+        /* Sub-tab content animation */
+        @keyframes fadeInSub {
+          from { opacity: 0; transform: translateY(6px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .sub-tab-content-wrapper {
+          min-height: 50px; 
+        }
+        .sub-tab-content-text {
+          font-size: 0.85rem;
+          color: #a0a0a0;
+          line-height: 1.65;
+          animation: fadeInSub 0.3s ease-out forwards;
+        }
+
+        /* ── Process Visual Panels ── */
+        .process-visual {
+          position: absolute;
+          inset: 0;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          opacity: 0;
+          transform: translateY(30px) scale(0.96);
+          filter: blur(8px);
+          transition: opacity 0.8s cubic-bezier(0.16,1,0.3,1), 
+                      transform 0.8s cubic-bezier(0.16,1,0.3,1),
+                      filter 0.8s ease;
+          pointer-events: none;
+        }
+        .process-visual.active {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+          filter: blur(0px);
         }
 
         /* ── Contact form ── */
+        .contact-form-container {
+          background: rgba(8, 16, 20, 0.5);
+          backdrop-filter: blur(16px);
+          border: 1px solid var(--border);
+          padding: 3rem;
+          border-radius: 12px;
+          box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+        }
+
         .form-field {
           border-bottom: 1px solid var(--border);
           transition: border-color 0.3s;
         }
-        .form-field:focus-within { border-color: var(--purple); }
+        .form-field:focus-within { border-color: var(--teal); }
         .form-input {
           width: 100%;
           padding: 0.9rem 0;
@@ -543,32 +860,12 @@ export default function VideoEditPage() {
         }
         .form-input::placeholder { color: var(--text-muted); }
 
-        /* Reel fade edges */
-        .reel-fade-left {
-          position: absolute;
-          top: 0; left: 0; bottom: 0;
-          width: 120px;
-          background: linear-gradient(to right, var(--bg), transparent);
-          z-index: 10;
-          pointer-events: none;
-        }
-        .reel-fade-right {
-          position: absolute;
-          top: 0; right: 0; bottom: 0;
-          width: 120px;
-          background: linear-gradient(to left, var(--bg), transparent);
-          z-index: 10;
-          pointer-events: none;
-        }
-
-        /* Lily cursor */
-        .lily-group { cursor: pointer; }
-
         @media (max-width: 640px) {
           .hero-stats { gap: 1.5rem; }
           .process-layout { grid-template-columns: 1fr !important; }
           .tools-grid { grid-template-columns: 1fr !important; }
           .contact-layout { grid-template-columns: 1fr !important; gap: 2.5rem !important; }
+          .contact-form-container { padding: 1.5rem; }
         }
       `}</style>
 
@@ -578,20 +875,21 @@ export default function VideoEditPage() {
         left: cursorPos.x, top: cursorPos.y,
         width: cursorBig ? 16 : 10,
         height: cursorBig ? 16 : 10,
-        background: "var(--purple)",
+        background: "var(--teal)",
         borderRadius: "50%",
         pointerEvents: "none",
         zIndex: 9999,
         transform: "translate(-50%,-50%)",
         transition: "width 0.3s, height 0.3s",
         mixBlendMode: "screen",
+        boxShadow: "0 0 15px var(--teal)"
       }} />
       <div style={{
         position: "fixed",
         left: ringPos.x, top: ringPos.y,
         width: cursorBig ? 52 : 36,
         height: cursorBig ? 52 : 36,
-        border: `1px solid rgba(155,93,229,${cursorBig ? "0.8" : "0.45"})`,
+        border: `1px solid rgba(0,245,212,${cursorBig ? "0.8" : "0.45"})`,
         borderRadius: "50%",
         pointerEvents: "none",
         zIndex: 9998,
@@ -600,137 +898,116 @@ export default function VideoEditPage() {
       }} />
 
       {/* ════════════════════════════════════════
-          HERO
+          GLOBAL FIXED CYBER-POND BACKGROUND 
       ════════════════════════════════════════ */}
-      <section id="hero" style={{
-        minHeight: "100vh",
-        display: "flex",
-        alignItems: "center",
-        padding: "0 clamp(2rem,7vw,7rem)",
-        position: "relative",
-        background: "var(--bg)",
-        overflow: "hidden",
-      }}>
-
-        {/* ── Water canvas — receives all hero clicks for ripples ── */}
+      <div style={{ position: "fixed", inset: 0, zIndex: -1, pointerEvents: "none" }}>
+        
+        {/* Base Water & Caustics */}
         <svg
           ref={waterSvgRef}
-          style={{
-            position: "absolute", inset: 0, width: "100%", height: "100%",
-            zIndex: 0,
-            cursor: "crosshair",
-          }}
+          style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }}
           viewBox="0 0 100 100"
           preserveAspectRatio="xMidYMid slice"
           xmlns="http://www.w3.org/2000/svg"
-          onClick={handleHeroClick}
         >
           <defs>
             <radialGradient id="waterGrad" cx="50%" cy="40%" r="70%">
-              <stop offset="0%"   stopColor="#0a0316" />
-              <stop offset="55%"  stopColor="#050110" />
-              <stop offset="100%" stopColor="#030108" />
+              <stop offset="0%"   stopColor="#020810" />
+              <stop offset="55%"  stopColor="#010408" />
+              <stop offset="100%" stopColor="#000204" />
             </radialGradient>
             <pattern id="caustic" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
-              <ellipse cx="10" cy="10" rx="8" ry="3" fill="none" stroke="rgba(155,93,229,0.025)" strokeWidth="0.35" />
-              <ellipse cx="5"  cy="5"  rx="3" ry="1.5" fill="none" stroke="rgba(155,93,229,0.015)" strokeWidth="0.25" />
+              <ellipse cx="10" cy="10" rx="8" ry="3" fill="none" stroke="rgba(0,245,212,0.025)" strokeWidth="0.35" />
+              <ellipse cx="5"  cy="5"  rx="3" ry="1.5" fill="none" stroke="rgba(82,183,136,0.015)" strokeWidth="0.25" />
             </pattern>
             <filter id="blur4"><feGaussianBlur stdDeviation="3" /></filter>
             <filter id="reflBlur"><feGaussianBlur stdDeviation="0.9" /></filter>
             <radialGradient id="lilyGrad" cx="40%" cy="35%" r="65%">
               <stop offset="0%"  stopColor="#52b788" />
               <stop offset="60%" stopColor="#2d6a4f" />
-              <stop offset="100%" stopColor="#1b4332" />
+              <stop offset="100%" stopColor="#0f2b1d" />
             </radialGradient>
             <radialGradient id="lilyGradDeep" cx="40%" cy="35%" r="65%">
               <stop offset="0%"  stopColor="#40916c" />
               <stop offset="60%" stopColor="#1b4332" />
-              <stop offset="100%" stopColor="#081c11" />
+              <stop offset="100%" stopColor="#06120b" />
             </radialGradient>
             <radialGradient id="flowerGrad" cx="50%" cy="50%" r="50%">
-              <stop offset="0%"  stopColor="#ffd6e0" />
-              <stop offset="100%" stopColor="#f4a5b8" />
+              <stop offset="0%"  stopColor="#ffcce0" />
+              <stop offset="100%" stopColor="#f48fb1" />
             </radialGradient>
           </defs>
 
           {/* Deep water */}
           <rect width="100" height="100" fill="url(#waterGrad)" />
-          <rect width="100" height="100" fill="url(#caustic)" style={{ animation: "shimmer 5s ease-in-out infinite", opacity: 0.6 }} />
-          <rect width="100" height="100" fill="url(#caustic)" style={{ animation: "shimmer 9s ease-in-out infinite", transform: "rotate(45deg) scale(1.5)", transformOrigin: "50% 50%", opacity: 0.4 }} />
+          <rect width="100" height="100" fill="url(#caustic)" style={{ animation: "shimmer 6s ease-in-out infinite", opacity: 0.8 }} />
+          <rect width="100" height="100" fill="url(#caustic)" style={{ animation: "shimmer 10s ease-in-out infinite", transform: "rotate(45deg) scale(1.5)", transformOrigin: "50% 50%", opacity: 0.5 }} />
 
-          {Array.from({ length: 8 }, (_, i) => (
+          {/* Bioluminescent streaks */}
+          {Array.from({ length: 12 }, (_, i) => (
             <line key={i}
-              x1="0" y1={10 + i * 10}
-              x2="100" y2={10 + i * 10}
-              stroke="rgba(155,93,229,0.04)"
+              x1="0" y1={5 + i * 8}
+              x2="100" y2={5 + i * 8}
+              stroke="rgba(0,245,212,0.035)"
               strokeWidth="0.25"
               style={{ animation: `shimmer ${4 + (i % 3)}s ease-in-out infinite`, animationDelay: `${i * 0.3}s` }}
             />
           ))}
 
-          <ellipse cx="15"  cy="20" rx="22" ry="14" fill="rgba(80,20,160,0.08)"  filter="url(#blur4)" />
-          <ellipse cx="85"  cy="75" rx="18" ry="11" fill="rgba(80,20,160,0.06)"  filter="url(#blur4)" />
-          <ellipse cx="50"  cy="50" rx="15" ry="9"  fill="rgba(155,93,229,0.04)" filter="url(#blur4)" />
+          {/* Ambient Glows */}
+          <ellipse cx="15"  cy="20" rx="22" ry="14" fill="rgba(0,245,212,0.06)"  filter="url(#blur4)" />
+          <ellipse cx="85"  cy="75" rx="18" ry="11" fill="rgba(155,93,229,0.05)"  filter="url(#blur4)" />
+          <ellipse cx="50"  cy="50" rx="15" ry="9"  fill="rgba(82,183,136,0.04)" filter="url(#blur4)" />
 
-          {/* ── Ripples rendered here — in viewBox coordinate space ── */}
+          {/* Multi-layered Ripples generated globally */}
           {ripples.map(r => (
             <g key={r.id}>
-              <circle cx={r.x} cy={r.y} r="1" fill="none" stroke="rgba(155,93,229,0.9)" strokeWidth="0.5" style={{ animation: "rippleOut 2.2s ease-out forwards" }} />
-              <circle cx={r.x} cy={r.y} r="1" fill="none" stroke="rgba(155,93,229,0.55)" strokeWidth="0.4" style={{ animation: "rippleOut2 2.2s ease-out forwards", animationDelay: "0.18s" }} />
-              <circle cx={r.x} cy={r.y} r="1" fill="none" stroke="rgba(155,93,229,0.25)" strokeWidth="0.3" style={{ animation: "rippleOut3 2.2s ease-out forwards", animationDelay: "0.35s" }} />
+              <circle cx={r.x} cy={r.y} r="1" fill="none" stroke="rgba(0,245,212,0.9)" strokeWidth="0.5" style={{ animation: "rippleOut 2.2s ease-out forwards" }} />
+              <circle cx={r.x} cy={r.y} r="1" fill="none" stroke="rgba(155,93,229,0.7)" strokeWidth="0.4" style={{ animation: "rippleOut2 2.2s ease-out forwards", animationDelay: "0.15s" }} />
+              <circle cx={r.x} cy={r.y} r="1" fill="none" stroke="rgba(82,183,136,0.5)" strokeWidth="0.3" style={{ animation: "rippleOut3 2.2s ease-out forwards", animationDelay: "0.3s" }} />
+              <circle cx={r.x} cy={r.y} r="1" fill="none" stroke="rgba(0,245,212,0.2)" strokeWidth="0.2" style={{ animation: "rippleOut4 2.2s ease-out forwards", animationDelay: "0.45s" }} />
             </g>
           ))}
         </svg>
 
-        {/* ── Lily Pads SVG layer — separate layer, pointer-events enabled ── */}
+        {/* Floating Lily Pads with Deep Parallax */}
         <svg
-          ref={lilySvgRef}
-          style={{
-            position: "absolute", inset: 0, width: "100%", height: "100%",
-            zIndex: 1, overflow: "visible",
-            pointerEvents: "none", // container ignores clicks; only <g> elements respond
-          }}
+          style={{ position: "absolute", inset: 0, width: "100%", height: "100%", overflow: "visible" }}
           viewBox="0 0 100 100"
           preserveAspectRatio="xMidYMid slice"
           xmlns="http://www.w3.org/2000/svg"
         >
           {LILY_PADS.map((pad, i) => {
             const s = pad.size / 1000;
-            const opacity = 0.35 + pad.depth * 0.55;
             const reflOpacity = (1 - pad.depth) * 0.28;
             const hasFlower = i % 3 === 0;
+            const transformStyle = padTransform(pad);
+            
+            // Culling optimization returned from transform mapping
+            if (transformStyle.display === 'none') return null;
+
             return (
               <g
                 key={pad.id}
-                className="lily-group"
-                style={{
-                  transform: padTransform(pad),
-                  animationDelay: `${pad.delay}s`,
-                  animationDuration: `${5 + pad.depth * 4}s`,
-                  animation: `float ${5 + pad.depth * 4}s ease-in-out ${pad.delay}s infinite`,
-                  opacity,
-                  willChange: "transform",
-                  pointerEvents: "all", // each pad is individually clickable
-                }}
-                onClick={handleLilyClick}
+                style={transformStyle}
               >
                 {/* Shadow */}
-                <ellipse cx={pad.x} cy={r(pad.y + s*120)} rx={r(s*460)} ry={r(s*140)} fill="rgba(0,0,0,0.3)" filter="url(#reflBlur)" />
+                <ellipse cx={0} cy={s*120} rx={r(s*460)} ry={r(s*140)} fill="rgba(0,0,0,0.5)" filter="url(#reflBlur)" />
 
                 {/* Pad */}
-                <g transform={`translate(${pad.x},${pad.y}) rotate(${pad.rotation})`}>
-                  <ellipse cx={r(-s*80)} cy={r(-s*100)} rx={r(s*175)} ry={r(s*95)} fill="rgba(255,255,255,0.08)" style={{ filter: "blur(1px)" }} />
+                <g transform={`rotate(${pad.rotation})`}>
+                  <ellipse cx={r(-s*80)} cy={r(-s*100)} rx={r(s*175)} ry={r(s*95)} fill="rgba(255,255,255,0.05)" style={{ filter: "blur(1px)" }} />
                   <path
                     d={`M 0 0 L ${r(s*500*Math.cos(Math.PI*0.15))} ${r(-s*500*Math.sin(Math.PI*0.15))} A ${r(s*500)} ${r(s*500)} 0 1 1 ${r(s*500*Math.cos(Math.PI*0.85))} ${r(-s*500*Math.sin(Math.PI*0.85))} Z`}
                     fill={pad.depth > 0.5 ? "url(#lilyGrad)" : "url(#lilyGradDeep)"}
-                    stroke="rgba(82,183,136,0.25)"
+                    stroke="rgba(82,183,136,0.35)"
                     strokeWidth={r(s*28)}
                   />
                   {[0,40,80,120,160,200,240,280,320].map((angle, vi) => (
                     <line key={vi} x1="0" y1="0"
                       x2={r(s*480*Math.cos((angle*Math.PI)/180))}
                       y2={r(s*480*Math.sin((angle*Math.PI)/180))}
-                      stroke="rgba(82,183,136,0.2)" strokeWidth={r(s*10)} />
+                      stroke="rgba(82,183,136,0.25)" strokeWidth={r(s*10)} />
                   ))}
                   {hasFlower && (
                     <g transform={`translate(${r(-s*60)},${r(-s*60)})`}>
@@ -740,19 +1017,19 @@ export default function VideoEditPage() {
                         return (
                           <ellipse key={fi}
                             cx={fcx} cy={fcy}
-                            rx={r(s*88)} ry={r(s*52)} fill="url(#flowerGrad)" opacity="0.8"
+                            rx={r(s*88)} ry={r(s*52)} fill="url(#flowerGrad)" opacity="0.85"
                             transform={`rotate(${a},${fcx},${fcy})`}
                           />
                         );
                       })}
-                      <circle cx="0" cy="0" r={r(s*52)} fill="#ffefd5" opacity="0.9" />
-                      <circle cx="0" cy="0" r={r(s*26)} fill="#ffd700" opacity="0.85" />
+                      <circle cx="0" cy="0" r={r(s*52)} fill="#fff5ee" opacity="0.95" />
+                      <circle cx="0" cy="0" r={r(s*26)} fill="#ffcc00" opacity="0.9" />
                     </g>
                   )}
                 </g>
 
                 {/* Reflection */}
-                <g transform={`translate(${pad.x},${r(pad.y+s*200)}) rotate(${-pad.rotation}) scale(1,-0.3)`} opacity={reflOpacity} filter="url(#reflBlur)">
+                <g transform={`translate(0,${r(s*200)}) rotate(${-pad.rotation}) scale(1,-0.3)`} opacity={reflOpacity} filter="url(#reflBlur)">
                   <path d={`M 0 0 L ${r(s*500*Math.cos(Math.PI*0.15))} ${r(-s*500*Math.sin(Math.PI*0.15))} A ${r(s*500)} ${r(s*500)} 0 1 1 ${r(s*500*Math.cos(Math.PI*0.85))} ${r(-s*500*Math.sin(Math.PI*0.85))} Z`} fill="url(#lilyGrad)" />
                 </g>
               </g>
@@ -762,23 +1039,35 @@ export default function VideoEditPage() {
 
         {/* Scanline reflection overlay */}
         <div style={{
-          position: "absolute", inset: 0, zIndex: 2, pointerEvents: "none",
-          background: "repeating-linear-gradient(180deg,transparent 0px,transparent 3px,rgba(0,0,0,0.04) 3px,rgba(0,0,0,0.04) 4px)",
-          mixBlendMode: "multiply",
+          position: "absolute", inset: 0, zIndex: 2,
+          background: "repeating-linear-gradient(180deg,transparent 0px,transparent 3px,rgba(0,245,212,0.015) 3px,rgba(0,245,212,0.015) 4px)",
+          mixBlendMode: "screen",
         }} />
 
-        {/* Purple glow */}
+        {/* Dynamic Teal glow follows mouse */}
         <div style={{
           position: "absolute",
-          width: 650, height: 650,
+          width: 800, height: 800,
           borderRadius: "50%",
-          background: "radial-gradient(ellipse,rgba(109,40,217,0.14) 0%,transparent 70%)",
-          top: -120, right: -80,
-          pointerEvents: "none",
+          background: "radial-gradient(ellipse,rgba(0,245,212,0.08) 0%,transparent 70%)",
+          top: -150, right: -150,
           zIndex: 3,
-          transform: `translate(${mousePos.x * 30}px, ${mousePos.y * 20}px)`,
+          transform: `translate(${mousePos.x * 40}px, ${mousePos.y * 30}px)`,
           transition: "transform 0.1s linear",
         }} />
+      </div>
+
+
+      {/* ════════════════════════════════════════
+          HERO
+      ════════════════════════════════════════ */}
+      <section id="hero" style={{
+        minHeight: "100vh",
+        display: "flex",
+        alignItems: "center",
+        padding: "0 clamp(2rem,7vw,7rem)",
+        background: "transparent",
+      }}>
 
         {/* Background watermark text */}
         <div style={{
@@ -789,12 +1078,12 @@ export default function VideoEditPage() {
           fontSize: "clamp(12rem,28vw,25rem)",
           lineHeight: 1,
           color: "transparent",
-          WebkitTextStroke: "1px rgba(155,93,229,0.06)",
+          WebkitTextStroke: "1px rgba(0,245,212,0.04)",
           pointerEvents: "none",
           userSelect: "none",
           whiteSpace: "nowrap",
           letterSpacing: "-0.02em",
-          zIndex: 3,
+          zIndex: -1,
           transform: `translateY(calc(-50% + ${scrollY * 0.2}px))`,
         }}>
           EDIT
@@ -804,10 +1093,11 @@ export default function VideoEditPage() {
         <div style={{ position: "relative", zIndex: 5, maxWidth: 760, pointerEvents: "none" }}>
           <div className="reveal" style={{ display: "flex", alignItems: "center", gap: "1rem", marginBottom: "2rem" }}>
             <div style={{
-              width: 7, height: 7, borderRadius: "50%", background: "var(--purple)",
+              width: 7, height: 7, borderRadius: "50%", background: "var(--teal)",
               animation: "pulseDot 2s ease-in-out infinite",
+              boxShadow: "0 0 10px var(--teal)"
             }} />
-            <span style={{ fontSize: "0.7rem", letterSpacing: "0.4em", textTransform: "uppercase", color: "var(--text-muted)" }}>
+            <span style={{ fontSize: "0.7rem", letterSpacing: "0.4em", textTransform: "uppercase", color: "var(--text-muted)", background: "rgba(0,0,0,0.3)", padding: "0.3rem 0.8rem", borderRadius: 4, backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.05)" }}>
               Available for projects — 2025
             </span>
           </div>
@@ -825,16 +1115,17 @@ export default function VideoEditPage() {
               fontStyle: "italic",
               fontFamily: "'Cormorant Garamond', serif",
               fontWeight: 300,
-              color: "var(--purple-light)",
+              color: "var(--teal)",
               fontSize: "0.82em",
               display: "block",
             }}>Edit</em>
           </h1>
 
           <p className="reveal" style={{
-            maxWidth: 440, color: "var(--text-muted)", lineHeight: 1.85,
+            maxWidth: 440, color: "#d0d0d0", lineHeight: 1.85,
             fontSize: "0.95rem", fontWeight: 400, marginTop: "2rem",
             transitionDelay: "0.2s",
+            background: "rgba(2,6,8,0.4)", padding: "1rem 1.5rem", borderRadius: 8, backdropFilter: "blur(12px)", border: "1px solid rgba(255,255,255,0.05)"
           }}>
             Cinematic storytelling through precision cutting, colour, and motion. Every frame is intentional. Every cut earns its place.
           </p>
@@ -856,9 +1147,9 @@ export default function VideoEditPage() {
             transitionDelay: "0.4s",
           }}>
             {[["120+","Projects"],["6","Years"],["40+","Clients"]].map(([n, l]) => (
-              <div key={l}>
+              <div key={l} style={{ background: "rgba(2,6,8,0.4)", padding: "0.8rem 1.5rem", borderRadius: 8, backdropFilter: "blur(12px)", border: "1px solid rgba(255,255,255,0.05)" }}>
                 <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "2.6rem", color: "var(--text)", lineHeight: 1 }}>{n}</div>
-                <div style={{ fontSize: "0.68rem", color: "var(--text-muted)", letterSpacing: "0.18em", textTransform: "uppercase", marginTop: "0.3rem" }}>{l}</div>
+                <div style={{ fontSize: "0.68rem", color: "var(--teal)", letterSpacing: "0.18em", textTransform: "uppercase", marginTop: "0.3rem" }}>{l}</div>
               </div>
             ))}
           </div>
@@ -876,17 +1167,17 @@ export default function VideoEditPage() {
         }}>
           <div style={{
             width: 1, height: 50,
-            background: "linear-gradient(to bottom, var(--purple), transparent)",
+            background: "linear-gradient(to bottom, var(--teal), transparent)",
             animation: "scrollLine 2s ease-in-out infinite",
           }} />
-          <span>Scroll</span>
+          <span style={{ background: "rgba(0,0,0,0.5)", padding: "0.3rem 0.8rem", borderRadius: 4, backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.05)" }}>Scroll</span>
         </div>
       </section>
 
       {/* ════════════════════════════════════════
           FILM STRIP REEL
       ════════════════════════════════════════ */}
-      <section id="reel" style={{ padding: "7rem 0", background: "var(--bg)", position: "relative" }}>
+      <section id="reel" style={{ padding: "7rem 0", background: "transparent" }}>
         <div style={{
           padding: "0 clamp(2rem,7vw,7rem)",
           marginBottom: "3.5rem",
@@ -898,28 +1189,40 @@ export default function VideoEditPage() {
             <div className="accent-dash reveal" style={{ transitionDelay: "0.2s" }} />
           </div>
           <div style={{ display: "flex", gap: "0.8rem" }}>
-            {[{ label: "←", action: () => resetAuto(carouselIdx - 1) }, { label: "→", action: () => resetAuto(carouselIdx + 1) }].map(({ label, action }) => (
-              <button key={label} onClick={action}
-                onMouseEnter={() => setCursorBig(true)} onMouseLeave={() => setCursorBig(false)}
-                style={{
-                  width: 44, height: 44,
-                  background: "var(--surface)", border: "1px solid var(--border)",
-                  color: "var(--text-muted)", fontSize: "1.05rem",
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  cursor: "pointer", transition: "border-color 0.3s, color 0.3s, background 0.3s",
-                }}
-                onMouseOver={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--purple)"; (e.currentTarget as HTMLButtonElement).style.color = "var(--purple)"; }}
-                onMouseOut={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--border)"; (e.currentTarget as HTMLButtonElement).style.color = "var(--text-muted)"; }}
-              >
-                {label}
-              </button>
-            ))}
+            <button onClick={handlePrev}
+              onMouseEnter={() => setCursorBig(true)} onMouseLeave={() => setCursorBig(false)}
+              style={{
+                width: 44, height: 44,
+                background: "rgba(0,0,0,0.4)", border: "1px solid var(--border)", backdropFilter: "blur(8px)",
+                color: "var(--text-muted)", fontSize: "1.05rem",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                cursor: "pointer", transition: "border-color 0.3s, color 0.3s, background 0.3s",
+                borderRadius: "50%"
+              }}
+              onMouseOver={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--teal)"; (e.currentTarget as HTMLButtonElement).style.color = "var(--teal)"; }}
+              onMouseOut={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--border)"; (e.currentTarget as HTMLButtonElement).style.color = "var(--text-muted)"; }}
+            >
+              ←
+            </button>
+            <button onClick={handleNext}
+              onMouseEnter={() => setCursorBig(true)} onMouseLeave={() => setCursorBig(false)}
+              style={{
+                width: 44, height: 44,
+                background: "rgba(0,0,0,0.4)", border: "1px solid var(--border)", backdropFilter: "blur(8px)",
+                color: "var(--text-muted)", fontSize: "1.05rem",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                cursor: "pointer", transition: "border-color 0.3s, color 0.3s, background 0.3s",
+                borderRadius: "50%"
+              }}
+              onMouseOver={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--teal)"; (e.currentTarget as HTMLButtonElement).style.color = "var(--teal)"; }}
+              onMouseOut={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--border)"; (e.currentTarget as HTMLButtonElement).style.color = "var(--text-muted)"; }}
+            >
+              →
+            </button>
           </div>
         </div>
 
-        <div style={{ position: "relative", overflow: "hidden", padding: "16px 0" }}>
-          <div className="reel-fade-left" />
-          <div className="reel-fade-right" />
+        <div className="reel-container">
           <div style={{
             display: "flex",
             transform: `translateX(${-carouselIdx * 340}px)`,
@@ -935,12 +1238,12 @@ export default function VideoEditPage() {
                 <div className="film-frame">
                   <div className="film-frame-bg" style={{ background: w.gradient }} />
                   <div className="play-circle">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="var(--purple-light)">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="var(--teal)">
                       <polygon points="5 3 19 12 5 21 5 3" />
                     </svg>
                   </div>
                   <div className="film-meta">
-                    <span style={{ fontSize: "0.62rem", letterSpacing: "0.25em", textTransform: "uppercase", color: "var(--purple-light)", marginBottom: 4, display: "block" }}>
+                    <span style={{ fontSize: "0.62rem", letterSpacing: "0.25em", textTransform: "uppercase", color: "var(--teal)", marginBottom: 4, display: "block" }}>
                       {w.cat}
                     </span>
                     <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "1.2rem", fontWeight: 600, color: "#fff", lineHeight: 1.2 }}>
@@ -968,7 +1271,7 @@ export default function VideoEditPage() {
               style={{
                 width: i === carouselIdx ? 28 : 8, height: 8,
                 borderRadius: 4, border: "none",
-                background: i === carouselIdx ? "var(--purple)" : "var(--surface2)",
+                background: i === carouselIdx ? "var(--teal)" : "rgba(255,255,255,0.1)",
                 cursor: "pointer", transition: "width 0.3s, background 0.3s", padding: 0,
               }}
             />
@@ -979,34 +1282,29 @@ export default function VideoEditPage() {
       {/* ════════════════════════════════════════
           SERVICES
       ════════════════════════════════════════ */}
-      <section id="services" style={{ padding: "8rem clamp(2rem,7vw,7rem)", background: "var(--bg)", position: "relative" }}>
-        <div style={{
-          position: "absolute", width: 500, height: 500, borderRadius: "50%",
-          background: "radial-gradient(ellipse,rgba(109,40,217,0.07) 0%,transparent 70%)",
-          bottom: -100, right: "5%", pointerEvents: "none",
-        }} />
-
+      <section id="services" style={{ padding: "8rem clamp(2rem,7vw,7rem)", background: "transparent" }}>
         <p className="section-label reveal">What I offer</p>
         <h2 className="section-title reveal" style={{ transitionDelay: "0.1s" }}>Services</h2>
         <div className="accent-dash reveal" style={{ transitionDelay: "0.2s" }} />
 
         <div className="services-grid">
           {SERVICES.map((svc, i) => (
-            <div key={svc.num} className={`service-item reveal`} style={{ transitionDelay: `${(i % 3) * 0.1}s` }}>
+            <div key={svc.num} className={`service-item reveal`} style={{ transitionDelay: `${(i % 3) * 0.1}s`, borderRadius: 8 }}>
               <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "0.75rem", color: "var(--text-dim)", letterSpacing: "0.2em", marginBottom: "1.8rem" }}>{svc.num}</div>
               <div style={{
                 width: 46, height: 46,
-                background: "rgba(155,93,229,0.08)", border: "1px solid rgba(155,93,229,0.18)",
+                background: "rgba(0,245,212,0.08)", border: "1px solid rgba(0,245,212,0.18)",
                 display: "flex", alignItems: "center", justifyContent: "center",
                 marginBottom: "1.4rem",
+                borderRadius: 8
               }}>
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--purple)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--teal)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                   <path d={svc.icon} />
                 </svg>
               </div>
               <div style={{ fontFamily: "'Syne', sans-serif", fontSize: "1rem", fontWeight: 700, color: "var(--text)", marginBottom: "0.7rem" }}>{svc.name}</div>
               <div style={{ fontSize: "0.84rem", color: "var(--text-muted)", lineHeight: 1.8 }}>{svc.desc}</div>
-              <div style={{ marginTop: "1.8rem", fontFamily: "'Bebas Neue', sans-serif", fontSize: "1.6rem", color: "var(--purple-light)", letterSpacing: "0.04em" }}>
+              <div style={{ marginTop: "1.8rem", fontFamily: "'Bebas Neue', sans-serif", fontSize: "1.6rem", color: "var(--teal)", letterSpacing: "0.04em" }}>
                 {svc.price}
                 <span style={{ fontFamily: "'Syne', sans-serif", fontSize: "0.7rem", color: "var(--text-muted)", letterSpacing: "0.1em", textTransform: "uppercase", marginLeft: 7, verticalAlign: "middle" }}>
                   / {svc.unit}
@@ -1020,68 +1318,139 @@ export default function VideoEditPage() {
       {/* ════════════════════════════════════════
           PROCESS
       ════════════════════════════════════════ */}
-      <section id="process" style={{
-        padding: "8rem clamp(2rem,7vw,7rem)",
-        background: "var(--bg2)",
-        position: "relative",
-      }}>
-        <div style={{
-          position: "absolute", top: 0, left: 0, right: 0, height: 1,
-          background: "linear-gradient(90deg,transparent,rgba(155,93,229,0.2),transparent)",
-        }} />
-        <div style={{
-          position: "absolute", bottom: 0, left: 0, right: 0, height: 1,
-          background: "linear-gradient(90deg,transparent,rgba(155,93,229,0.2),transparent)",
-        }} />
-
+      <section id="process" style={{ padding: "8rem clamp(2rem,7vw,7rem)", background: "transparent" }}>
         <p className="section-label reveal">How it works</p>
         <h2 className="section-title reveal" style={{ transitionDelay: "0.1s" }}>The Process</h2>
         <div className="accent-dash reveal" style={{ transitionDelay: "0.2s" }} />
 
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "5rem", alignItems: "start", marginTop: "3rem" }} className="process-layout">
+        {/* Wrap in a container to detect hover and pause the auto-play */}
+        <div 
+          className="process-wrapper"
+          onMouseEnter={() => setIsProcessHovered(true)} 
+          onMouseLeave={() => setIsProcessHovered(false)}
+          style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "5rem", alignItems: "start", marginTop: "3rem" }} 
+        >
+          {/* Left Column: Interactive Main Tabs with Nested Sub-Tabs */}
           <div>
-            {PROCESS_STEPS.map((step, i) => (
-              <div key={step.n} className={`process-step reveal`} style={{ transitionDelay: `${i * 0.08}s` }}>
-                <div className="step-num">{step.n}</div>
-                <div>
-                  <div style={{ fontFamily: "'Syne', sans-serif", fontSize: "0.98rem", fontWeight: 700, color: "var(--text)", marginBottom: "0.45rem" }}>{step.title}</div>
-                  <div style={{ fontSize: "0.84rem", color: "var(--text-muted)", lineHeight: 1.8 }}>{step.desc}</div>
+            {PROCESS_STEPS.map((step, stepIndex) => {
+              const isActiveStep = activeProcessStep === stepIndex;
+              const currentSubTab = activeSubTabs[stepIndex];
+
+              return (
+                <div 
+                  key={step.n} 
+                  className={`process-step reveal ${isActiveStep ? "active" : ""}`} 
+                  style={{ 
+                    transitionDelay: `${stepIndex * 0.08}s`, 
+                    background: isActiveStep ? "rgba(8,16,20,0.6)" : "transparent", 
+                    backdropFilter: isActiveStep ? "blur(12px)" : "none",
+                    border: isActiveStep ? "1px solid rgba(255,255,255,0.05)" : "none",
+                    borderBottom: isActiveStep ? "none" : "1px solid var(--border)"
+                  }}
+                  onClick={() => setActiveProcessStep(stepIndex)}
+                  onMouseEnter={() => setCursorBig(true)}
+                  onMouseLeave={() => setCursorBig(false)}
+                >
+                  <div className="step-num">{step.n}</div>
+                  <div style={{ flex: 1, paddingRight: "1rem" }}>
+                    <div style={{ fontFamily: "'Syne', sans-serif", fontSize: "0.98rem", fontWeight: 700, color: "var(--text)", marginBottom: "0.45rem" }}>{step.title}</div>
+                    <div style={{ fontSize: "0.84rem", color: "var(--text-muted)", lineHeight: 1.8 }}>{step.desc}</div>
+                    
+                    {/* Expanding Rich Detail Block (Nested Sub-tabs) */}
+                    <div className="step-accordion">
+                      <div className="step-accordion-inner">
+                        
+                        {/* Nested Tabs UI */}
+                        <div className="sub-tabs-container">
+                          {step.subTabs.map((subTab, subIndex) => (
+                            <button
+                              key={subIndex}
+                              className={`sub-tab-btn ${currentSubTab === subIndex ? 'active' : ''}`}
+                              onClick={(e) => {
+                                e.stopPropagation(); 
+                                handleSetSubTab(stepIndex, subIndex);
+                              }}
+                              onMouseEnter={() => setCursorBig(true)}
+                              onMouseLeave={() => setCursorBig(false)}
+                            >
+                              {subTab.label}
+                            </button>
+                          ))}
+                        </div>
+
+                        {/* Nested Tab Content */}
+                        <div className="sub-tab-content-wrapper">
+                          <p key={currentSubTab} className="sub-tab-content-text">
+                            {step.subTabs[currentSubTab]?.content}
+                          </p>
+                        </div>
+
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
-          <div className="reveal-right" style={{ position: "sticky", top: "3rem" }}>
+          {/* Right Column: Visual Panel & Floating Card info */}
+          <div className="reveal-right" style={{ position: "sticky", top: "5rem" }}>
             <div style={{
               aspectRatio: "4/5",
-              background: "var(--surface)",
+              background: "rgba(8,16,20,0.5)",
+              backdropFilter: "blur(16px)",
               border: "1px solid var(--border)",
+              borderRadius: 12,
               position: "relative",
               overflow: "hidden",
               display: "flex", alignItems: "center", justifyContent: "center",
+              boxShadow: "0 20px 40px rgba(0,0,0,0.3)",
             }}>
               <div style={{
                 position: "absolute", inset: -60,
-                background: "radial-gradient(ellipse at center,rgba(155,93,229,0.1) 0%,transparent 70%)",
+                background: "radial-gradient(ellipse at center,rgba(0,245,212,0.1) 0%,transparent 70%)",
                 animation: "rotatePulse 10s linear infinite",
               }} />
-              <div style={{ position: "relative", zIndex: 2, textAlign: "center" }}>
-                <div style={{
-                  fontFamily: "'Bebas Neue', sans-serif", fontSize: "4.5rem",
-                  color: "transparent", WebkitTextStroke: "1px rgba(155,93,229,0.25)",
-                  lineHeight: 1, letterSpacing: "0.05em",
-                }}>
-                  FRAME<br />BY<br />FRAME
+              
+              {PROCESS_STEPS.map((step, i) => (
+                <div key={step.n} className={`process-visual ${activeProcessStep === i ? 'active' : ''}`}>
+                  <div style={{ position: "relative", zIndex: 2, textAlign: "center", transform: "translateY(-20px)" }}>
+                    <div style={{
+                      fontFamily: "'Bebas Neue', sans-serif", fontSize: "4.5rem",
+                      color: "transparent", WebkitTextStroke: "1px rgba(0,245,212,0.3)",
+                      lineHeight: 1, letterSpacing: "0.05em",
+                    }}>
+                      {step.visual.split('\n').map((line, li) => (
+                        <React.Fragment key={li}>{line}<br /></React.Fragment>
+                      ))}
+                    </div>
+                    <div style={{ fontSize: "0.68rem", letterSpacing: "0.38em", textTransform: "uppercase", color: "var(--text-muted)", marginTop: "1rem" }}>
+                      Phase {step.n}
+                    </div>
+                  </div>
+
+                  {/* Floating Information Details within Right Column */}
+                  <div style={{
+                    position: "absolute", bottom: 32, left: 32, right: 32,
+                    display: "flex", gap: "2.5rem", borderTop: "1px solid rgba(0,245,212,0.15)", paddingTop: "1.5rem"
+                  }}>
+                    <div>
+                      <div style={{ fontSize: "0.62rem", letterSpacing: "0.2em", color: "var(--teal)", textTransform: "uppercase", marginBottom: "0.3rem" }}>Timeline</div>
+                      <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "1.45rem", color: "var(--text)", letterSpacing: "0.05em" }}>{step.time}</div>
+                    </div>
+                    <div>
+                      <div style={{ fontSize: "0.62rem", letterSpacing: "0.2em", color: "var(--teal)", textTransform: "uppercase", marginBottom: "0.3rem" }}>Output</div>
+                      <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "1.45rem", color: "var(--text)", letterSpacing: "0.05em" }}>{step.deliverable}</div>
+                    </div>
+                  </div>
                 </div>
-                <div style={{ fontSize: "0.68rem", letterSpacing: "0.38em", textTransform: "uppercase", color: "var(--text-muted)", marginTop: "1rem" }}>
-                  Precision in every cut
-                </div>
-              </div>
+              ))}
+              
               {[
-                { top: 14, left: 14, borderTop: "1px solid rgba(155,93,229,0.35)", borderLeft: "1px solid rgba(155,93,229,0.35)" },
-                { top: 14, right: 14, borderTop: "1px solid rgba(155,93,229,0.35)", borderRight: "1px solid rgba(155,93,229,0.35)" },
-                { bottom: 14, left: 14, borderBottom: "1px solid rgba(155,93,229,0.35)", borderLeft: "1px solid rgba(155,93,229,0.35)" },
-                { bottom: 14, right: 14, borderBottom: "1px solid rgba(155,93,229,0.35)", borderRight: "1px solid rgba(155,93,229,0.35)" },
+                { top: 14, left: 14, borderTop: "1px solid rgba(0,245,212,0.35)", borderLeft: "1px solid rgba(0,245,212,0.35)" },
+                { top: 14, right: 14, borderTop: "1px solid rgba(0,245,212,0.35)", borderRight: "1px solid rgba(0,245,212,0.35)" },
+                { bottom: 14, left: 14, borderBottom: "1px solid rgba(0,245,212,0.35)", borderLeft: "1px solid rgba(0,245,212,0.35)" },
+                { bottom: 14, right: 14, borderBottom: "1px solid rgba(0,245,212,0.35)", borderRight: "1px solid rgba(0,245,212,0.35)" },
               ].map((s, ci) => (
                 <div key={ci} style={{ position: "absolute", width: 22, height: 22, ...s }} />
               ))}
@@ -1093,7 +1462,7 @@ export default function VideoEditPage() {
       {/* ════════════════════════════════════════
           TOOLS
       ════════════════════════════════════════ */}
-      <section id="tools" style={{ padding: "8rem clamp(2rem,7vw,7rem)", background: "var(--bg)" }}>
+      <section id="tools" style={{ padding: "8rem clamp(2rem,7vw,7rem)", background: "transparent" }}>
         <p className="section-label reveal">Arsenal</p>
         <h2 className="section-title reveal" style={{ transitionDelay: "0.1s" }}>Tools of<br/>the Craft</h2>
         <div className="accent-dash reveal" style={{ transitionDelay: "0.2s" }} />
@@ -1110,12 +1479,13 @@ export default function VideoEditPage() {
                 marginBottom: "1.6rem",
                 fontFamily: "'Bebas Neue', sans-serif", fontSize: "1.45rem",
                 color: tool.color, letterSpacing: "0.05em",
+                borderRadius: 8
               }}>
                 {tool.logo}
               </div>
               <div style={{ fontFamily: "'Syne', sans-serif", fontSize: "1.1rem", fontWeight: 700, color: "var(--text)", marginBottom: "0.6rem" }}>{tool.name}</div>
               <div style={{ fontSize: "0.85rem", color: "var(--text-muted)", lineHeight: 1.8 }}>{tool.desc}</div>
-              <div style={{ marginTop: "1.8rem", fontSize: "0.7rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--purple)" }}>
+              <div style={{ marginTop: "1.8rem", fontSize: "0.7rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--teal)" }}>
                 Visit site →
               </div>
             </a>
@@ -1126,12 +1496,7 @@ export default function VideoEditPage() {
       {/* ════════════════════════════════════════
           CONTACT
       ════════════════════════════════════════ */}
-      <section id="contact" style={{ padding: "8rem clamp(2rem,7vw,7rem) 10rem", background: "var(--bg2)", position: "relative" }}>
-        <div style={{
-          position: "absolute", top: 0, left: 0, right: 0, height: 1,
-          background: "linear-gradient(90deg,transparent,rgba(155,93,229,0.2),transparent)",
-        }} />
-
+      <section id="contact" style={{ padding: "8rem clamp(2rem,7vw,7rem) 10rem", background: "transparent" }}>
         <p className="section-label reveal">Connect</p>
         <h2 className="section-title reveal" style={{ transitionDelay: "0.1s" }}>Start a<br/>Conversation</h2>
         <div className="accent-dash reveal" style={{ transitionDelay: "0.2s" }} />
@@ -1144,12 +1509,12 @@ export default function VideoEditPage() {
               ["Availability",  "Open for Projects"],
               ["Response time", "Within 24 hours"],
             ].map(([label, value]) => (
-              <div key={label}>
-                <span style={{ fontSize: "0.67rem", letterSpacing: "0.35em", textTransform: "uppercase", color: "var(--text-muted)", display: "block", marginBottom: "0.4rem" }}>{label}</span>
+              <div key={label} style={{ background: "rgba(8,16,20,0.6)", padding: "0.8rem 1.5rem", borderRadius: 8, backdropFilter: "blur(12px)", width: "fit-content", border: "1px solid rgba(255,255,255,0.05)" }}>
+                <span style={{ fontSize: "0.67rem", letterSpacing: "0.35em", textTransform: "uppercase", color: "var(--teal)", display: "block", marginBottom: "0.4rem" }}>{label}</span>
                 <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "1.25rem", fontWeight: 300, color: "var(--text)" }}>{value}</span>
               </div>
             ))}
-            <p style={{ fontSize: "0.82rem", color: "var(--text-muted)", lineHeight: 1.85, paddingTop: "1.5rem", borderTop: "1px solid var(--border)" }}>
+            <p style={{ fontSize: "0.82rem", color: "#d0d0d0", lineHeight: 1.85, paddingTop: "1.5rem", borderTop: "1px solid var(--border)", background: "rgba(8,16,20,0.6)", padding: "1.5rem", borderRadius: 8, backdropFilter: "blur(12px)", marginTop: "1rem" }}>
               Whether it&apos;s a quick question or a full project brief — I&apos;m happy to talk about your vision.
             </p>
           </div>
@@ -1157,16 +1522,17 @@ export default function VideoEditPage() {
           <div className="reveal-right">
             {submitted ? (
               <div style={{
-                padding: "3rem", border: "1px solid rgba(155,93,229,0.28)",
-                background: "rgba(155,93,229,0.04)",
+                padding: "3rem", border: "1px solid rgba(0,245,212,0.28)",
+                background: "rgba(0,245,212,0.04)", backdropFilter: "blur(16px)",
                 display: "flex", flexDirection: "column", alignItems: "center", gap: "1rem", textAlign: "center",
+                borderRadius: 12
               }}>
-                <div style={{ fontSize: "2rem", color: "var(--purple)" }}>✦</div>
-                <h3 style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "2rem", color: "var(--purple-light)", letterSpacing: "0.06em" }}>Message Sent</h3>
+                <div style={{ fontSize: "2rem", color: "var(--teal)" }}>✦</div>
+                <h3 style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "2rem", color: "var(--teal)", letterSpacing: "0.06em" }}>Message Sent</h3>
                 <p style={{ color: "var(--text-muted)", fontSize: "0.9rem" }}>Thank you for reaching out. I&apos;ll be in touch within 24 hours.</p>
               </div>
             ) : (
-              <div style={{ display: "flex", flexDirection: "column", gap: "1.2rem" }}>
+              <div className="contact-form-container" style={{ display: "flex", flexDirection: "column", gap: "1.2rem" }}>
                 {[
                   { key: "name",    placeholder: "Your Name",     type: "text"  },
                   { key: "email",   placeholder: "Email Address", type: "email" },
@@ -1198,17 +1564,26 @@ export default function VideoEditPage() {
                   style={{
                     marginTop: "0.8rem",
                     padding: "1rem 2.8rem",
-                    background: "transparent",
-                    border: "1px solid var(--purple)",
-                    color: "var(--purple)",
+                    background: "rgba(0,0,0,0.4)",
+                    border: "1px solid var(--teal)",
+                    color: "var(--teal)",
                     fontFamily: "'Syne', sans-serif",
                     fontSize: "0.78rem", fontWeight: 700,
                     letterSpacing: "0.22em", textTransform: "uppercase",
                     cursor: "pointer", alignSelf: "flex-start",
-                    transition: "background 0.3s, color 0.3s, transform 0.2s",
+                    transition: "background 0.3s, color 0.3s, transform 0.2s, box-shadow 0.3s",
+                    borderRadius: 4
                   }}
-                  onMouseOver={e => { (e.currentTarget as HTMLButtonElement).style.background = "var(--purple)"; (e.currentTarget as HTMLButtonElement).style.color = "#fff"; }}
-                  onMouseOut={e => { (e.currentTarget as HTMLButtonElement).style.background = "transparent"; (e.currentTarget as HTMLButtonElement).style.color = "var(--purple)"; }}
+                  onMouseOver={e => { 
+                    (e.currentTarget as HTMLButtonElement).style.background = "var(--teal)"; 
+                    (e.currentTarget as HTMLButtonElement).style.color = "#000"; 
+                    (e.currentTarget as HTMLButtonElement).style.boxShadow = "0 0 15px rgba(0,245,212,0.4)";
+                  }}
+                  onMouseOut={e => { 
+                    (e.currentTarget as HTMLButtonElement).style.background = "rgba(0,0,0,0.4)"; 
+                    (e.currentTarget as HTMLButtonElement).style.color = "var(--teal)"; 
+                    (e.currentTarget as HTMLButtonElement).style.boxShadow = "none";
+                  }}
                 >
                   Send Message →
                 </button>
@@ -1217,6 +1592,6 @@ export default function VideoEditPage() {
           </div>
         </div>
       </section>
-    </>
+    </main>
   );
 }
