@@ -233,12 +233,12 @@ function SwampCanvas() {
     resize();
     window.addEventListener("resize", resize);
 
-    // Init lily pads
+    // Init lily pads - LARGER SIZE (r: 45 to 75 instead of 28 to 68)
     const initPads = () => {
       lilyPadsRef.current = Array.from({ length: 14 }, () => ({
         x: Math.random() * window.innerWidth,
         y: Math.random() * window.innerHeight,
-        r: 28 + Math.random() * 40,
+        r: 45 + Math.random() * 55,  // LARGER: min 45, max 100
         rot: Math.random() * Math.PI * 2,
         speed: (Math.random() - 0.5) * 0.15,
         wobble: Math.random() * Math.PI * 2,
@@ -247,30 +247,55 @@ function SwampCanvas() {
     };
     initPads();
 
-    // Touch / click on canvas
-    const handleClick = (e: MouseEvent | TouchEvent) => {
+    // LEFT CLICK ONLY - filter out right-click and touch events that aren't primary
+    const handleLeftClick = (e: MouseEvent | TouchEvent) => {
+      // For mouse events: only left button (button === 0)
+      if ("button" in e && e.button !== 0) return;
+      
+      // For touch events: always add ripple on touch start (primary touch)
       const rect = canvas.getBoundingClientRect();
-      const pos =
-        "touches" in e
-          ? { x: e.touches[0].clientX - rect.left, y: e.touches[0].clientY - rect.top }
-          : { x: (e as MouseEvent).clientX - rect.left, y: (e as MouseEvent).clientY - rect.top };
-      addRipple(pos.x, pos.y);
+      let clientX: number, clientY: number;
+      
+      if ("touches" in e) {
+        if (e.touches.length === 0) return;
+        clientX = e.touches[0].clientX;
+        clientY = e.touches[0].clientY;
+      } else {
+        clientX = e.clientX;
+        clientY = e.clientY;
+      }
+      
+      const pos = {
+        x: clientX - rect.left,
+        y: clientY - rect.top
+      };
+      
+      // Check bounds
+      if (pos.x >= 0 && pos.x <= rect.width && pos.y >= 0 && pos.y <= rect.height) {
+        addRipple(pos.x, pos.y);
+      }
     };
-    canvas.addEventListener("click", handleClick);
-    canvas.addEventListener("touchstart", handleClick, { passive: true });
+    
+    canvas.addEventListener("click", handleLeftClick);
+    canvas.addEventListener("touchstart", handleLeftClick, { passive: true });
+    
+    // Prevent context menu on canvas to avoid right-click interference
+    canvas.addEventListener("contextmenu", (e) => e.preventDefault());
 
-    // Check if click hits a lily pad
+    // Hover effect over lily pads (no ripple, just visual feedback - optional)
     const checkPadHit = (e: MouseEvent) => {
       const rect = canvas.getBoundingClientRect();
       const mx = e.clientX - rect.left;
       const my = e.clientY - rect.top;
+      let hit = false;
       lilyPadsRef.current.forEach((pad) => {
         const dx = mx - pad.x;
         const dy = my - pad.y;
         if (Math.sqrt(dx * dx + dy * dy) < pad.r) {
-          addRipple(pad.x, pad.y);
+          hit = true;
         }
       });
+      canvas.style.cursor = hit ? "pointer" : "crosshair";
     };
     window.addEventListener("mousemove", checkPadHit);
 
@@ -324,37 +349,37 @@ function SwampCanvas() {
       ctx.translate(x, y);
       ctx.rotate(currentRot);
 
-      // Shadow
+      // Shadow (larger to match bigger pads)
       ctx.save();
-      ctx.globalAlpha = 0.2;
+      ctx.globalAlpha = 0.25;
       ctx.fillStyle = "#000";
       ctx.beginPath();
-      ctx.ellipse(3, 4, r * 0.95, r * 0.45, 0, 0, Math.PI * 2);
+      ctx.ellipse(5, 6, r * 0.95, r * 0.5, 0, 0, Math.PI * 2);
       ctx.fill();
       ctx.restore();
 
-      // Pad body
+      // Pad body - enhanced gradient
       const padGrad = ctx.createRadialGradient(-r * 0.2, -r * 0.2, 0, 0, 0, r);
-      padGrad.addColorStop(0, "#3a7d44");
-      padGrad.addColorStop(0.5, "#2d6b38");
-      padGrad.addColorStop(1, "#1a4a22");
+      padGrad.addColorStop(0, "#4b9e5a");
+      padGrad.addColorStop(0.4, "#327a42");
+      padGrad.addColorStop(1, "#1e5530");
       ctx.fillStyle = padGrad;
       ctx.beginPath();
       ctx.moveTo(0, 0);
       for (let a = 0; a <= Math.PI * 2; a += 0.05) {
-        const rVar = r * (0.92 + Math.sin(a * 7) * 0.04);
+        const rVar = r * (0.92 + Math.sin(a * 7) * 0.05);
         ctx.lineTo(Math.cos(a) * rVar, Math.sin(a) * rVar);
       }
       // Notch
       ctx.moveTo(0, 0);
-      ctx.lineTo(Math.cos(-0.3) * r, Math.sin(-0.3) * r);
-      ctx.lineTo(Math.cos(0.3) * r, Math.sin(0.3) * r);
+      ctx.lineTo(Math.cos(-0.35) * r, Math.sin(-0.35) * r);
+      ctx.lineTo(Math.cos(0.35) * r, Math.sin(0.35) * r);
       ctx.closePath();
       ctx.fill();
 
-      // Veins
-      ctx.strokeStyle = "rgba(100,200,80,0.3)";
-      ctx.lineWidth = 0.8;
+      // Veins - more pronounced
+      ctx.strokeStyle = "rgba(120,220,100,0.4)";
+      ctx.lineWidth = 1.2;
       for (let v = 0; v < 8; v++) {
         const va = (v / 8) * Math.PI * 2 + 0.5;
         ctx.beginPath();
@@ -365,8 +390,8 @@ function SwampCanvas() {
 
       // Highlight
       ctx.save();
-      ctx.globalAlpha = 0.12;
-      const hlGrad = ctx.createRadialGradient(-r * 0.3, -r * 0.35, 0, -r * 0.3, -r * 0.35, r * 0.55);
+      ctx.globalAlpha = 0.15;
+      const hlGrad = ctx.createRadialGradient(-r * 0.3, -r * 0.35, 0, -r * 0.3, -r * 0.35, r * 0.6);
       hlGrad.addColorStop(0, "#ffffff");
       hlGrad.addColorStop(1, "transparent");
       ctx.fillStyle = hlGrad;
@@ -381,21 +406,22 @@ function SwampCanvas() {
     const drawRipples = () => {
       ripplesRef.current = ripplesRef.current.filter((rip) => rip.t < 1);
       ripplesRef.current.forEach((rip) => {
-        const maxR = 120;
+        // LARGER RIPPLES: max radius 200 instead of 120
+        const maxR = 200;
         const r1 = rip.t * maxR;
-        const r2 = rip.t * maxR * 0.6;
-        const r3 = rip.t * maxR * 0.3;
-        const alpha = (1 - rip.t) * 0.7;
+        const r2 = rip.t * maxR * 0.65;
+        const r3 = rip.t * maxR * 0.35;
+        const alpha = (1 - rip.t) * 0.65;
 
         [r1, r2, r3].forEach((rr, i) => {
           ctx.beginPath();
           ctx.arc(rip.x, rip.y, rr, 0, Math.PI * 2);
-          ctx.strokeStyle = `rgba(150, 255, 180, ${alpha * (1 - i * 0.25)})`;
-          ctx.lineWidth = 1.5 - i * 0.4;
+          ctx.strokeStyle = `rgba(140, 255, 180, ${alpha * (1 - i * 0.2)})`;
+          ctx.lineWidth = 2.2 - i * 0.6;
           ctx.stroke();
         });
 
-        rip.t += 0.018;
+        rip.t += 0.014; // slightly slower for larger ripples
       });
     };
 
@@ -403,15 +429,15 @@ function SwampCanvas() {
       const w = canvas.width;
       const h = canvas.height;
       ctx.save();
-      ctx.globalAlpha = 0.06;
-      for (let i = 0; i < 3; i++) {
-        const fy = (h * 0.6) + Math.sin(t * 0.1 + i) * 40;
-        const fg = ctx.createLinearGradient(0, fy - 60, 0, fy + 60);
+      ctx.globalAlpha = 0.07;
+      for (let i = 0; i < 4; i++) {
+        const fy = (h * 0.6) + Math.sin(t * 0.1 + i) * 50;
+        const fg = ctx.createLinearGradient(0, fy - 80, 0, fy + 80);
         fg.addColorStop(0, "transparent");
-        fg.addColorStop(0.5, "#b8e8c0");
+        fg.addColorStop(0.5, "#c8f0d0");
         fg.addColorStop(1, "transparent");
         ctx.fillStyle = fg;
-        ctx.fillRect(0, fy - 60, w, 120);
+        ctx.fillRect(0, fy - 80, w, 160);
       }
       ctx.restore();
     };
@@ -429,8 +455,8 @@ function SwampCanvas() {
 
       // Move pads
       lilyPadsRef.current.forEach((pad) => {
-        pad.x += Math.sin(t * 0.2 + pad.wobble) * 0.3;
-        pad.y += Math.cos(t * 0.15 + pad.wobble) * 0.2;
+        pad.x += Math.sin(t * 0.2 + pad.wobble) * 0.4;
+        pad.y += Math.cos(t * 0.15 + pad.wobble) * 0.3;
         pad.wobble += pad.wobbleSpeed;
         if (pad.x < -pad.r) pad.x = canvas.width + pad.r;
         if (pad.x > canvas.width + pad.r) pad.x = -pad.r;
@@ -447,8 +473,9 @@ function SwampCanvas() {
     return () => {
       cancelAnimationFrame(animFrameRef.current);
       window.removeEventListener("resize", resize);
-      canvas.removeEventListener("click", handleClick);
-      canvas.removeEventListener("touchstart", handleClick);
+      canvas.removeEventListener("click", handleLeftClick);
+      canvas.removeEventListener("touchstart", handleLeftClick);
+      canvas.removeEventListener("contextmenu", (e) => e.preventDefault());
       window.removeEventListener("mousemove", checkPadHit);
     };
   }, [addRipple]);
@@ -493,7 +520,7 @@ function ProcessColumn({ col, index }: { col: (typeof PROCESS_COLUMNS)[0]; index
         transform: "translateY(40px)",
         transition: `opacity 0.7s ease ${index * 0.12}s, transform 0.7s ease ${index * 0.12}s`,
       }}
-      className="flex flex-col gap-3 min-w-[220px] flex-1"
+      className="flex flex-col gap-3 min-w-[240px] flex-1"
     >
       {/* Column header */}
       <div className="relative p-5 rounded-xl border border-green-900/60 bg-black/40 backdrop-blur-md overflow-hidden group">
@@ -633,138 +660,11 @@ export default function Page() {
 
   return (
     <>
-      {/* Google Fonts */}
-      <style>{`
+      {/* Global Styles */}
+      <style jsx global>{`
         @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,700;1,300;1,700&family=JetBrains+Mono:wght@300;400;600&display=swap');
-
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-        html { scroll-behavior: smooth; }
-        body { background: #060e0a; color: #d1fae5; overflow-x: hidden; }
-
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-track { background: #060e0a; }
-        ::-webkit-scrollbar-thumb { background: #1a4a22; border-radius: 2px; }
-
-        .font-display { font-family: 'Cormorant Garamond', serif; }
-        .font-mono-custom { font-family: 'JetBrains Mono', monospace; }
-
-        .glitch-text {
-          position: relative;
-          display: inline-block;
-        }
-        .glitch-text::before,
-        .glitch-text::after {
-          content: attr(data-text);
-          position: absolute;
-          inset: 0;
-          background: transparent;
-        }
-        .glitch-text::before {
-          color: #00ff88;
-          clip-path: polygon(0 30%, 100% 30%, 100% 50%, 0 50%);
-          transform: translateX(-2px);
-          animation: glitch1 4s infinite;
-        }
-        .glitch-text::after {
-          color: #ff4488;
-          clip-path: polygon(0 65%, 100% 65%, 100% 80%, 0 80%);
-          transform: translateX(2px);
-          animation: glitch2 4s infinite;
-        }
-        @keyframes glitch1 {
-          0%, 90%, 100% { transform: translateX(0); opacity: 0; }
-          92% { transform: translateX(-3px); opacity: 0.8; }
-          94% { transform: translateX(3px); opacity: 0.6; }
-          96% { transform: translateX(0); opacity: 0; }
-        }
-        @keyframes glitch2 {
-          0%, 91%, 100% { transform: translateX(0); opacity: 0; }
-          93% { transform: translateX(3px); opacity: 0.8; }
-          95% { transform: translateX(-3px); opacity: 0.5; }
-          97% { transform: translateX(0); opacity: 0; }
-        }
-
-        .card-hover {
-          transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
-        }
-        .card-hover:hover {
-          transform: translateY(-6px);
-          box-shadow: 0 20px 60px rgba(0,255,100,0.1);
-          border-color: rgba(74,222,128,0.4);
-        }
-
-        .reveal-section {
-          opacity: 0;
-          transform: translateY(50px);
-          transition: opacity 0.8s ease, transform 0.8s ease;
-        }
-
-        .text-stroke {
-          -webkit-text-stroke: 1px rgba(74,222,128,0.4);
-          color: transparent;
-        }
-
-        .tool-card:hover .tool-logo {
-          transform: scale(1.1) rotate(-5deg);
-          transition: transform 0.3s ease;
-        }
-
-        .ripple-btn {
-          position: relative;
-          overflow: hidden;
-        }
-        .ripple-btn::after {
-          content: '';
-          position: absolute;
-          inset: 0;
-          background: radial-gradient(circle, rgba(74,222,128,0.3) 0%, transparent 70%);
-          opacity: 0;
-          transition: opacity 0.3s;
-        }
-        .ripple-btn:hover::after { opacity: 1; }
-
-        .works-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; }
-
-        .input-field {
-          width: 100%;
-          background: rgba(0,0,0,0.4);
-          border: 1px solid rgba(74,222,128,0.2);
-          border-radius: 0.75rem;
-          padding: 0.875rem 1.25rem;
-          color: #d1fae5;
-          font-family: 'JetBrains Mono', monospace;
-          font-size: 0.875rem;
-          outline: none;
-          transition: border-color 0.2s, box-shadow 0.2s;
-          backdrop-filter: blur(8px);
-        }
-        .input-field::placeholder { color: rgba(74,222,128,0.3); }
-        .input-field:focus {
-          border-color: rgba(74,222,128,0.5);
-          box-shadow: 0 0 0 3px rgba(74,222,128,0.07);
-        }
-
-        @keyframes floatUp {
-          from { opacity: 0; transform: translateY(30px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        .hero-animate { animation: floatUp 1s ease forwards; }
-        .hero-animate-2 { animation: floatUp 1s 0.3s ease forwards; opacity: 0; }
-        .hero-animate-3 { animation: floatUp 1s 0.6s ease forwards; opacity: 0; }
-        .hero-animate-4 { animation: floatUp 1s 0.9s ease forwards; opacity: 0; }
-
-        @keyframes pulse-glow {
-          0%, 100% { box-shadow: 0 0 20px rgba(74,222,128,0.2); }
-          50% { box-shadow: 0 0 40px rgba(74,222,128,0.5); }
-        }
-        .pulse-glow { animation: pulse-glow 3s ease infinite; }
-
-        @keyframes marquee {
-          from { transform: translateX(0); }
-          to { transform: translateX(-50%); }
-        }
-        .marquee-track { animation: marquee 20s linear infinite; display: flex; width: max-content; }
-        .marquee-track:hover { animation-play-state: paused; }
+        * { box-sizing: border-box; }
+        body { background: #060e0a; color: #d1fae5; overflow-x: hidden; margin: 0; }
       `}</style>
 
       {/* Background Canvas */}
@@ -777,7 +677,7 @@ export default function Page() {
         <nav
           ref={navRef}
           className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-8 py-5 transition-all duration-500"
-          style={{ backdropFilter: "blur(0px)", transition: "background 0.4s, backdrop-filter 0.4s" }}
+          style={{ backdropFilter: "blur(0px)" }}
         >
           <span className="font-mono-custom text-green-400 text-lg font-bold tracking-widest">
             ◈ VIDE∅
@@ -834,7 +734,7 @@ export default function Page() {
 
         {/* ── MARQUEE ── */}
         <div className="py-4 border-y border-green-900/40 overflow-hidden bg-black/20 backdrop-blur-sm">
-          <div className="marquee-track">
+          <div className="marquee-track" style={{ animation: "marquee 20s linear infinite", display: "flex", width: "max-content" }}>
             {[...Array(2)].map((_, i) => (
               <span key={i} className="flex items-center gap-8 pr-8">
                 {["COLOR GRADING", "◈", "MOTION GRAPHICS", "◈", "SOUND DESIGN", "◈", "SOCIAL CONTENT", "◈", "DOCUMENTARIES", "◈", "BRAND FILMS", "◈"].map(
@@ -871,7 +771,6 @@ export default function Page() {
                   background: "linear-gradient(135deg, rgba(0,0,0,0.4) 0%, rgba(10,30,15,0.3) 100%)",
                 }}
               >
-                {/* Thumbnail placeholder */}
                 <div
                   className="h-48 relative overflow-hidden"
                   style={{
@@ -999,7 +898,7 @@ export default function Page() {
           </div>
         </section>
 
-        {/* ── WORKS / PROJECTS ── */}
+        {/* ── FEATURED PROJECTS ── */}
         <section className="py-32 px-6 max-w-7xl mx-auto reveal-section">
           <div className="flex items-baseline gap-6 mb-16">
             <h2 className="font-display text-5xl md:text-7xl font-bold text-green-50">
@@ -1010,7 +909,6 @@ export default function Page() {
             <div className="flex-1 h-px bg-gradient-to-r from-green-400/30 to-transparent self-center ml-4" />
           </div>
 
-          {/* Featured large project */}
           <div className="card-hover rounded-3xl border border-green-900/40 bg-black/30 backdrop-blur-md overflow-hidden mb-8 group cursor-pointer">
             <div
               className="h-64 md:h-96 relative"
@@ -1032,7 +930,6 @@ export default function Page() {
             </div>
           </div>
 
-          {/* Grid of smaller projects */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {WORKS.slice(0, 4).map((w, i) => (
               <div
@@ -1057,7 +954,7 @@ export default function Page() {
         {/* ── CONTACT ── */}
         <section id="contact" className="py-32 px-6 max-w-3xl mx-auto reveal-section">
           <div className="text-center mb-16">
-            <p className="font-mono-custom text-xs text-green-400/40 tracking-[0.4em] uppercase mb-4">◈ Let's Create</p>
+            <p className="font-mono-custom text-xs text-green-400/40 tracking-[0.4em] uppercase mb-4">◈ Let&apos;s Create</p>
             <h2 className="font-display text-5xl md:text-7xl font-bold text-green-50">
               Get In
               <br />
