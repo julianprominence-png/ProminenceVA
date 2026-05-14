@@ -71,6 +71,7 @@ interface RippleObject {
   maxR: number;
   x: number;
   z: number;
+  layer: number;
 }
 
 /* ─────────────────────────────────────────────
@@ -213,26 +214,77 @@ function WaterCanvas() {
     ];
     padConfigs.forEach((c) => makeLilyPad(c.x, c.z, c.r, c.rot));
 
-    // ── Ripple system ──
+    // ── 5-Layer Ripple system ──
     function spawnRipple(x: number, z: number) {
-      const count = 4;
-      for (let i = 0; i < count; i++) {
+      const ringCount = 5; // Five layers of ripples
+      const colors = [0x88ffcc, 0x77ffbb, 0x66ffaa, 0x55ff99, 0x44ff88];
+      const startRadii = [0.15, 0.25, 0.35, 0.45, 0.55];
+      const endRadii = [7, 9, 11, 13, 15];
+      const speeds = [2.0, 2.2, 2.4, 2.6, 2.8];
+      const opacities = [0.9, 0.85, 0.8, 0.75, 0.7];
+      
+      for (let i = 0; i < ringCount; i++) {
+        const delay = i * 60;
         setTimeout(() => {
           if (!sceneRef.current) return;
-          const geo = new THREE.RingGeometry(0.1, 0.5, 64);
-          const mat = new THREE.MeshBasicMaterial({
-            color: 0x88ffcc,
+          
+          // Create ring geometry for each layer
+          const geo = new THREE.RingGeometry(startRadii[i], startRadii[i] + 0.3, 128);
+          const mat = new THREE.MeshPhongMaterial({
+            color: colors[i],
             transparent: true,
-            opacity: 0.7,
+            opacity: opacities[i],
             side: THREE.DoubleSide,
+            emissive: 0x44ffaa,
+            emissiveIntensity: 0.3,
+            shininess: 200,
           });
           const mesh = new THREE.Mesh(geo, mat);
           mesh.rotation.x = -Math.PI / 2;
-          mesh.position.set(x, 0.07, z);
+          mesh.position.set(x, 0.08 + i * 0.005, z);
           sceneRef.current.add(mesh);
-          ripplesRef.current.push({ mesh, t: 0, speed: 2.5 + i * 0.5, maxR: 5 + i * 2, x, z });
-        }, i * 120);
+          
+          ripplesRef.current.push({ 
+            mesh, 
+            t: 0, 
+            speed: speeds[i], 
+            maxR: endRadii[i], 
+            x, 
+            z,
+            layer: i
+          });
+        }, delay);
       }
+      
+      // Add a central splash effect
+      const centerGlowGeo = new THREE.SphereGeometry(0.12, 16, 16);
+      const centerGlowMat = new THREE.MeshBasicMaterial({
+        color: 0xaaffdd,
+        transparent: true,
+        opacity: 0.9,
+      });
+      const centerGlow = new THREE.Mesh(centerGlowGeo, centerGlowMat);
+      centerGlow.position.set(x, 0.1, z);
+      scene.add(centerGlow);
+      
+      gsap.to(centerGlow.position, {
+        y: 0.2,
+        duration: 0.3,
+        yoyo: true,
+        repeat: 2,
+        ease: "power2.out",
+        onComplete: () => {
+          scene.remove(centerGlow);
+          centerGlow.geometry.dispose();
+          centerGlowMat.dispose();
+        }
+      });
+      
+      gsap.to(centerGlowMat, {
+        opacity: 0,
+        duration: 0.5,
+        delay: 0.2,
+      });
     }
 
     // LEFT CLICK ONLY → ripple
@@ -271,17 +323,34 @@ function WaterCanvas() {
         waterGeoRef.current.computeVertexNormals();
       }
 
-      // Ripple update
+      // 5-Layer Ripple update
       for (let i = ripplesRef.current.length - 1; i >= 0; i--) {
         const r = ripplesRef.current[i];
-        r.t += 0.016 * r.speed;
-        const scale = 1 + r.t * (r.maxR / 1);
-        r.mesh.scale.set(scale, scale, scale);
-        if (r.mesh.material) {
-          const material = r.mesh.material as THREE.MeshBasicMaterial;
-          material.opacity = Math.max(0, 0.7 - r.t * 0.6);
+        r.t += 0.012 * r.speed;
+        
+        // Calculate the current inner and outer radius
+        const currentRadius = 0.3 + r.t * (r.maxR - 0.3);
+        
+        // Update the ring geometry
+        if (r.mesh.geometry) {
+          const newGeo = new THREE.RingGeometry(
+            Math.max(0.05, currentRadius - 0.4), 
+            currentRadius, 
+            128
+          );
+          r.mesh.geometry.dispose();
+          r.mesh.geometry = newGeo;
         }
-        if (r.t >= 1.2) {
+        
+        if (r.mesh.material) {
+          const material = r.mesh.material as THREE.MeshPhongMaterial;
+          // Fade out as ring expands
+          const baseOpacity = r.layer === 0 ? 0.9 : r.layer === 1 ? 0.85 : r.layer === 2 ? 0.8 : r.layer === 3 ? 0.75 : 0.7;
+          material.opacity = Math.max(0, baseOpacity - r.t * 0.7);
+          material.emissiveIntensity = Math.max(0, 0.3 - r.t * 0.3);
+        }
+        
+        if (r.t >= 1.0 || (r.mesh.material && (r.mesh.material as THREE.MeshPhongMaterial).opacity <= 0.02)) {
           scene.remove(r.mesh);
           r.mesh.geometry.dispose();
           if (r.mesh.material) {
@@ -448,7 +517,7 @@ function Hero() {
         transition={{ delay: 2, duration: 1 }}
         className="absolute bottom-8 text-emerald-300 text-xs font-mono tracking-widest"
       >
-        ← click the water to create ripples →
+        ← click the water to create five-layer ripples →
       </motion.p>
     </section>
   );
