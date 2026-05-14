@@ -13,6 +13,11 @@ const CircularGallery = dynamic(
   { ssr: false }
 );
 
+const SplashCursor = dynamic(
+  () => import("./components/SplashCursor/SplashCursor"),
+  { ssr: false }
+);
+
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
 }
@@ -687,6 +692,7 @@ export default function MountainLanding() {
   return (
     <>
       {!loaderDone && <TriangleLoader onComplete={handleLoaderComplete} />}
+      {loaderDone && <SplashCursor />}
 
       {/* ── MORPH PAGE-TRANSITION OVERLAY ── */}
       <div

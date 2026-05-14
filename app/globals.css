@@ -210,4 +210,204 @@ body, #__next {
     font-size: 3rem;
     line-height: 3.5rem;
   }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════ */
+/* 3D LOGO LOADER — Assembly & Time-Travel Transition                        */
+/* ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Pulse ring that expands from center during assembly ── */
+@keyframes pulse-ring-expand {
+  0% {
+    transform: translate(-50%, -50%) scale(0.3);
+    opacity: 0.6;
+  }
+  70% {
+    opacity: 0.15;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(2.5);
+    opacity: 0;
+  }
+}
+
+.loader-pulse-ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  border: 1px solid rgba(168, 85, 247, 0.4);
+  transform: translate(-50%, -50%) scale(0.3);
+  pointer-events: none;
+  animation: pulse-ring-expand 2.5s ease-out infinite;
+}
+
+.loader-pulse-ring:nth-child(2) {
+  animation-delay: 0.8s;
+  border-color: rgba(147, 51, 234, 0.3);
+}
+
+.loader-pulse-ring:nth-child(3) {
+  animation-delay: 1.6s;
+  border-color: rgba(192, 132, 252, 0.25);
+}
+
+/* ── Floating particles ── */
+@keyframes loader-particle-float {
+  0%, 100% {
+    transform: translateY(0px) translateX(0px) scale(1);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 0.6;
+  }
+  50% {
+    transform: translateY(-40px) translateX(15px) scale(1.5);
+    opacity: 0.8;
+  }
+}
+
+.loader-particle {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: rgba(168, 85, 247, 0.6);
+  box-shadow: 0 0 6px rgba(168, 85, 247, 0.4);
+  animation: loader-particle-float 3s ease-in-out infinite;
+  pointer-events: none;
+}
+
+/* ── Warp light streaks for time-travel exit ── */
+@keyframes warp-streak {
+  0% {
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 0;
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(8);
+    opacity: 0;
+  }
+}
+
+.loader-warp-container {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  opacity: 0;
+}
+
+.loader-warp-streak {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 120vmax;
+  height: 120vmax;
+  transform: translate(-50%, -50%) scale(0);
+  background: conic-gradient(
+    from 0deg,
+    transparent 0deg,
+    rgba(168, 85, 247, 0.15) 8deg,
+    transparent 16deg,
+    transparent 30deg,
+    rgba(255, 255, 255, 0.08) 36deg,
+    transparent 42deg,
+    transparent 60deg,
+    rgba(147, 51, 234, 0.12) 66deg,
+    transparent 72deg,
+    transparent 90deg,
+    rgba(192, 132, 252, 0.10) 96deg,
+    transparent 102deg,
+    transparent 120deg,
+    rgba(255, 255, 255, 0.06) 126deg,
+    transparent 132deg,
+    transparent 150deg,
+    rgba(168, 85, 247, 0.14) 156deg,
+    transparent 162deg,
+    transparent 180deg,
+    rgba(255, 255, 255, 0.07) 186deg,
+    transparent 192deg,
+    transparent 210deg,
+    rgba(147, 51, 234, 0.11) 216deg,
+    transparent 222deg,
+    transparent 240deg,
+    rgba(192, 132, 252, 0.09) 246deg,
+    transparent 252deg,
+    transparent 270deg,
+    rgba(255, 255, 255, 0.05) 276deg,
+    transparent 282deg,
+    transparent 300deg,
+    rgba(168, 85, 247, 0.13) 306deg,
+    transparent 312deg,
+    transparent 330deg,
+    rgba(147, 51, 234, 0.08) 336deg,
+    transparent 342deg,
+    transparent 360deg
+  );
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+/* ── Progress text glow ── */
+.loader-progress-glow {
+  text-shadow:
+    0 0 20px rgba(168, 85, 247, 0.6),
+    0 0 40px rgba(147, 51, 234, 0.3),
+    0 0 60px rgba(168, 85, 247, 0.15);
+}
+
+/* ── Flash overlay for warp climax ── */
+@keyframes warp-flash {
+  0% { opacity: 0; }
+  50% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+.loader-flash {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse 60% 60% at 50% 50%,
+    rgba(255, 255, 255, 0.95),
+    rgba(192, 132, 252, 0.3) 40%,
+    transparent 70%
+  );
+  pointer-events: none;
+  opacity: 0;
+}
+
+/* ── Ambient scanner line ── */
+@keyframes scanner-sweep {
+  0% { top: 20%; opacity: 0; }
+  10% { opacity: 0.6; }
+  90% { opacity: 0.6; }
+  100% { top: 80%; opacity: 0; }
+}
+
+.loader-scanner {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 200px;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(168, 85, 247, 0.5),
+    rgba(255, 255, 255, 0.8),
+    rgba(168, 85, 247, 0.5),
+    transparent
+  );
+  box-shadow: 0 0 15px rgba(168, 85, 247, 0.3);
+  animation: scanner-sweep 2.5s ease-in-out infinite;
+  pointer-events: none;
 }
