@@ -18,6 +18,13 @@ const SplashCursor = dynamic(
   { ssr: false }
 );
 
+const MagicBento = dynamic(
+  () => import("./components/MagicBento/MagicBento"),
+  { ssr: false }
+);
+
+import { Box, Code, Flame, Triangle, Scissors, Video, Film, Paintbrush, ImageIcon, PenTool } from "lucide-react";
+
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
 }
@@ -925,77 +932,35 @@ export default function MountainLanding() {
             </div>
 
             {/* ── Individual floating tool cards ── */}
-            <div className="max-w-6xl mx-auto relative z-10">
-
-              {/* Category labels */}
-              {[
-                { category: 'Engineering', icon: (<svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>), tools: [{name:'Next.js',color:'#ffffff'},{name:'VS Code',color:'#007ACC'},{name:'Firebase',color:'#FFA000'},{name:'Vercel',color:'#cccccc'}] },
-                { category: 'Post-Production', icon: (<svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/></svg>), tools: [{name:'CapCut',color:'#a855f7'},{name:'Adobe Premiere',color:'#9999FF'},{name:'DaVinci Resolve',color:'#2dd4bf'}] },
-                { category: 'Graphics', icon: (<svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/></svg>), tools: [{name:'Canva',color:'#00C4CC'},{name:'Photoshop',color:'#31A8FF'},{name:'Illustrator',color:'#FF9A00'}] },
-              ].map((group, gi) => (
-                <div key={gi} className="mb-12 last:mb-0">
-                  {/* Category header */}
-                  <div className="flex items-center gap-3 mb-6 pl-1">
-                    <div className="w-8 h-8 rounded-lg flex items-center justify-center text-purple-400" style={{ background: '#161330', boxShadow: 'inset -2px -2px 5px rgba(255,255,255,0.04), inset 2px 2px 5px rgba(0,0,0,0.5)' }}>
-                      {group.icon}
-                    </div>
-                    <h3 className="text-white/80 font-black tracking-[0.18em] text-[10px] uppercase">{group.category}</h3>
-                    <div className="flex-1 h-px" style={{ background: 'linear-gradient(to right, rgba(147,51,234,0.2), transparent)' }} />
-                  </div>
-
-                  {/* Tool cards row */}
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                    {group.tools.map((tool, ti) => (
-                      <div
-                        key={ti}
-                        className="tool-card-neu group relative rounded-2xl p-5 flex flex-col items-center gap-3 cursor-default transition-all duration-500 hover:translate-y-[-4px]"
-                        style={{
-                          background: '#161330',
-                          boxShadow: '-6px -6px 14px rgba(255,255,255,0.03), 6px 6px 18px rgba(0,0,0,0.5)',
-                        }}
-                      >
-                        {/* Glow accent on hover */}
-                        <div
-                          className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-                          style={{
-                            boxShadow: `0 0 30px ${tool.color}15, inset 0 0 20px ${tool.color}08`,
-                            border: `1px solid ${tool.color}20`,
-                          }}
-                        />
-
-                        {/* Tool icon dot */}
-                        <div
-                          className="w-10 h-10 rounded-xl flex items-center justify-center relative z-10 transition-transform duration-500 group-hover:scale-110"
-                          style={{
-                            background: '#161330',
-                            boxShadow: 'inset -3px -3px 6px rgba(255,255,255,0.04), inset 3px 3px 6px rgba(0,0,0,0.5)',
-                          }}
-                        >
-                          <div
-                            className="w-3 h-3 rounded-full transition-all duration-500 group-hover:scale-125"
-                            style={{
-                              background: tool.color,
-                              boxShadow: `0 0 10px ${tool.color}60, 0 0 20px ${tool.color}20`,
-                              opacity: 0.7,
-                            }}
-                          />
-                        </div>
-
-                        {/* Tool name */}
-                        <span className="text-white/60 text-xs font-bold tracking-[0.12em] uppercase relative z-10 text-center group-hover:text-white/85 transition-colors duration-500">
-                          {tool.name}
-                        </span>
-
-                        {/* Subtle category accent line */}
-                        <div
-                          className="w-8 h-[2px] rounded-full opacity-30 group-hover:opacity-60 group-hover:w-12 transition-all duration-500"
-                          style={{ background: `linear-gradient(to right, ${tool.color}, transparent)` }}
-                        />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ))}
+            <div className="max-w-6xl mx-auto relative z-10 px-4">
+              <MagicBento
+                enableStars={true}
+                enableSpotlight={true}
+                enableBorderGlow={true}
+                enableTilt={true}
+                enableMagnetism={true}
+                clickEffect={true}
+                spotlightRadius={300}
+                particleCount={12}
+                glowColor="147, 51, 234"
+                cards={[
+                  // Engineering
+                  { title: 'Next.js', label: 'Engineering', icon: <Box size={24} color="#ffffff" />, color: '#161330', glowColor: '255, 255, 255' },
+                  { title: 'VS Code', label: 'Engineering', icon: <Code size={24} color="#007ACC" />, color: '#161330', glowColor: '0, 122, 204' },
+                  { title: 'Firebase', label: 'Engineering', icon: <Flame size={24} color="#FFA000" />, color: '#161330', glowColor: '255, 160, 0' },
+                  { title: 'Vercel', label: 'Engineering', icon: <Triangle size={24} color="#cccccc" fill="#cccccc" />, color: '#161330', glowColor: '204, 204, 204' },
+                  
+                  // Post-Production
+                  { title: 'CapCut', label: 'Post-Production', icon: <Scissors size={24} color="#a855f7" />, color: '#161330', glowColor: '168, 85, 247' },
+                  { title: 'Adobe Premiere', label: 'Post-Production', icon: <Video size={24} color="#9999FF" />, color: '#161330', glowColor: '153, 153, 255' },
+                  { title: 'DaVinci Resolve', label: 'Post-Production', icon: <Film size={24} color="#2dd4bf" />, color: '#161330', glowColor: '45, 212, 191' },
+                  
+                  // Graphics
+                  { title: 'Canva', label: 'Graphics', icon: <Paintbrush size={24} color="#00C4CC" />, color: '#161330', glowColor: '0, 196, 204' },
+                  { title: 'Photoshop', label: 'Graphics', icon: <ImageIcon size={24} color="#31A8FF" />, color: '#161330', glowColor: '49, 168, 255' },
+                  { title: 'Illustrator', label: 'Graphics', icon: <PenTool size={24} color="#FF9A00" />, color: '#161330', glowColor: '255, 154, 0' }
+                ]}
+              />
             </div>
           </section>
 
