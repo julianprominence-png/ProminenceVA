@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -809,9 +809,9 @@ export default function MountainLanding() {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-24">
               {[
-                { title: 'Web Development', desc: 'Scalable Next.js web apps & platforms', icon: <Globe size={28} /> },
-                { title: 'Graphics Design', desc: 'Branding, identity, print & digital assets', icon: <Paintbrush size={28} /> },
-                { title: 'Video Editing', desc: 'Cinematic reels, shorts, films & motion', icon: <Clapperboard size={28} /> },
+                { title: 'Web Development', desc: 'Scalable Next.js web apps & platforms', icon: <Globe size={28} />, href: '#contact' },
+                { title: 'Graphics Design', desc: 'Branding, identity, print & digital assets', icon: <Paintbrush size={28} />, href: '/graphics#contact' },
+                { title: 'Video Editing', desc: 'Cinematic reels, shorts, films & motion', icon: <Clapperboard size={28} />, href: '/video#contact' },
               ].map((svc, i) => (
                 <div
                   key={i}
@@ -830,12 +830,13 @@ export default function MountainLanding() {
                   </div>
                   <h3 className="text-white/90 font-bold text-sm tracking-[0.1em] uppercase">{svc.title}</h3>
                   <p className="text-white/30 text-xs leading-relaxed font-medium">{svc.desc}</p>
-                  <button
+                  <a
+                    href={svc.href}
                     className={`mt-3 px-6 py-3 rounded-full text-[10px] cursor-pointer ${darkButton}`}
                     style={{ background: 'rgba(147,51,234,0.12)', boxShadow: '0 0 15px rgba(147,51,234,0.08)' }}
                   >
                     Go to {svc.title} Contact
-                  </button>
+                  </a>
                 </div>
               ))}
             </div>

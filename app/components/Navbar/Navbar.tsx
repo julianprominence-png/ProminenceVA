@@ -8,8 +8,8 @@ import './Navbar.css';
 
 const services = [
   { label: 'Web Development', href: '#contact', icon: '⟨/⟩' },
-  { label: 'Graphics Design', href: '#contact', icon: '◆' },
-  { label: 'Video Editing', href: '#contact', icon: '▶' },
+  { label: 'Graphics Design', href: '/graphics', icon: '◆' },
+  { label: 'Video Editing', href: '/video', icon: '▶' },
 ];
 
 export default function Navbar() {
@@ -78,10 +78,16 @@ export default function Navbar() {
     }
   }, []);
 
-  const handleServiceClick = (href: string) => {
+  const handleServiceClick = (e: React.MouseEvent, href: string) => {
     setDropdownOpen(false);
     setMobileOpen(false);
+    if (href.startsWith('/')) {
+      // Page navigation — let the <a> default behavior handle it
+      return;
+    }
+    // Hash link — handle scroll on current page or redirect to home
     if (pathname !== '/') {
+      e.preventDefault();
       window.location.href = '/' + href;
     }
   };
@@ -125,7 +131,7 @@ export default function Navbar() {
                     key={s.label}
                     href={s.href}
                     className="nav-dropdown-item"
-                    onClick={() => handleServiceClick(s.href)}
+                    onClick={(e) => handleServiceClick(e, s.href)}
                   >
                     <span className="nav-dropdown-icon">{s.icon}</span>
                     <span>{s.label}</span>
@@ -173,7 +179,7 @@ export default function Navbar() {
           <div className="navbar-mobile-links">
             <p className="navbar-mobile-label">Services</p>
             {services.map((s) => (
-              <a key={s.label} href={s.href} className="navbar-mobile-link" onClick={() => handleServiceClick(s.href)}>
+              <a key={s.label} href={s.href} className="navbar-mobile-link" onClick={(e) => handleServiceClick(e, s.href)}>
                 <span className="nav-dropdown-icon">{s.icon}</span>
                 {s.label}
               </a>

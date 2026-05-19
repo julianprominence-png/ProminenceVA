@@ -1,4 +1,6 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&display=swap');
 @import "tailwindcss";
+
 
 :root {
   --bg-deep: #0a110f;
