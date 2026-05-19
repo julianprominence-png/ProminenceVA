@@ -170,7 +170,7 @@ function VioletCursor() {
   return (
     <>
       <div ref={outer} style={{ position: "fixed", top: 0, left: 0, pointerEvents: "none", zIndex: 9999, width: hov ? 64 : 32, height: hov ? 64 : 32, borderRadius: "50%", border: `1px solid ${V.neon}`, transition: "width .3s cubic-bezier(0.76, 0, 0.24, 1), height .3s cubic-bezier(0.76, 0, 0.24, 1), opacity .3s", opacity: hov ? 0.8 : 0.35, background: hov ? "rgba(124,58,237,0.15)" : "transparent", backdropFilter: hov ? "blur(2px)" : "none" }} />
-      <div ref={inner} style={{ position: "fixed", top: 0, left: 0, pointerEvents: "none", zIndex: 10000, width: hov ? 4 : 6, height: hov ? 4 : 6, borderRadius: "50%", background: V.neon, boxShadow: `0 0 12px 3px ${V.neon}`, transition: "width .3s, height .3s, opacity .3s", opacity: hov ? 0.5 : 1 }} />
+      <div ref={inner} style={{ position: "fixed", top: 0, left: 0, pointerEvents: "none", zIndex: 10000, width: hov ? 4 : 6, height: hov ? 4 : 6, borderRadius: "50%", background: V.neon, transition: "width .3s, height .3s, opacity .3s", opacity: hov ? 0.5 : 1 }} />
     </>
   );
 }
@@ -656,7 +656,7 @@ export default function Page() {
         ::-webkit-scrollbar-track{background:${V.bg};}
         ::-webkit-scrollbar-thumb{background:${V.violet};border-radius:2px;}
         @keyframes spin{to{transform:rotate(360deg)}}
-        @keyframes glow{0%,100%{box-shadow:0 0 18px rgba(124,58,237,0.35)}50%{box-shadow:0 0 36px rgba(167,139,250,0.55)}}
+        @keyframes glow{0%,100%{}50%{}}
         @keyframes breathe { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-8px);} }
         
         .nav-link::after{content:'';position:absolute;bottom:-3px;left:0;width:0;height:1px;background:linear-gradient(to right,${V.violet},${V.neon});transition:width .4s cubic-bezier(.76,0,.24,1);}
@@ -664,15 +664,15 @@ export default function Page() {
         .glow-btn{position:relative; overflow:hidden;}
         .glow-btn::before{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.2),transparent);transition:left 0.7s ease;}
         .glow-btn:hover::before{left:100%;}
-        .glow-btn:hover{box-shadow:0 0 32px rgba(124,58,237,0.65), 0 0 12px rgba(167,139,250,0.4);}
+        .glow-btn:hover{}
         
         /* Glass Input Fields */
         .glass-input { background: rgba(255,255,255,0.02); border: 1px solid rgba(167,139,250,0.2); border-radius: 8px; padding: 16px; color: #fff; font-size: 14px; outline: none; transition: all 0.3s ease; }
         .glass-input:focus, .glass-input:hover { background: rgba(255,255,255,0.06); border-color: ${V.neon}; transform: translateY(-2px); }
 
         /* Smoother hover curves for glass cards */
-        .glass-card { background: rgba(13, 11, 38, 0.4); backdrop-filter: blur(12px); border: 1px solid rgba(167,139,250,0.1); border-radius: 16px; transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.6s ease, box-shadow 0.6s ease; }
-        .glass-card:hover { transform: translateY(-10px); border-color: rgba(167,139,250,0.4); box-shadow: 0 20px 40px rgba(124,58,237,0.15); }
+        .glass-card { background: rgba(13, 11, 38, 0.4); backdrop-filter: blur(12px); border: 1px solid rgba(167,139,250,0.1); border-radius: 16px; transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.6s ease; }
+        .glass-card:hover { transform: translateY(-10px); border-color: rgba(167,139,250,0.4); }
         
         /* Typography Descender Fix */
         .text-reveal-wrap { overflow: hidden; display: inline-block; padding-bottom: 0.3em; margin-bottom: -0.3em; line-height: 1; }
@@ -745,7 +745,7 @@ export default function Page() {
 
           <div className="hidden md:flex items-center" style={{ gap: 24 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-              <div style={{ width: 5, height: 5, borderRadius: "50%", background: "#7EEB85", boxShadow: "0 0 6px #7EEB85", animation: "glow 2.5s ease-in-out infinite" }} />
+              <div style={{ width: 5, height: 5, borderRadius: "50%", background: "#7EEB85", animation: "glow 2.5s ease-in-out infinite" }} />
               <span style={{ fontSize: 8, letterSpacing: "0.3em", textTransform: "uppercase", color: "rgba(196,181,253,0.28)" }}>Live</span>
             </div>
             <Magnetic>

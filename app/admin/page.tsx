@@ -163,7 +163,7 @@ export default function AdminDashboard() {
           <div className="flex items-center gap-4">
             <div className="relative flex items-center justify-center">
               <div className="absolute w-3 h-3 rounded-full bg-fuchsia-500/60 animate-ping" />
-              <div className="relative w-2 h-2 rounded-full bg-fuchsia-200 shadow-[0_0_20px_rgba(217,70,239,1)]" />
+              <div className="relative w-2 h-2 rounded-full bg-fuchsia-200" />
             </div>
             <div>
               <h1 className="text-xl md:text-2xl font-medium tracking-tight">
@@ -191,7 +191,7 @@ export default function AdminDashboard() {
             )}
             <button
               onClick={handleLogout}
-              className="bg-gradient-to-b from-white/[0.04] to-transparent border border-white/10 border-b-black/60 shadow-[0_4px_10px_rgba(0,0,0,0.5),inset_0_1px_1px_rgba(255,255,255,0.2)] rounded-full px-5 py-2.5 text-[9px] font-bold tracking-[0.2em] uppercase text-red-300/80 hover:text-red-200 hover:border-red-500/40 transition-all"
+              className="bg-gradient-to-b from-white/[0.04] to-transparent border border-white/10 border-b-black/60 rounded-full px-5 py-2.5 text-[9px] font-bold tracking-[0.2em] uppercase text-red-300/80 hover:text-red-200 hover:border-red-500/40 transition-all"
             >
               Disconnect
             </button>
@@ -209,7 +209,7 @@ export default function AdminDashboard() {
           ].map((stat, i) => (
             <div
               key={i}
-              className="relative overflow-hidden bg-gradient-to-b from-white/[0.04] to-[#020104]/80 backdrop-blur-[60px] border border-white/10 border-b-black/80 border-r-black/50 shadow-[0_20px_40px_rgba(0,0,0,0.8),inset_0_1px_1px_rgba(255,255,255,0.15),inset_0_-1px_1px_rgba(0,0,0,0.5)] rounded-2xl p-5 md:p-6 group hover:-translate-y-1 hover:shadow-[0_30px_60px_rgba(0,0,0,0.9)] transition-all duration-500"
+              className="relative overflow-hidden bg-gradient-to-b from-white/[0.04] to-[#020104]/80 backdrop-blur-[60px] border border-white/10 border-b-black/80 border-r-black/50 rounded-2xl p-5 md:p-6 group hover:-translate-y-1 transition-all duration-500"
             >
               <div
                 className="absolute -top-10 -right-10 w-32 h-32 rounded-full blur-[50px] opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none"
@@ -224,7 +224,7 @@ export default function AdminDashboard() {
         </div>
 
         {/* Contacts Table */}
-        <div className="relative overflow-hidden bg-gradient-to-b from-white/[0.03] to-[#020104]/90 backdrop-blur-[60px] border border-white/10 border-b-black/80 shadow-[0_30px_60px_rgba(0,0,0,0.9),inset_0_1px_1px_rgba(255,255,255,0.1)] rounded-3xl">
+        <div className="relative overflow-hidden bg-gradient-to-b from-white/[0.03] to-[#020104]/90 backdrop-blur-[60px] border border-white/10 border-b-black/80 rounded-3xl">
           {/* Table header */}
           <div className="px-6 md:px-8 py-5 border-b border-white/[0.06] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
             <div>
@@ -247,7 +247,7 @@ export default function AdminDashboard() {
             </div>
           ) : contacts.length === 0 ? (
             <div className="p-16 text-center">
-              <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-[#010002]/80 border border-white/5 shadow-[inset_0_4px_10px_rgba(0,0,0,0.8)] flex items-center justify-center">
+              <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-[#010002]/80 border border-white/5 flex items-center justify-center">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-white/20">
                   <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
                   <polyline points="22,6 12,13 2,6" />
@@ -285,7 +285,7 @@ export default function AdminDashboard() {
                       >
                         <td className="px-4 py-5">
                           {!contact.readByAdmin && (
-                            <div className="w-2 h-2 rounded-full bg-fuchsia-400 shadow-[0_0_8px_rgba(217,70,239,0.6)]" />
+                            <div className="w-2 h-2 rounded-full bg-fuchsia-400" />
                           )}
                         </td>
                         <td className="px-6 py-5">
@@ -325,7 +325,7 @@ export default function AdminDashboard() {
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        {!contact.readByAdmin && <div className="w-2 h-2 rounded-full bg-fuchsia-400 shadow-[0_0_8px_rgba(217,70,239,0.6)]" />}
+                        {!contact.readByAdmin && <div className="w-2 h-2 rounded-full bg-fuchsia-400" />}
                         <span className="text-sm font-medium text-white/90">{contact.name}</span>
                       </div>
                       <span className="text-[10px] text-white/30 font-light">{formatDate(contact.createdAt)}</span>
@@ -346,7 +346,7 @@ export default function AdminDashboard() {
                   <button
                     onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                     disabled={currentPage === 1}
-                    className={`bg-gradient-to-b from-white/[0.06] to-transparent border border-white/10 border-b-black/60 shadow-[0_4px_10px_rgba(0,0,0,0.5),inset_0_1px_1px_rgba(255,255,255,0.2)] rounded-full px-5 py-2.5 text-[9px] font-bold tracking-[0.15em] uppercase transition-all ${
+                    className={`bg-gradient-to-b from-white/[0.06] to-transparent border border-white/10 border-b-black/60 rounded-full px-5 py-2.5 text-[9px] font-bold tracking-[0.15em] uppercase transition-all ${
                       currentPage === 1 ? "opacity-30 cursor-not-allowed" : "text-white/70 hover:text-white hover:border-fuchsia-500/40"
                     }`}
                   >
@@ -359,7 +359,7 @@ export default function AdminDashboard() {
                         onClick={() => setCurrentPage(page)}
                         className={`w-8 h-8 rounded-full text-[10px] font-bold transition-all duration-300 ${
                           page === currentPage
-                            ? "bg-gradient-to-b from-fuchsia-500 to-purple-700 text-white shadow-[0_4px_15px_rgba(217,70,239,0.5),inset_0_1px_1px_rgba(255,255,255,0.3)]"
+                            ? "bg-gradient-to-b from-fuchsia-500 to-purple-700 text-white"
                             : "text-white/30 hover:text-white/60 hover:bg-white/[0.05]"
                         }`}
                       >
@@ -370,7 +370,7 @@ export default function AdminDashboard() {
                   <button
                     onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                     disabled={currentPage === totalPages}
-                    className={`bg-gradient-to-b from-white/[0.06] to-transparent border border-white/10 border-b-black/60 shadow-[0_4px_10px_rgba(0,0,0,0.5),inset_0_1px_1px_rgba(255,255,255,0.2)] rounded-full px-5 py-2.5 text-[9px] font-bold tracking-[0.15em] uppercase transition-all ${
+                    className={`bg-gradient-to-b from-white/[0.06] to-transparent border border-white/10 border-b-black/60 rounded-full px-5 py-2.5 text-[9px] font-bold tracking-[0.15em] uppercase transition-all ${
                       currentPage === totalPages ? "opacity-30 cursor-not-allowed" : "text-white/70 hover:text-white hover:border-fuchsia-500/40"
                     }`}
                   >

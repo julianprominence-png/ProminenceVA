@@ -47,13 +47,13 @@ export default function AdminLogin() {
           <div className="flex items-center justify-center gap-3 mb-6">
             <div className="relative flex items-center justify-center">
               <div className="absolute w-3 h-3 rounded-full bg-fuchsia-500/60 animate-ping" />
-              <div className="relative w-2 h-2 rounded-full bg-fuchsia-200 shadow-[0_0_20px_rgba(217,70,239,1)]" />
+              <div className="relative w-2 h-2 rounded-full bg-fuchsia-200" />
             </div>
             <span className="text-[10px] font-bold tracking-[0.3em] uppercase text-white/80">
               Prominence
             </span>
           </div>
-          <h1 className="text-3xl md:text-4xl font-medium text-white mb-3 drop-shadow-xl">
+          <h1 className="text-3xl md:text-4xl font-medium text-white mb-3">
             Admin Access
           </h1>
           <p className="text-white/40 text-xs tracking-[0.15em] uppercase">
@@ -62,7 +62,7 @@ export default function AdminLogin() {
         </div>
 
         {/* Login card */}
-        <div className="relative overflow-hidden bg-gradient-to-b from-white/[0.04] to-[#020104]/80 backdrop-blur-[80px] border border-white/10 border-b-black/80 border-r-black/50 shadow-[0_30px_60px_rgba(0,0,0,0.9),inset_0_1px_1px_rgba(255,255,255,0.15),inset_0_-1px_1px_rgba(0,0,0,0.5)] rounded-3xl p-8 md:p-10">
+        <div className="relative overflow-hidden bg-gradient-to-b from-white/[0.04] to-[#020104]/80 backdrop-blur-[80px] border border-white/10 border-b-black/80 border-r-black/50 rounded-3xl p-8 md:p-10">
           {/* Card ambient glow */}
           <div className="absolute -top-20 -right-20 w-60 h-60 bg-purple-600/20 rounded-full blur-[80px] pointer-events-none" />
 
@@ -77,7 +77,7 @@ export default function AdminLogin() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="admin@gmail.com"
                 required
-                className="w-full bg-[#010002]/80 border border-white/5 shadow-[inset_0_4px_10px_rgba(0,0,0,0.8),0_1px_1px_rgba(255,255,255,0.05)] rounded-2xl px-6 py-4 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-fuchsia-500/60 focus:bg-white/[0.04] transition-all"
+                className="w-full bg-[#010002]/80 border border-white/5 rounded-2xl px-6 py-4 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-fuchsia-500/60 focus:bg-white/[0.04] transition-all"
               />
             </div>
             <div>
@@ -90,7 +90,7 @@ export default function AdminLogin() {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
                 required
-                className="w-full bg-[#010002]/80 border border-white/5 shadow-[inset_0_4px_10px_rgba(0,0,0,0.8),0_1px_1px_rgba(255,255,255,0.05)] rounded-2xl px-6 py-4 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-fuchsia-500/60 focus:bg-white/[0.04] transition-all"
+                className="w-full bg-[#010002]/80 border border-white/5 rounded-2xl px-6 py-4 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-fuchsia-500/60 focus:bg-white/[0.04] transition-all"
               />
             </div>
 
@@ -103,7 +103,7 @@ export default function AdminLogin() {
             <button
               type="submit"
               disabled={loading}
-              className={`w-full bg-gradient-to-b from-white to-gray-300 text-black font-bold rounded-full px-8 py-4 text-[10px] uppercase tracking-widest shadow-[0_10px_20px_rgba(0,0,0,0.5),inset_0_1px_2px_rgba(255,255,255,0.9),inset_0_-2px_2px_rgba(0,0,0,0.15)] active:shadow-[inset_0_3px_6px_rgba(0,0,0,0.4)] active:translate-y-1 hover:from-white hover:to-gray-100 transition-all ${
+              className={`w-full bg-gradient-to-b from-white to-gray-300 text-black font-bold rounded-full px-8 py-4 text-[10px] uppercase tracking-widest active:translate-y-1 hover:from-white hover:to-gray-100 transition-all ${
                 loading ? "opacity-60 cursor-wait" : ""
               }`}
             >
