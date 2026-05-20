@@ -31,7 +31,7 @@ const webProjects = [
     title: "Art Masons",
     sub: "E-Commerce",
     url: "https://artmasons.com",
-    img: "https://images.unsplash.com/photo-1618220179428-22790b46a0eb?w=1200&q=90",
+    img: "/images/ARTMASONS-PREVIEW.png",
     description: "A robust e-commerce platform crafted for artisans to sell their high-quality creations online.",
   },
   {
@@ -281,18 +281,28 @@ export default function WebPortfolioPage() {
             {/* Animated Device Container */}
             <motion.div 
               layout
-              className={`relative h-full w-full transition-all duration-700 ease-[0.16,1,0.3,1] bg-white sm:rounded-xl shadow-2xl overflow-hidden ${
+              className={`relative h-full w-full transition-all duration-700 ease-[0.16,1,0.3,1] bg-white sm:rounded-xl shadow-2xl overflow-auto ${
                 device === "mobile" ? "sm:max-h-[800px]" : ""
               }`}
               style={{ maxWidth: deviceWidths[device] }}
             >
-              <iframe
-                key={activeProject.url} // Forces remount to trigger onLoad properly
-                src={activeProject.url}
-                className="w-full h-full border-none bg-white"
-                onLoad={() => setIsLoading(false)}
-                title={`Live Preview of ${activeProject.title}`}
-              />
+              {activeProject.url.includes("artmasons") ? (
+                <img
+                  key={activeProject.num}
+                  src={activeProject.img}
+                  className="w-full h-auto object-scale-down"
+                  onLoad={() => setIsLoading(false)}
+                  alt={`Preview of ${activeProject.title}`}
+                />
+              ) : (
+                <iframe
+                  key={activeProject.url} // Forces remount to trigger onLoad properly
+                  src={activeProject.url}
+                  className="w-full h-full border-none bg-white"
+                  onLoad={() => setIsLoading(false)}
+                  title={`Live Preview of ${activeProject.title}`}
+                />
+              )}
             </motion.div>
           </div>
         </div>
