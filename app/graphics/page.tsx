@@ -227,7 +227,8 @@ export default function GraphicsPage() {
         </div>
 
         {/* Bottom: Infinite Carousel — Polaroid Style */}
-        <div className="absolute bottom-0 left-0 right-0 z-30 overflow-hidden pb-12 pt-6">
+        {/* Positioned to overlap the boundary between Hero and Contact sections */}
+        <div className="absolute -bottom-32 left-0 right-0 z-30 overflow-visible pt-6">
           <div className="flex w-max animate-carousel-scroll hover:[animation-play-state:paused]" style={{ gap: `${GAP}px` }}>
             {carouselCards.map((card, index) => {
               const actualIndex = index % TOTAL_CARDS;
@@ -273,7 +274,7 @@ export default function GraphicsPage() {
       {/* ══════════════════════════════════════════════════════════════ */}
       {/* CONTACT + SERVICES                                             */}
       {/* ══════════════════════════════════════════════════════════════ */}
-      <section ref={contactRef} id="contact" className="relative z-10 py-32 px-6 sm:px-12 bg-transparent">
+      <section ref={contactRef} id="contact" className="relative z-10 pt-48 pb-32 px-6 sm:px-12 bg-transparent">
         <div className="max-w-7xl mx-auto">
 
           {/* Section header */}
