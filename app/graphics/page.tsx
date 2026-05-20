@@ -38,8 +38,8 @@ const SERVICES = [
   { icon: Award,              title:"Packaging",        desc:"Packaging that turns an unboxing into a luxury ritual your clients remember." },
 ];
 
-const CARD_W = 260; // px
-const GAP = 24; // px
+const CARD_W = 340; // px
+const GAP = 0; // px
 const TOTAL_CARDS = WORKS.length;
 const TRACK_W = (CARD_W + GAP) * TOTAL_CARDS;
 
@@ -156,15 +156,15 @@ export default function GraphicsPage() {
               <span className="text-[11px] tracking-[0.3em] uppercase text-purple-200 font-bold">Creative Studio</span>
             </div>
 
-            <h1 className="hero-elem text-5xl sm:text-7xl lg:text-8xl font-black tracking-tight leading-[1.05] mb-8 drop-shadow-2xl">
-              <span className="text-white">WE ARCHITECT</span>
+            <h1 className="hero-elem text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight leading-[1] mb-6 drop-shadow-2xl">
+              <span className="text-white">PROMINENCE</span>
               <br />
               <span className="bg-gradient-to-br from-purple-400 to-purple-100 bg-clip-text text-transparent">
-                DESIRE.
+                GRAPHICS
               </span>
             </h1>
 
-            <p className="hero-elem text-white/60 text-base sm:text-lg lg:text-xl leading-relaxed mb-12 font-medium max-w-xl">
+            <p className="hero-elem text-white/60 text-sm sm:text-base lg:text-lg leading-relaxed mb-10 font-medium max-w-xl">
               We create visual identities so compelling, your audience can&apos;t look away. Precision design for founders who refuse average.
             </p>
 
@@ -242,7 +242,7 @@ export default function GraphicsPage() {
                   style={{ width: `${CARD_W}px` }}
                 >
                   {/* Polaroid Frame */}
-                  <div className={`relative w-full bg-[#f8f9fa] p-3 pb-14 shadow-2xl transition-all duration-500 ${isActive ? 'shadow-[0_20px_50px_rgba(168,85,247,0.4)] rotate-0' : 'rotate-1 group-hover:rotate-0'}`}>
+                  <div className={`relative w-full bg-[#f8f9fa] p-3 pb-14 shadow-2xl transition-all duration-500 ${isActive ? 'shadow-[0_20px_50px_rgba(168,85,247,0.4)] z-10' : ''}`}>
                     {/* Image Area */}
                     <div className="relative w-full aspect-square overflow-hidden bg-gray-200 border border-gray-200">
                       <Image 
