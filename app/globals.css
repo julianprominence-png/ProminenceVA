@@ -407,47 +407,252 @@ body, #__next {
   pointer-events: none;
 }
 /* -------------------------------------------------------------------------- */
-/* WORKS PORTFOLIO INFINITE SCROLL ANIMATIONS                               */
+/* WORKS CAROUSEL — INFINITE HORIZONTAL + CARTRIDGE HOVER                     */
 /* -------------------------------------------------------------------------- */
 
-.works-scroll-col {
+.carousel-container {
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+  padding: 40px 0 80px;
+  mask-image: linear-gradient(to right, transparent 0%, black 6%, black 94%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, black 6%, black 94%, transparent 100%);
+}
+
+.carousel-track {
+  display: flex;
+  gap: 20px;
+  width: max-content;
+  animation: carousel-scroll 50s linear infinite;
+  align-items: flex-end;
+  padding-top: 70px;
+}
+
+.carousel-card {
+  flex-shrink: 0;
+  width: 280px;
+  height: 380px;
+  border-radius: 14px;
+  overflow: hidden;
+  cursor: pointer;
+  position: relative;
+  background: rgba(15, 10, 35, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  transition:
+    transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.5s ease,
+    border-color 0.4s ease;
   will-change: transform;
 }
 
-.works-scroll-up {
-  animation: scrollUp 40s linear infinite;
+.carousel-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.7s ease, filter 0.5s ease;
+  user-select: none;
+  pointer-events: none;
 }
 
-.works-scroll-down {
-  animation: scrollDown 35s linear infinite;
+.carousel-card:hover {
+  transform: translateY(-55px) scale(1.05);
+  box-shadow:
+    0 35px 80px rgba(147, 51, 234, 0.28),
+    0 15px 35px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(147, 51, 234, 0.25),
+    0 0 60px -10px rgba(147, 51, 234, 0.18);
+  border-color: rgba(147, 51, 234, 0.35);
+  z-index: 10;
 }
 
-.works-scroll-up-slow {
-  animation: scrollUp 50s linear infinite;
+.carousel-card:hover img {
+  transform: scale(1.12);
+  filter: brightness(1.08);
 }
 
-.works-scroll-col:hover {
-  animation-play-state: paused;
+/* Overlay — slides up on hover */
+.carousel-card-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.88) 0%,
+    rgba(0, 0, 0, 0.4) 35%,
+    transparent 60%
+  );
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 24px;
+  pointer-events: none;
 }
 
-@keyframes scrollUp {
+.carousel-card:hover .carousel-card-overlay {
+  opacity: 1;
+}
+
+.carousel-card-label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  transform: translateY(14px);
+  transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.carousel-card:hover .carousel-card-label {
+  transform: translateY(0);
+}
+
+.carousel-card-index {
+  font-size: 28px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  color: rgba(255, 255, 255, 0.9);
+  font-family: 'Astron', 'Orbitron', sans-serif;
+  text-shadow: 0 0 20px rgba(147, 51, 234, 0.5);
+}
+
+.carousel-card-action {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: rgba(168, 85, 247, 0.8);
+}
+
+/* Glow underneath lifted card */
+.carousel-card::after {
+  content: '';
+  position: absolute;
+  bottom: -25px;
+  left: 15%;
+  width: 70%;
+  height: 25px;
+  background: radial-gradient(ellipse, rgba(147, 51, 234, 0.4) 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  pointer-events: none;
+  filter: blur(8px);
+}
+
+.carousel-card:hover::after {
+  opacity: 1;
+}
+
+@keyframes carousel-scroll {
   0% {
-    transform: translateY(0);
+    transform: translateX(0);
   }
   100% {
-    transform: translateY(calc(-50% - 0.5rem));
+    transform: translateX(-50%);
   }
 }
 
-@keyframes scrollDown {
-  0% {
-    transform: translateY(calc(-50% - 0.5rem));
+@media (max-width: 768px) {
+  .carousel-card {
+    width: 220px;
+    height: 300px;
   }
-  100% {
-    transform: translateY(0);
+  .carousel-card:hover {
+    transform: translateY(-35px) scale(1.03);
   }
 }
 
-.works-card {
-  border: 1px solid rgba(255, 255, 255, 0.05);
+/* -------------------------------------------------------------------------- */
+/* PREVIEW MODAL                                                               */
+/* -------------------------------------------------------------------------- */
+
+.preview-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  background: rgba(0, 0, 0, 0.88);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  animation: preview-fade-in 0.35s ease;
+  cursor: pointer;
+}
+
+.preview-content {
+  position: relative;
+  max-width: 900px;
+  width: 100%;
+  max-height: 80vh;
+  border-radius: 20px;
+  overflow: hidden;
+  animation: preview-scale-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  border: 1px solid rgba(147, 51, 234, 0.2);
+  box-shadow:
+    0 40px 120px rgba(0, 0, 0, 0.6),
+    0 0 80px rgba(147, 51, 234, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  cursor: default;
+}
+
+.preview-content img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.preview-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: white;
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.35s ease;
+  z-index: 10;
+  line-height: 1;
+}
+
+.preview-close:hover {
+  background: rgba(147, 51, 234, 0.45);
+  transform: scale(1.12) rotate(90deg);
+  border-color: rgba(147, 51, 234, 0.4);
+}
+
+@keyframes preview-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes preview-scale-in {
+  from {
+    transform: scale(0.85) translateY(25px);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+}
+
+@media (max-width: 640px) {
+  .preview-content {
+    max-width: 95vw;
+    max-height: 70vh;
+    border-radius: 14px;
+  }
+  .preview-overlay {
+    padding: 20px;
+  }
 }

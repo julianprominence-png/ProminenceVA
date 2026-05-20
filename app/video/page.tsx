@@ -131,7 +131,7 @@ export default function VideoPage() {
       {/* Global Wrapper with Vertical Radiant Gradient */}
       <div
         className="relative min-h-screen text-white overflow-x-hidden selection:bg-purple-500/20"
-        style={{ background: "linear-gradient(180deg, #ffffff 0%, #000000ff 15%, #000000ff 50%, #2e1065 75%, #0a0814 100%)" }}
+        style={{ background: "linear-gradient(180deg, #ffffff 0%, #000000ff 15%, #000000ff 50%, #000000 75%, #0a0814 100%)" }}
       >
         {/* Starfield */}
         <div className="starfield fixed inset-0 z-0 opacity-40 mix-blend-screen" />
