@@ -7,7 +7,7 @@ import gsap from 'gsap';
 import './Navbar.css';
 
 const services = [
-  { label: 'Web Development', href: '#contact', icon: '⟨/⟩' },
+  { label: 'Web Development', href: '/web', icon: '⟨/⟩' },
   { label: 'Graphics Design', href: '/graphics', icon: '◆' },
   { label: 'Video Editing', href: '/video', icon: '▶' },
 ];
