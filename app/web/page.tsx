@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
-import { ExternalLink, Monitor, Code2, Zap } from "lucide-react";
+import { useState, useRef } from "react";
+import { motion } from "framer-motion";
+import { ExternalLink, Code2, Monitor, Smartphone, Tablet } from "lucide-react";
 import Aurora from "../components/Aurora/Aurora";
 import Link from "next/link";
 
@@ -61,14 +61,19 @@ const webProjects = [
 ];
 
 export default function WebPortfolioPage() {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start start", "end end"],
-  });
+  const [activeProject, setActiveProject] = useState(webProjects[0]);
+  const [device, setDevice] = useState<"desktop" | "tablet" | "mobile">("desktop");
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Device width mapping for the iframe container
+  const deviceWidths = {
+    desktop: "100%",
+    tablet: "768px",
+    mobile: "375px",
+  };
 
   return (
-    <div ref={containerRef} className="relative min-h-screen text-white bg-black selection:bg-blue-500/30 overflow-hidden font-sans">
+    <div className="relative min-h-screen text-white bg-black selection:bg-blue-500/30 overflow-hidden font-sans flex flex-col pt-24 pb-0 md:pb-12">
       
       {/* ── BACKGROUND EFFECTS ── */}
       <div className="fixed inset-0 z-0 opacity-40 mix-blend-screen pointer-events-none starfield" />
@@ -81,121 +86,206 @@ export default function WebPortfolioPage() {
         />
       </div>
 
-      {/* ── HEADER ── */}
-      <header className="relative z-20 pt-32 pb-16 px-6 sm:px-12 max-w-7xl mx-auto flex flex-col items-center text-center">
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
-          className="inline-flex items-center gap-3 px-4 py-2 rounded-full border border-blue-500/30 bg-blue-500/10 backdrop-blur-md mb-8"
-        >
-          <Code2 className="w-4 h-4 text-blue-400" />
-          <span className="text-[10px] tracking-[0.3em] uppercase font-bold text-blue-200">
-            Web Development
-          </span>
-        </motion.div>
-
-        <motion.h1
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
-          className="text-4xl md:text-6xl lg:text-7xl font-black uppercase tracking-tight text-white drop-shadow-2xl mb-6"
-          style={{ fontFamily: "'Orbitron', sans-serif" }}
-        >
-          Digital <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-300">Experiences</span>
-        </motion.h1>
-
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 1, delay: 0.4 }}
-          className="max-w-2xl text-white/60 text-sm md:text-base leading-relaxed"
-        >
-          We architect award-winning web platforms that blend fluid aesthetics with elite performance. 
-          Explore our latest interactive projects crafted for founders who refuse average.
-        </motion.p>
-      </header>
-
-      {/* ── PROJECTS GRID ── */}
-      <section className="relative z-10 px-6 sm:px-12 pb-32 max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
-          {webProjects.map((project, idx) => (
-            <motion.a
-              key={project.num}
-              href={project.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-100px" }}
-              transition={{ duration: 0.8, delay: (idx % 2) * 0.2, ease: "easeOut" }}
-              className="group block relative rounded-[2rem] overflow-hidden bg-white/5 border border-white/10 backdrop-blur-sm transition-all duration-500 hover:border-blue-500/50 hover:shadow-[0_0_40px_rgba(59,130,246,0.15)]"
+      <div className="relative z-10 w-full max-w-[1800px] mx-auto px-4 sm:px-6 lg:px-8 flex-1 flex flex-col lg:flex-row gap-6 lg:gap-10 h-full">
+        
+        {/* ── LEFT COLUMN: INFO & LIST ── */}
+        <div className="w-full lg:w-1/3 xl:w-1/4 flex flex-col h-auto lg:h-[calc(100vh-8rem)]">
+          {/* Header Area */}
+          <div className="mb-6 flex-shrink-0 pt-4">
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, ease: "easeOut" }}
+              className="inline-flex items-center gap-3 px-4 py-2 rounded-full border border-blue-500/30 bg-blue-500/10 backdrop-blur-md mb-6"
             >
-              {/* Image Container */}
-              <div className="relative w-full aspect-[4/3] overflow-hidden bg-black/50">
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent z-10 opacity-60 group-hover:opacity-40 transition-opacity duration-500" />
-                <motion.img 
-                  src={project.img} 
-                  alt={project.title}
-                  className="w-full h-full object-cover transform scale-105 group-hover:scale-110 transition-transform duration-700 ease-out"
-                />
-                
-                {/* Floating Tags */}
-                <div className="absolute top-6 left-6 z-20 flex gap-2">
-                  <span className="px-3 py-1 text-[9px] font-bold tracking-widest uppercase bg-black/60 backdrop-blur-md text-white/80 rounded-full border border-white/10">
-                    {project.num}
-                  </span>
-                  <span className="px-3 py-1 text-[9px] font-bold tracking-widest uppercase bg-blue-500/20 backdrop-blur-md text-blue-200 rounded-full border border-blue-500/30">
-                    {project.sub}
-                  </span>
-                </div>
+              <Code2 className="w-4 h-4 text-blue-400" />
+              <span className="text-[10px] tracking-[0.3em] uppercase font-bold text-blue-200">
+                Web Development
+              </span>
+            </motion.div>
 
-                {/* View Project Button */}
-                <div className="absolute top-6 right-6 z-20 w-10 h-10 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center opacity-0 -translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500">
-                  <ExternalLink className="w-4 h-4 text-white" />
-                </div>
-              </div>
+            <motion.h1
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.1, ease: "easeOut" }}
+              className="text-4xl xl:text-5xl font-black uppercase tracking-tight text-white drop-shadow-2xl mb-4"
+              style={{ fontFamily: "'Orbitron', sans-serif" }}
+            >
+              Web <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-300">Works</span>
+            </motion.h1>
 
-              {/* Content */}
-              <div className="p-8 relative z-20 bg-gradient-to-b from-transparent to-black/40">
-                <h3 className="text-2xl font-black text-white uppercase tracking-wider mb-3 group-hover:text-blue-400 transition-colors duration-300">
-                  {project.title}
-                </h3>
-                <p className="text-sm text-white/50 leading-relaxed mb-6">
-                  {project.description}
-                </p>
-                <div className="flex items-center text-[10px] uppercase tracking-[0.2em] font-bold text-blue-400 gap-2 group-hover:gap-4 transition-all duration-300">
-                  <span>Visit Website</span>
-                  <div className="w-8 h-[1px] bg-blue-500/50 group-hover:w-12 transition-all duration-300" />
-                </div>
-              </div>
-            </motion.a>
-          ))}
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              className="text-white/60 text-sm leading-relaxed"
+            >
+              Select a project to experience the live preview. We build interactive platforms that merge high-end aesthetics with elite performance.
+            </motion.p>
+          </div>
+
+          {/* Project List */}
+          <div className="flex-1 flex flex-col gap-3 overflow-y-auto custom-scrollbar pr-2 pb-6 lg:pb-0">
+            {webProjects.map((project, idx) => {
+              const isActive = activeProject.num === project.num;
+              return (
+                <motion.button
+                  key={project.num}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.4, delay: 0.05 * idx }}
+                  onClick={() => {
+                    if (!isActive) setIsLoading(true);
+                    setActiveProject(project);
+                  }}
+                  className={`group relative p-5 rounded-2xl text-left transition-all duration-500 border ${
+                    isActive 
+                      ? "bg-blue-500/10 border-blue-500/50 shadow-[0_0_30px_rgba(59,130,246,0.15)]" 
+                      : "bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20"
+                  }`}
+                >
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-[10px] font-bold tracking-widest uppercase text-blue-400">
+                      {project.num} // {project.sub}
+                    </span>
+                    {isActive && (
+                      <motion.div 
+                        layoutId="active-dot"
+                        className="w-2 h-2 rounded-full bg-blue-400 shadow-[0_0_10px_rgba(96,165,250,0.8)]"
+                      />
+                    )}
+                  </div>
+                  <h3 className={`text-xl font-black uppercase tracking-wider mb-2 transition-colors duration-300 ${isActive ? "text-white" : "text-white/80 group-hover:text-blue-300"}`}>
+                    {project.title}
+                  </h3>
+                  <p className="text-xs text-white/50 leading-relaxed line-clamp-2">
+                    {project.description}
+                  </p>
+                </motion.button>
+              );
+            })}
+          </div>
         </div>
-      </section>
 
-      {/* ── CTA SECTION ── */}
-      <section className="relative z-10 py-32 px-6 bg-black/40 border-t border-white/5">
-        <div className="max-w-4xl mx-auto text-center">
-          <Zap className="w-8 h-8 text-blue-400 mx-auto mb-6" />
-          <h2 className="text-3xl md:text-5xl font-black uppercase tracking-tight text-white mb-6">
-            Ready to build your <span className="text-blue-400">digital presence?</span>
-          </h2>
-          <p className="text-white/60 mb-10 max-w-xl mx-auto">
-            Let's create a platform that doesn't just look incredible, but performs flawlessly. Contact us to start your next web project.
-          </p>
-          <Link 
-            href="/#contact"
-            className="inline-flex items-center gap-4 px-8 py-4 rounded-full bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs tracking-[0.2em] uppercase transition-all duration-300 shadow-[0_0_20px_rgba(37,99,235,0.4)] hover:shadow-[0_0_30px_rgba(37,99,235,0.6)] hover:-translate-y-1"
+        {/* ── RIGHT COLUMN: INTERACTIVE PREVIEW ── */}
+        <div className="w-full lg:w-2/3 xl:w-3/4 flex flex-col h-[600px] lg:h-[calc(100vh-8rem)] min-h-[500px]">
+          
+          {/* Browser Toolbar */}
+          <motion.div 
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="flex items-center justify-between p-3 sm:p-4 bg-black/60 backdrop-blur-xl border border-white/10 rounded-t-2xl z-20"
           >
-            Start a Project
-          </Link>
+            {/* Window Controls */}
+            <div className="flex items-center gap-2 pr-4 border-r border-white/10">
+              <div className="w-3 h-3 rounded-full bg-red-500/80" />
+              <div className="w-3 h-3 rounded-full bg-yellow-500/80" />
+              <div className="w-3 h-3 rounded-full bg-green-500/80" />
+            </div>
+
+            {/* URL Display */}
+            <div className="hidden sm:flex flex-1 items-center justify-center mx-4">
+              <div className="w-full max-w-lg px-4 py-2 bg-white/5 rounded-full border border-white/5 flex items-center justify-center gap-2">
+                <span className="text-[10px] font-mono text-blue-400/80 uppercase">https://</span>
+                <span className="text-xs text-white/70 truncate font-mono tracking-wide">
+                  {activeProject.url.replace("https://", "")}
+                </span>
+              </div>
+            </div>
+
+            {/* Controls Right */}
+            <div className="flex items-center gap-3 pl-4 border-l border-transparent sm:border-white/10">
+              {/* Device Toggles */}
+              <div className="hidden sm:flex items-center gap-1 bg-white/5 p-1 rounded-xl border border-white/10">
+                {(["desktop", "tablet", "mobile"] as const).map((type) => (
+                  <button
+                    key={type}
+                    onClick={() => setDevice(type)}
+                    className={`p-2 rounded-lg transition-all duration-300 ${
+                      device === type 
+                        ? "bg-white/10 text-blue-400 shadow-sm" 
+                        : "text-white/40 hover:text-white hover:bg-white/5"
+                    }`}
+                    title={`View in ${type} mode`}
+                  >
+                    {type === "desktop" && <Monitor className="w-4 h-4" />}
+                    {type === "tablet" && <Tablet className="w-4 h-4" />}
+                    {type === "mobile" && <Smartphone className="w-4 h-4" />}
+                  </button>
+                ))}
+              </div>
+
+              {/* Visit Link */}
+              <a
+                href={activeProject.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 p-2 sm:px-4 sm:py-2 rounded-xl bg-blue-600/20 text-blue-400 hover:bg-blue-600 hover:text-white transition-all duration-300 border border-blue-500/30"
+                title="Open live site in new tab"
+              >
+                <span className="hidden xl:inline text-[10px] font-bold uppercase tracking-wider">Live Site</span>
+                <ExternalLink className="w-4 h-4" />
+              </a>
+            </div>
+          </motion.div>
+
+          {/* Iframe Viewport */}
+          <div className="flex-1 bg-black/80 backdrop-blur-sm border-x border-b border-white/10 rounded-b-2xl overflow-hidden relative flex justify-center items-start lg:items-center p-0 sm:p-4 lg:p-8 transition-all duration-500">
+            {/* Ambient Glow */}
+            <div className="absolute inset-0 bg-gradient-to-b from-blue-500/5 to-transparent pointer-events-none" />
+            
+            {/* Loading Overlay */}
+            {isLoading && (
+              <div className="absolute inset-0 z-30 flex flex-col items-center justify-center bg-black/60 backdrop-blur-md">
+                <div className="relative w-12 h-12 flex items-center justify-center">
+                  <div className="absolute inset-0 rounded-full border-2 border-blue-500/20 border-t-blue-500 animate-spin" />
+                  <div className="w-4 h-4 bg-blue-500 rounded-full animate-pulse" />
+                </div>
+                <span className="mt-4 text-[10px] uppercase tracking-[0.2em] font-bold text-blue-400 animate-pulse">
+                  Loading Live Preview
+                </span>
+              </div>
+            )}
+
+            {/* Animated Device Container */}
+            <motion.div 
+              layout
+              className={`relative h-full w-full transition-all duration-700 ease-[0.16,1,0.3,1] bg-white sm:rounded-xl shadow-2xl overflow-hidden ${
+                device === "mobile" ? "sm:max-h-[800px]" : ""
+              }`}
+              style={{ maxWidth: deviceWidths[device] }}
+            >
+              <iframe
+                key={activeProject.url} // Forces remount to trigger onLoad properly
+                src={activeProject.url}
+                className="w-full h-full border-none bg-white"
+                onLoad={() => setIsLoading(false)}
+                title={`Live Preview of ${activeProject.title}`}
+              />
+            </motion.div>
+          </div>
         </div>
-      </section>
-      
+      </div>
+
       {/* Global Styles */}
       <style jsx global>{`
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&display=swap');
+        
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: rgba(255, 255, 255, 0.02);
+          border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: rgba(59, 130, 246, 0.3);
+          border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: rgba(59, 130, 246, 0.5);
+        }
       `}</style>
     </div>
   );
