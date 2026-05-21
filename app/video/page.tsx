@@ -149,10 +149,14 @@ export default function VideoPage() {
             src={heroCards[featuredIndex].img}
             alt={heroCards[featuredIndex].title}
             className="absolute inset-0 w-full h-full object-cover transition-all duration-[1.2s] ease-out scale-105"
+            style={{ 
+              WebkitMaskImage: 'linear-gradient(to bottom, black 0%, black 60%, transparent 100%)',
+              maskImage: 'linear-gradient(to bottom, black 0%, black 60%, transparent 100%)'
+            }}
           />
 
           {/* Cinematic overlays */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-black/20" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-black/20" />
           <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-transparent to-black/40" />
           <div className="absolute inset-0 bg-gradient-to-b from-purple-900/10 to-transparent opacity-50" />
 
@@ -379,7 +383,7 @@ export default function VideoPage() {
                     <img src="/images/icon-logo.png" alt="Prominence" className="w-full h-full object-cover" onError={(e) => (e.currentTarget.style.display = "none")} />
                   </div>
                   <div>
-                    <h4 className="font-black tracking-[0.25em] uppercase text-white/90 text-sm">Prominence</h4>
+                    <h4 className="tracking-[0.25em] uppercase text-white/90 text-sm science-gothic-brand">Prominence</h4>
                     <p className="text-[9px] tracking-[0.3em] uppercase text-purple-400/60 font-semibold mt-0.5">Virtual Assistance</p>
                   </div>
                 </div>

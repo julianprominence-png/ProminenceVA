@@ -107,7 +107,7 @@ export default function Navbar() {
               />
               <div className="navbar-logo-pulse" />
             </div>
-            <span className="navbar-brand-text">Prominence</span>
+            <span className="navbar-brand-text science-gothic-brand">Prominence</span>
           </Link>
 
           {/* Desktop Nav */}

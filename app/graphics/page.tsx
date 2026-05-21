@@ -156,7 +156,7 @@ export default function GraphicsPage() {
               <span className="text-[11px] tracking-[0.3em] uppercase text-purple-200 font-bold">Creative Studio</span>
             </div>
 
-            <h1 className="hero-elem text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight leading-[1] mb-6 drop-shadow-2xl">
+            <h1 className="hero-elem text-[clamp(1.8rem,4vw,3.2rem)] tracking-tight leading-[1] mb-6 drop-shadow-2xl science-gothic-brand">
               <span className="text-white">PROMINENCE</span>
               <br />
               <span className="bg-gradient-to-br from-purple-400 to-purple-100 bg-clip-text text-transparent">
@@ -412,7 +412,7 @@ export default function GraphicsPage() {
                   <img src="/images/icon-logo.png" alt="Prominence" className="w-full h-full object-cover" onError={(e) => ((e.target as HTMLImageElement).style.display = "none")} />
                 </div>
                 <div>
-                  <h4 className="font-black tracking-[0.25em] uppercase text-white/90 text-sm">Prominence</h4>
+                  <h4 className="tracking-[0.25em] uppercase text-white/90 text-sm science-gothic-brand">Prominence</h4>
                   <p className="text-[9px] tracking-[0.3em] uppercase text-purple-400/60 font-semibold mt-0.5">Virtual Assistance</p>
                 </div>
               </div>

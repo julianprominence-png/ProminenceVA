@@ -179,7 +179,7 @@ const TriangleLoader = ({ onComplete }: { onComplete: () => void }) => {
           <polygon ref={tri1Ref} points="0,-38 34,22 -34,22" fill="#7c3aed" stroke="#a855f7" strokeWidth="1.5" strokeLinejoin="round" style={{ filter: "drop-shadow(0 0 12px rgba(168,85,247,0.75))" }} />
           <polygon ref={tri2Ref} points="0,-38 34,22 -34,22" fill="#ffffff" stroke="rgba(255,255,255,0.55)" strokeWidth="1" strokeLinejoin="round" style={{ filter: "drop-shadow(0 0 8px rgba(255,255,255,0.55))" }} transform="translate(38,0) rotate(180)" />
         </svg>
-        <p className="font-black tracking-[0.45em] text-transparent uppercase select-none" style={{ fontSize: "clamp(1.1rem,4vw,1.55rem)", WebkitTextStroke: "1px rgba(255,255,255,0.18)", textShadow: "0 0 40px rgba(168,85,247,0.45)" }}>
+        <p className="tracking-[0.45em] text-transparent uppercase select-none science-gothic-brand" style={{ fontSize: "clamp(1.1rem,4vw,1.55rem)", WebkitTextStroke: "1px rgba(255,255,255,0.18)", textShadow: "0 0 40px rgba(168,85,247,0.45)" }}>
           PROMINENCE
         </p>
       </div>
@@ -640,7 +640,7 @@ export default function MountainLanding() {
         {/* FIXED MOUNTAIN BG */}
         <div className="fixed inset-0 z-0 pointer-events-none bg-[#020104]">
           <div ref={mountainBgRef} className="absolute inset-0 will-change-transform" style={{ backgroundImage: "url('/images/mountain.jpg')", backgroundSize: "cover", backgroundPosition: "center center", backgroundRepeat: "no-repeat", transform: "scale(1.4)" }} />
-          <div className="absolute inset-0 pointer-events-none opacity-60" style={{ background: "linear-gradient(to bottom, rgba(2,1,4,0.3) 0%, transparent 20%, transparent 80%, #e6eaf0 100%)" }} />
+          <div className="absolute inset-0 pointer-events-none opacity-60" style={{ background: "linear-gradient(to bottom, rgba(2,1,4,0.3) 0%, transparent 20%, transparent 70%, rgba(230,234,240,0.3) 82%, rgba(230,234,240,0.6) 90%, #e6eaf0 100%)" }} />
         </div>
 
         {/* HERO ON MOUNTAIN */}
@@ -653,7 +653,7 @@ export default function MountainLanding() {
             <div className="hero-fade-in hero-parallax mb-6" data-speed="0.8">
               <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-white/[0.02] backdrop-blur-xl border border-white/[0.08] border-t-white/[0.15] border-l-white/[0.12] transition-all duration-300 hover:border-purple-500/35">
                 <span className="w-1.5 h-1.5 rounded-full bg-purple-500 animate-pulse" style={{ boxShadow: '0 0 8px rgba(168,85,247,0.8)' }} />
-                <span className="text-white/80 text-[11px] tracking-[0.25em] uppercase font-bold">
+                <span className="text-white/80 text-[11px] tracking-[0.25em] uppercase science-gothic-brand">
                   Isaiah 60 &mdash; 61
                 </span>
               </div>
@@ -661,11 +661,10 @@ export default function MountainLanding() {
 
             {/* Headline */}
             <h1
-              className="hero-parallax mb-8 flex justify-center gap-[2px]"
+              className="hero-parallax mb-8 flex justify-center gap-[2px] science-gothic-brand"
               data-speed="0.6"
               style={{
-                fontFamily: "'Astron', sans-serif",
-                fontSize: "clamp(3.5rem, 12vw, 10rem)",
+                fontSize: "clamp(2.5rem, 10vw, 8.75rem)",
                 letterSpacing: "0.04em",
                 lineHeight: 0.9,
                 color: "rgba(255,255,255,0.95)",
@@ -712,7 +711,7 @@ export default function MountainLanding() {
                 { num: '03', label: 'Video Editing', desc: 'Cinematic post-production, motion graphics, and narrative-driven edits that transform raw footage into compelling visual stories.' },
               ].map((svc, i) => (
                 <div key={i} className="flex items-start gap-4 px-6 py-4" style={{ borderLeft: i > 0 ? '1px solid rgba(255, 255, 255, 1)' : 'none' }}>
-                  <span style={{ fontFamily: "'Astron', sans-serif", fontSize: 'clamp(1.5rem, 3vw, 2.2rem)', lineHeight: 1, color: 'rgba(255, 255, 255, 1)', fontWeight: 400 }}>
+                  <span style={{ fontFamily: "'Astrona', 'Astron', sans-serif", fontSize: 'clamp(1.5rem, 3vw, 2.2rem)', lineHeight: 1, color: 'rgba(255, 255, 255, 1)', fontWeight: 400 }}>
                     {svc.num}
                   </span>
                   <div className="flex flex-col gap-1.5">
@@ -728,7 +727,7 @@ export default function MountainLanding() {
 
         </div>
         <div ref={cloudTriggerRef} className="relative z-20 w-full h-[40vh] translate-y-[20px] pointer-events-none flex items-center justify-center">
-          <div ref={threeCanvasRef} className="absolute inset-0 w-full h-[150vh] -top-[50vh]" style={{ pointerEvents: "none", maskImage: "linear-gradient(to bottom, transparent 0%, black 15%, black 60%, transparent 85%)", WebkitMaskImage: "linear-gradient(to bottom, transparent 0%, black 15%, black 60%, transparent 85%)" }} />
+          <div ref={threeCanvasRef} className="absolute inset-0 w-full h-[150vh] -top-[50vh]" style={{ pointerEvents: "none", maskImage: "linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.05) 5%, rgba(0,0,0,0.2) 10%, rgba(0,0,0,0.5) 18%, black 28%, black 55%, rgba(0,0,0,0.5) 70%, rgba(0,0,0,0.2) 80%, rgba(0,0,0,0.05) 90%, transparent 100%)", WebkitMaskImage: "linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.05) 5%, rgba(0,0,0,0.2) 10%, rgba(0,0,0,0.5) 18%, black 28%, black 55%, rgba(0,0,0,0.5) 70%, rgba(0,0,0,0.2) 80%, rgba(0,0,0,0.05) 90%, transparent 100%)" }} />
         </div>
 
         {/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */}
@@ -744,11 +743,7 @@ export default function MountainLanding() {
           {/* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */}
           {/* ── WORKS — INFINITE SCROLLING SHOWCASE ── */}
           <div className="relative -mx-6 sm:-mx-12">
-            {/* Outer fade — background color bleeds over the works edges */}
-            <div className="absolute top-0 left-0 right-0 z-20 pointer-events-none" style={{ height: '200px', background: 'linear-gradient(to bottom, rgba(22,19,48,1) 0%, rgba(22,19,48,0.85) 30%, rgba(22,19,48,0.4) 60%, transparent 100%)' }} />
-            <div className="absolute bottom-0 left-0 right-0 z-20 pointer-events-none" style={{ height: '200px', background: 'linear-gradient(to top, rgba(16,14,36,1) 0%, rgba(16,14,36,0.85) 30%, rgba(16,14,36,0.4) 60%, transparent 100%)' }} />
-
-            <section id="works" className="w-full overflow-hidden" ref={worksRef} style={{ padding: 0, margin: 0 }}>
+            <section id="works" className="w-full overflow-hidden" ref={worksRef} style={{ padding: 0, margin: 0, maskImage: 'linear-gradient(to bottom, transparent 0%, black 18%, black 82%, transparent 100%)', WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 18%, black 82%, transparent 100%)' }}>
               <div className="relative w-full" style={{ height: 'clamp(600px, 85vh, 1000px)' }}>
                 <div className="flex gap-1 h-full items-start" style={{ padding: 0 }}>
                   {/* Column 1 — scrolls up */}
@@ -1044,7 +1039,7 @@ export default function MountainLanding() {
                     />
                   </div>
                   <div>
-                    <h4 className="font-black tracking-[0.25em] uppercase text-white/90 text-sm">Prominence</h4>
+                    <h4 className="tracking-[0.25em] uppercase text-white/90 text-sm science-gothic-brand">Prominence</h4>
                     <p className="text-[9px] tracking-[0.3em] uppercase text-purple-400/60 font-semibold mt-0.5">Virtual Assistance</p>
                   </div>
                 </div>

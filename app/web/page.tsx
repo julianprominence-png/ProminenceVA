@@ -455,7 +455,7 @@ export default function WebPortfolioPage() {
                   <img src="/images/icon-logo.png" alt="Prominence" className="w-full h-full object-cover" onError={(e) => (e.currentTarget.style.display = "none")} />
                 </div>
                 <div>
-                  <h4 className="font-black tracking-[0.25em] uppercase text-white/90 text-sm">Prominence</h4>
+                  <h4 className="tracking-[0.25em] uppercase text-white/90 text-sm science-gothic-brand">Prominence</h4>
                   <p className="text-[9px] tracking-[0.3em] uppercase text-purple-400/60 font-semibold mt-0.5">Virtual Assistance</p>
                 </div>
               </div>

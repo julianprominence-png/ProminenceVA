@@ -206,7 +206,7 @@ export default function AboutPage() {
         <p className="about-animate about-overline">Who We Are</p>
 
         {/* Large title */}
-        <h1 className="about-animate about-title">Prominence</h1>
+        <h1 className="about-animate about-title">PROMINENCE</h1>
 
         {/* Detail pills row */}
         <div className="about-animate" style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', marginBottom: '3rem', flexWrap: 'wrap', justifyContent: 'center' }}>

@@ -42,6 +42,9 @@ export default function RootLayout({
     >
       <head>
         <link href="https://fonts.cdnfonts.com/css/astron" rel="stylesheet" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&family=Science+Gothic:wdth,wght@200,100&display=swap" rel="stylesheet" />
       </head>
       <body className="min-h-full flex flex-col">
         <Navbar />

@@ -49,7 +49,7 @@ export default function AdminLogin() {
               <div className="absolute w-3 h-3 rounded-full bg-fuchsia-500/60 animate-ping" />
               <div className="relative w-2 h-2 rounded-full bg-fuchsia-200" />
             </div>
-            <span className="text-[10px] font-bold tracking-[0.3em] uppercase text-white/80">
+            <span className="text-[10px] tracking-[0.3em] uppercase text-white/80 science-gothic-brand">
               Prominence
             </span>
           </div>

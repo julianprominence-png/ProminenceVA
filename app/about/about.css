@@ -37,8 +37,15 @@
 }
 
 .about-title {
-  font-family: 'Astron', sans-serif;
-  font-size: clamp(4.5rem, 14vw, 10rem);
+  font-family: "Science Gothic", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 100;
+  font-style: normal;
+  font-variation-settings:
+    "slnt" 0,
+    "wdth" 200,
+    "CTRS" 0;
+  font-size: clamp(3.5rem, 11vw, 7.5rem);
   letter-spacing: 0.05em;
   line-height: 0.9;
   color: rgba(255, 255, 255, 0.92);
