@@ -138,8 +138,8 @@
 
 .char-portrait-wrapper {
   position: relative;
-  width: 280px;
-  height: 360px;
+  width: 240px;
+  height: 310px;
   flex-shrink: 0;
   border-radius: 2rem;
   overflow: hidden;
@@ -243,8 +243,9 @@
 .char-roster {
   display: flex;
   gap: 0.75rem;
-  justify-content: center;
-  flex-wrap: wrap;
+  justify-content: flex-start;
+  flex-wrap: nowrap;
+  overflow-x: auto;
   padding: 1.5rem;
   border-radius: 2rem;
   background: rgba(15, 10, 35, 0.4);
@@ -267,6 +268,11 @@
 }
 
 @media (min-width: 768px) {
+  .char-roster {
+    justify-content: center;
+    flex-wrap: wrap;
+    overflow-x: visible;
+  }
   .char-slot {
     width: 72px;
     height: 72px;

@@ -161,47 +161,47 @@ export default function VideoPage() {
           <div className="absolute inset-0 bg-gradient-to-b from-purple-900/10 to-transparent opacity-50" />
 
           {/* ── Bottom-left: Title + CTA content ── */}
-          <div className="absolute bottom-0 left-0 right-0 lg:right-[380px] p-8 sm:p-12 lg:p-16 z-10">
+          <div className="absolute bottom-[140px] lg:bottom-0 left-0 right-0 lg:right-[380px] p-8 sm:p-12 lg:p-16 z-10">
             <span
               className="block text-white/[0.07] font-black leading-none mb-4"
-              style={{ fontSize: "clamp(5rem, 12vw, 10rem)", fontFamily: "Inter, sans-serif" }}
+              style={{ fontSize: "clamp(4rem, 12vw, 10rem)", fontFamily: "Inter, sans-serif" }}
             >
               {heroCards[featuredIndex].num}
             </span>
             <h1
               className="font-black leading-[1.05] text-white mb-4 max-w-2xl drop-shadow-lg"
-              style={{ fontSize: "clamp(2rem, 5vw, 4rem)" }}
+              style={{ fontSize: "clamp(1.8rem, 5vw, 4rem)" }}
             >
               {heroCards[featuredIndex].title.split('\n').map((line, i) => (
                 <span key={i}>{line}{i === 0 && <br />}</span>
               ))}
             </h1>
-            <p className="text-white/60 text-sm font-medium tracking-wide mb-8">{heroCards[featuredIndex].date}</p>
+            <p className="text-white/60 text-sm font-medium tracking-wide mb-6 lg:mb-8">{heroCards[featuredIndex].date}</p>
             <button className="inline-flex items-center gap-3 text-white/90 hover:text-white transition-colors group/btn">
-              <span className="w-14 h-14 rounded-full border border-white/30 flex items-center justify-center group-hover/btn:border-purple-400 group-hover/btn:bg-purple-500/20 transition-all shadow-lg bg-black/30 backdrop-blur-sm">
-                <Play className="w-6 h-6 ml-0.5" fill="currentColor" />
+              <span className="w-12 h-12 lg:w-14 lg:h-14 rounded-full border border-white/30 flex items-center justify-center group-hover/btn:border-purple-400 group-hover/btn:bg-purple-500/20 transition-all shadow-lg bg-black/30 backdrop-blur-sm">
+                <Play className="w-5 h-5 lg:w-6 lg:h-6 ml-0.5" fill="currentColor" />
               </span>
-              <span className="text-sm font-bold tracking-[0.15em] uppercase drop-shadow-md">Watch Promo</span>
+              <span className="text-xs lg:text-sm font-bold tracking-[0.15em] uppercase drop-shadow-md">Watch Promo</span>
             </button>
           </div>
 
-          {/* ── RIGHT: Overlaid card column ── */}
+          {/* ── RIGHT: Overlaid card list ── */}
           <div
-            className="absolute top-0 right-0 bottom-0 w-full lg:w-[380px] z-20 flex flex-col overflow-y-auto"
+            className="absolute top-auto bottom-0 lg:top-0 lg:bottom-0 right-0 left-0 lg:left-auto w-full lg:w-[380px] h-[140px] lg:h-full z-20 flex flex-row lg:flex-col overflow-x-auto overflow-y-hidden lg:overflow-x-hidden lg:overflow-y-auto"
             style={{ scrollbarWidth: 'none', background: 'linear-gradient(to left, rgba(0,0,0,0.5), rgba(0,0,0,0.2))' }}
           >
-            {/* Spacer to push cards below navbar */}
-            <div className="flex-shrink-0 h-20" />
+            {/* Spacer to push cards below navbar on desktop */}
+            <div className="flex-shrink-0 hidden lg:block h-20" />
 
             {heroCards.map((card, index) => {
               const isActive = index === featuredIndex;
               return (
                 <div
                   key={card.num}
-                  className={`hero-card relative overflow-hidden cursor-pointer flex-shrink-0 transition-all duration-500 ${isActive ? 'pointer-events-none' : 'group'}`}
+                  className={`hero-card relative overflow-hidden cursor-pointer flex-shrink-0 transition-all duration-500 ${isActive ? 'pointer-events-none' : 'group'} h-full lg:w-full border-r lg:border-r-0 lg:border-b border-white/15`}
                   style={{
-                    height: isActive ? '160px' : '130px',
-                    borderBottom: '1px solid rgba(255,255,255,0.15)',
+                    width: typeof window !== "undefined" && window.innerWidth >= 1024 ? "100%" : isActive ? "280px" : "220px",
+                    height: typeof window !== "undefined" && window.innerWidth >= 1024 ? (isActive ? '160px' : '130px') : "100%",
                   }}
                   onClick={() => !isActive && setFeaturedIndex(index)}
                 >
@@ -213,9 +213,9 @@ export default function VideoPage() {
                   {/* Darken overlay — active card is brighter */}
                   <div className={`absolute inset-0 transition-all duration-500 ${isActive ? 'bg-black/30' : 'bg-black/50 group-hover:bg-black/30'}`} />
 
-                  {/* Active indicator — left purple accent bar */}
+                  {/* Active indicator — top accent bar on mobile, left on desktop */}
                   {isActive && (
-                    <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-purple-400 z-10" />
+                    <div className="absolute left-0 top-0 right-0 lg:right-auto lg:bottom-0 h-[3px] lg:h-auto lg:w-[3px] bg-purple-400 z-10" />
                   )}
 
                   <div className="absolute inset-0 flex items-center justify-between px-5 sm:px-6">
