@@ -646,18 +646,8 @@ export default function MountainLanding() {
         {/* HERO ON MOUNTAIN */}
         <div ref={heroSpacerRef} className="relative z-10 w-full min-h-[100vh] flex flex-col px-6">
 
-          {/* Center content: Title + CTA */}
-          <div ref={heroSectionRef} className="relative flex-1 flex flex-col items-center justify-center text-center w-full">
+          <div ref={heroSectionRef} className="relative flex-1 flex flex-col items-center justify-center text-center w-full mt-[136px]">
 
-            {/* Overline */}
-            <div className="hero-fade-in hero-parallax mb-6" data-speed="0.8">
-              <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-white/[0.02] backdrop-blur-xl border border-white/[0.08] border-t-white/[0.15] border-l-white/[0.12] transition-all duration-300 hover:border-purple-500/35">
-                <span className="w-1.5 h-1.5 rounded-full bg-purple-500 animate-pulse" style={{ boxShadow: '0 0 8px rgba(168,85,247,0.8)' }} />
-                <span className="text-white/80 text-[11px] tracking-[0.25em] uppercase science-gothic-brand">
-                  Isaiah 60 &mdash; 61
-                </span>
-              </div>
-            </div>
 
             {/* Headline */}
             <h1
@@ -685,26 +675,11 @@ export default function MountainLanding() {
                 </span>
               ))}
             </h1>
-
-            {/* CTA button */}
-            <a
-              href="#contact"
-              className="hero-fade-in hero-parallax group relative inline-flex items-center gap-3 px-10 py-4 rounded-full text-white font-bold text-xs tracking-[0.25em] uppercase transition-all duration-500 hover:scale-105"
-              data-speed="0.5"
-              style={{
-                background: "linear-gradient(135deg, #7c3aed, #9333ea, #a855f7)",
-              }}
-            >
-              <span>Discover Now</span>
-              <span className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center group-hover:bg-white/30 transition-colors">
-                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>
-              </span>
-            </a>
           </div>
 
           {/* Bottom strip: numbered services */}
           <div className="hero-fade-in relative w-full pb-10 pt-16" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.3) 50%, transparent 100%)' }}>
-            <div className="grid grid-cols-1 sm:grid-cols-3 mb-32 gap-16 w-full max-w-full mx-auto">
+            <div className="grid grid-cols-1 sm:grid-cols-3 mb-12 gap-16 w-full max-w-full mx-auto">
               {[
                 { num: '01', label: 'Web Development', desc: 'We architect scalable, high-performance web platforms that drive results and deliver seamless user experiences across every device.' },
                 { num: '02', label: 'Graphics Design', desc: 'Crafting striking brand identities, print design, and visual strategies that command attention and elevate your market presence.' },
@@ -721,6 +696,23 @@ export default function MountainLanding() {
                 </div>
               ))}
             </div>
+
+            {/* CTA button moved to bottom */}
+            <div className="flex justify-center w-full mb-12">
+              <a
+                href="#contact"
+                className="group relative inline-flex items-center gap-3 px-10 py-4 rounded-full text-white font-bold text-xs tracking-[0.25em] uppercase transition-all duration-500 hover:scale-105"
+                style={{
+                  background: "linear-gradient(135deg, #7c3aed, #9333ea, #a855f7)",
+                }}
+              >
+                <span>Discover Now</span>
+                <span className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center group-hover:bg-white/30 transition-colors">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>
+                </span>
+              </a>
+            </div>
+
             {/* Progress line */}
             <div className="mt-6 ml-6 w-24 h-[2px] bg-gradient-to-r from-white/40 to-transparent" />
           </div>
@@ -1092,6 +1084,16 @@ export default function MountainLanding() {
                     <circle cx="12" cy="10" r="3" />
                   </svg>
                   <span>Olongapo City, 2200</span>
+                </div>
+              </div>
+
+              {/* Isaiah Overline moved to footer */}
+              <div className="footer-animate flex justify-center mt-12">
+                <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-white/[0.02] backdrop-blur-xl border border-white/[0.08] border-t-white/[0.15] border-l-white/[0.12] transition-all duration-300 hover:border-purple-500/35">
+                  <span className="w-1.5 h-1.5 rounded-full bg-purple-500 animate-pulse" style={{ boxShadow: '0 0 8px rgba(168,85,247,0.8)' }} />
+                  <span className="text-white/80 text-[11px] tracking-[0.25em] uppercase science-gothic-brand">
+                    Isaiah 60 &mdash; 61
+                  </span>
                 </div>
               </div>
 
