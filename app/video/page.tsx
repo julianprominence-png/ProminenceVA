@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import * as THREE from "three";
+import Image from "next/image";
 import {
   Menu,
   X,
@@ -74,7 +75,6 @@ function WaterCanvas() {
   const animIdRef = useRef<number>(0);
   const clockRef = useRef<THREE.Clock>(new THREE.Clock());
 
-  // Detailed procedural canvas textures for luxury organic leaf body
   const createLilyPadTexture = () => {
     const canvas = document.createElement("canvas");
     canvas.width = 1024;
@@ -87,7 +87,6 @@ function WaterCanvas() {
     const r = 470;
 
     ctx.clearRect(0, 0, 1024, 1024);
-
     ctx.beginPath();
     ctx.arc(cx, cy, r, 0.16 * Math.PI, 1.84 * Math.PI, false);
     ctx.lineTo(cx, cy);
@@ -140,12 +139,11 @@ function WaterCanvas() {
     return new THREE.ShapeGeometry(shape);
   };
 
-  // Generates custom 3D mesh architecture representing a premium lotus blossom
   const createWaterLilyFlower = (scaleFactor: number) => {
     const flowerGroup = new THREE.Group();
     const petalLayers = 3;
     const petalsPerLayer = 12;
-    const basePetalColor = new THREE.Color(0xd2f5dc); // Soft organic mint/white bloom
+    const basePetalColor = new THREE.Color(0xd2f5dc);
 
     for (let layer = 0; layer < petalLayers; layer++) {
       const layerScale = 1.0 - layer * 0.18;
@@ -154,8 +152,6 @@ function WaterCanvas() {
 
       for (let p = 0; p < petalsPerLayer; p++) {
         const angle = ((p * Math.PI * 2) / petalsPerLayer) + angleOffset;
-        
-        // Build streamlined geometric petal geometry via paths
         const petalShape = new THREE.Shape();
         petalShape.moveTo(0, 0);
         petalShape.quadraticCurveTo(0.25, 0.6, 0.0, 1.4);
@@ -172,25 +168,20 @@ function WaterCanvas() {
         });
 
         const petalMesh = new THREE.Mesh(petalGeo, petalMat);
-        
-        // Position & lift individual petals up organically into a bowl configuration
         petalMesh.scale.set(scaleFactor * layerScale, scaleFactor * layerScale, scaleFactor * layerScale);
         petalMesh.rotation.z = angle - Math.PI / 2;
-        petalMesh.rotation.x = 0.35 + layer * 0.15; // Upward angle flare
-        
+        petalMesh.rotation.x = 0.35 + layer * 0.15;
         petalMesh.position.x = Math.cos(angle) * 0.12 * scaleFactor;
         petalMesh.position.z = Math.sin(angle) * 0.12 * scaleFactor;
         petalMesh.position.y = layerHeight * scaleFactor;
         petalMesh.castShadow = true;
-
         flowerGroup.add(petalMesh);
       }
     }
 
-    // Add a golden structural core/pistil structure at center point
     const coreGeo = new THREE.CylinderGeometry(0.18 * scaleFactor, 0.1 * scaleFactor, 0.2 * scaleFactor, 12);
     const coreMat = new THREE.MeshStandardMaterial({
-      color: 0x93c47d, // Vivid emerald-gold center matrix
+      color: 0x93c47d,
       roughness: 0.5,
       metalness: 0.2,
     });
@@ -211,7 +202,7 @@ function WaterCanvas() {
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
     renderer.setSize(W, H);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.setClearColor(0x010c05); // Deep luxury green background logic
+    renderer.setClearColor(0x010c05);
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -229,7 +220,6 @@ function WaterCanvas() {
     camera.lookAt(0, -1, 0);
     cameraRef.current = camera;
 
-    // Dark liquid reflective floor matrix
     const waterGeometry = new THREE.CircleGeometry(90, 64);
     const waterMaterial = new THREE.MeshStandardMaterial({
       color: 0x02160a,
@@ -244,7 +234,6 @@ function WaterCanvas() {
     waterPlane.receiveShadow = true;
     scene.add(waterPlane);
 
-    // Spatial Lighting Design Architectures
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.04);
     scene.add(ambientLight);
 
@@ -263,14 +252,19 @@ function WaterCanvas() {
     causticLight.position.set(5, 16, 8);
     scene.add(causticLight);
 
-    // SIGNIFICANTLY SCALED UP COMPOSITE STRUCTURAL POSITIONS
     const structuralPads = [
       { x: -5.0, z: -2, s: 7.5, rot: 0.5, hasFlower: true, fScale: 1.4 }, 
       { x: 8.5, z: 3, s: 6.8, rot: 2.9, hasFlower: true, fScale: 1.2 },  
       { x: -2.0, z: 8, s: 5.2, rot: 4.2, hasFlower: false, fScale: 1.0 },
       { x: -11, z: 6, s: 4.8, rot: 1.1, hasFlower: true, fScale: 0.9 },  
       { x: 12.5, z: -6, s: 8.2, rot: 3.8, hasFlower: false, fScale: 1.5 },
-      { x: 3.0, z: -10, s: 5.8, rot: 0.8, hasFlower: true, fScale: 1.1 }, 
+      { x: 3.0, z: -10, s: 5.8, rot: 0.8, hasFlower: true, fScale: 1.1 },
+      { x: -15.0, z: -8, s: 9.0, rot: 1.5, hasFlower: true, fScale: 1.6 },
+      { x: 18.0, z: 8, s: 6.0, rot: 5.2, hasFlower: true, fScale: 1.0 },
+      { x: -8.0, z: 14, s: 7.2, rot: 2.1, hasFlower: true, fScale: 1.3 },
+      { x: 6.0, z: 12, s: 5.5, rot: 3.4, hasFlower: false, fScale: 1.0 },
+      { x: -22.0, z: 2, s: 8.5, rot: 0.9, hasFlower: true, fScale: 1.4 },
+      { x: 20.0, z: -12, s: 7.8, rot: 4.5, hasFlower: true, fScale: 1.2 },
     ];
 
     const sharedPadTexture = createLilyPadTexture();
@@ -297,10 +291,8 @@ function WaterCanvas() {
       padMesh.receiveShadow = true;
       parentGroup.add(padMesh);
 
-      // Add blooming 3D Lily architecture inside the grouped cluster if active
       if (pos.hasFlower) {
         const flower = createWaterLilyFlower(pos.fScale);
-        // Slightly offset flower center point from pad cutout axis
         flower.position.set(Math.cos(pos.rot) * 0.2, 0.02, Math.sin(pos.rot) * 0.2);
         parentGroup.add(flower);
       }
@@ -316,7 +308,6 @@ function WaterCanvas() {
       entitiesRef.current.push(parentGroup);
     });
 
-    // 7-Layer Line Circular Ripple Engine
     function createOrganicRipple(x: number, z: number) {
       const layersCount = 7;
       const colors = [0xe2f7e6, 0xbfe8c7, 0x99daaa, 0x72cb8b, 0x4cbd6e, 0x309c52, 0x197036];
@@ -355,31 +346,50 @@ function WaterCanvas() {
 
     const handleClick = (e: MouseEvent) => {
       if (e.button !== 0 || !cameraRef.current) return;
-
       const raycaster = new THREE.Raycaster();
       const mouse = new THREE.Vector2(
         (e.clientX / window.innerWidth) * 2 - 1,
         -(e.clientY / window.innerHeight) * 2 + 1
       );
       raycaster.setFromCamera(mouse, cameraRef.current);
-
       const plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0.3);
       const intersectPoint = new THREE.Vector3();
       raycaster.ray.intersectPlane(plane, intersectPoint);
+      if (intersectPoint) createOrganicRipple(intersectPoint.x, intersectPoint.z);
+    };
 
-      if (intersectPoint) {
-        createOrganicRipple(intersectPoint.x, intersectPoint.z);
-      }
+    const handleTouch = (e: TouchEvent) => {
+      if (!cameraRef.current || e.touches.length === 0) return;
+      const touch = e.touches[0];
+      const raycaster = new THREE.Raycaster();
+      const mouse = new THREE.Vector2(
+        (touch.clientX / window.innerWidth) * 2 - 1,
+        -(touch.clientY / window.innerHeight) * 2 + 1
+      );
+      raycaster.setFromCamera(mouse, cameraRef.current);
+      const plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0.3);
+      const intersectPoint = new THREE.Vector3();
+      raycaster.ray.intersectPlane(plane, intersectPoint);
+      if (intersectPoint) createOrganicRipple(intersectPoint.x, intersectPoint.z);
     };
 
     window.addEventListener("mousedown", handleClick);
+    window.addEventListener("touchstart", handleTouch, { passive: true });
 
     let targetCamX = 0, targetCamY = 0;
     const handleMouseMove = (e: MouseEvent) => {
       targetCamX = (e.clientX / window.innerWidth - 0.5) * 1.8;
       targetCamY = (e.clientY / window.innerHeight - 0.5) * 0.6;
     };
+    
+    const handleTouchMove = (e: TouchEvent) => {
+      if (e.touches.length === 0) return;
+      targetCamX = (e.touches[0].clientX / window.innerWidth - 0.5) * 1.8;
+      targetCamY = (e.touches[0].clientY / window.innerHeight - 0.5) * 0.6;
+    };
+
     window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("touchmove", handleTouchMove, { passive: true });
 
     let time = 0;
     function animate() {
@@ -396,12 +406,10 @@ function WaterCanvas() {
         cameraRef.current.lookAt(0, -1, 0);
       }
 
-      // Elegant rotational floating drift matching water vectors
       entitiesRef.current.forEach((entity) => {
         const { originX, originZ, seed, tiltSeed } = entity.userData;
         entity.position.x = originX + Math.sin(time * 0.25 + seed) * 0.35;
         entity.position.z = originZ + Math.cos(time * 0.2 + seed) * 0.35;
-        
         entity.rotation.x = Math.sin(time * 0.45 + tiltSeed) * 0.02;
         entity.rotation.y = Math.cos(time * 0.35 + tiltSeed) * 0.018;
         entity.rotation.z += Math.sin(time * 0.06 + seed) * 0.0002;
@@ -410,7 +418,6 @@ function WaterCanvas() {
       for (let i = ripplesRef.current.length - 1; i >= 0; i--) {
         const ripple = ripplesRef.current[i];
         ripple.t += 0.0038 * ripple.speed;
-
         const currentScale = 0.1 + ripple.t * (ripple.maxR - 0.1);
         ripple.mesh.scale.set(currentScale, currentScale, currentScale);
 
@@ -450,8 +457,10 @@ function WaterCanvas() {
     return () => {
       cancelAnimationFrame(animIdRef.current);
       window.removeEventListener("mousedown", handleClick);
+      window.removeEventListener("touchstart", handleTouch);
       window.removeEventListener("resize", handleResize);
       window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("touchmove", handleTouchMove);
       if (rendererRef.current && mountNode) {
         rendererRef.current.dispose();
         if (mountNode.contains(rendererRef.current.domElement)) {
@@ -474,7 +483,7 @@ function SectionLabel({ children, icon }: { children: React.ReactNode; icon?: Re
       whileInView={{ opacity: 1, x: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.6 }}
-      className="text-emerald-400/50 text-[11px] font-mono uppercase tracking-[0.5em] mb-8 flex items-center gap-3"
+      className="text-emerald-400/50 text-[10px] sm:text-[11px] font-mono uppercase tracking-[0.5em] mb-6 sm:mb-8 flex items-center gap-3"
     >
       {icon && <span className="text-emerald-400/40">{icon}</span>}
       {children}
@@ -506,20 +515,20 @@ function Nav() {
   return (
     <nav
       ref={navRef}
-      className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-8 md:px-16 py-10 transition-all duration-500 border-b border-transparent"
+      className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 md:px-12 lg:px-20 py-6 md:py-8 transition-all duration-500 border-b border-transparent"
       style={{ background: "linear-gradient(to bottom, rgba(1,10,4,0.95) 0%, transparent 100%)" }}
     >
       <motion.span
         initial={{ opacity: 0, x: -30 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-        className="font-display text-xl tracking-[0.2em] text-zinc-100 uppercase flex items-center gap-3"
+        className="font-display text-lg sm:text-xl tracking-[0.2em] text-zinc-100 uppercase flex items-center gap-3"
       >
         <Film className="w-4 h-4 text-emerald-500" />
         V.EDIT
       </motion.span>
       
-      <div className="hidden md:flex gap-12 text-[10px] tracking-[0.25em] text-zinc-400 uppercase font-mono">
+      <div className="hidden md:flex gap-8 lg:gap-12 text-[10px] tracking-[0.25em] text-zinc-400 uppercase font-mono">
         {["Works", "Services", "Process", "Tools", "Contact"].map((n, i) => (
           <motion.a
             key={n}
@@ -535,8 +544,9 @@ function Nav() {
       </div>
 
       <button
-        className="md:hidden text-zinc-300 opacity-80 hover:opacity-100 transition-opacity"
+        className="md:hidden text-zinc-300 opacity-80 hover:opacity-100 transition-opacity p-2"
         onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+        aria-label="Toggle Menu"
       >
         {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
       </button>
@@ -548,7 +558,7 @@ function Nav() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.3 }}
-            className="absolute top-full left-0 right-0 bg-[#010a04]/98 backdrop-blur-2xl py-12 px-8 flex flex-col gap-8 md:hidden border-b border-white/5"
+            className="absolute top-full left-0 right-0 bg-[#010a04]/98 backdrop-blur-2xl py-8 px-6 md:px-12 flex flex-col gap-6 md:hidden border-b border-white/5"
           >
             {["Works", "Services", "Process", "Tools", "Contact"].map((n) => (
               <a
@@ -572,12 +582,12 @@ function Nav() {
 ───────────────────────────────────────────── */
 function Hero() {
   return (
-    <section id="hero" className="relative z-10 flex flex-col items-center justify-center min-h-screen text-center px-6 pt-32 pb-32">
+    <section id="hero" className="relative z-10 flex flex-col items-center justify-center min-h-[100svh] text-center px-6 md:px-12 lg:px-20 pt-32 pb-24">
       <motion.p
-        initial={{ opacity: 0, letterSpacing: "0.2em" }}
-        animate={{ opacity: 1, letterSpacing: "0.6em" }}
+        initial={{ opacity: 0, letterSpacing: "0.1em" }}
+        animate={{ opacity: 1, letterSpacing: "0.4em" }}
         transition={{ duration: 1.4, ease: "easeOut" }}
-        className="text-emerald-400/90 text-[10px] uppercase font-mono mb-10 flex items-center gap-2"
+        className="text-emerald-400/90 text-[9px] sm:text-[10px] uppercase font-mono mb-8 sm:mb-10 flex items-center gap-2 md:tracking-[0.6em]"
       >
         <Sparkles className="w-3 h-3 opacity-70" />
         Precision · Rhythm · Flow
@@ -586,7 +596,7 @@ function Hero() {
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 1.2, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-        className="font-display text-[clamp(4.5rem,15vw,11rem)] leading-[0.9] tracking-tight text-zinc-100"
+        className="font-display text-[clamp(3.5rem,12vw,10rem)] leading-[0.9] tracking-tight text-zinc-100"
       >
         VIDEO<br />
         <span className="text-emerald-600/40 italic font-light">EDITOR</span>
@@ -595,7 +605,7 @@ function Hero() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 1, delay: 0.5 }}
-        className="mt-12 max-w-xl text-zinc-400 text-sm md:text-base font-light leading-relaxed tracking-wide"
+        className="mt-8 md:mt-12 max-w-sm md:max-w-xl text-zinc-400 text-xs sm:text-sm md:text-base font-light leading-relaxed tracking-wide"
       >
         Crafting invisible seams and unforgettable movements. Elevating raw footage into compelling cinematic narratives.
       </motion.p>
@@ -603,11 +613,11 @@ function Hero() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.9, duration: 1 }}
-        className="mt-16"
+        className="mt-12 md:mt-16"
       >
         <a
           href="#works"
-          className="inline-flex items-center gap-4 px-10 py-5 rounded-full border border-emerald-800/30 text-zinc-300 text-[11px] tracking-[0.25em] uppercase font-mono hover:bg-emerald-950/80 hover:text-white hover:border-emerald-500/50 transition-all duration-500 group"
+          className="inline-flex items-center gap-3 sm:gap-4 px-8 md:px-10 py-4 md:py-5 rounded-full border border-emerald-800/30 text-zinc-300 text-[10px] md:text-[11px] tracking-[0.25em] uppercase font-mono hover:bg-emerald-950/80 hover:text-white hover:border-emerald-500/50 transition-all duration-500 group"
         >
           View Portfolio
           <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform text-emerald-400" />
@@ -617,9 +627,9 @@ function Hero() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1.5, duration: 1 }}
-        className="absolute bottom-16 flex flex-col items-center"
+        className="absolute bottom-10 md:bottom-16 flex flex-col items-center hidden sm:flex"
       >
-        <p className="text-emerald-500/50 text-[9px] font-mono tracking-[0.25em] mb-5 uppercase">
+        <p className="text-emerald-500/50 text-[8px] md:text-[9px] font-mono tracking-[0.25em] mb-4 md:mb-5 uppercase">
           Interact with fluid surface
         </p>
         <motion.div
@@ -652,20 +662,20 @@ const selectedWorks = [
 
 function SelectedWorks() {
   return (
-    <section id="works" className="relative z-10 py-64 md:py-80 px-8 md:px-16 max-w-[1600px] mx-auto">
-      <div className="mb-32 md:mb-44">
+    <section id="works" className="relative z-10 py-24 md:py-32 lg:py-40 px-6 md:px-12 lg:px-20 max-w-[1600px] mx-auto">
+      <div className="mb-16 md:mb-24">
         <SectionLabel icon={<Star className="w-3 h-3" />}>Featured Works</SectionLabel>
         <motion.h2
           initial={{ opacity: 0, x: -30 }}
           whileInView={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.8 }}
           viewport={{ once: true }}
-          className="font-display text-4xl md:text-7xl text-zinc-100"
+          className="font-display text-4xl sm:text-5xl lg:text-7xl text-zinc-100"
         >
           Selected <span className="text-emerald-600/40 italic font-light">Edits</span>
         </motion.h2>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-16 md:gap-24">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12 lg:gap-16">
         {selectedWorks.map((w, i) => (
           <motion.div
             key={w.title}
@@ -677,18 +687,19 @@ function SelectedWorks() {
             className="group relative rounded-lg overflow-hidden cursor-pointer"
           >
             <div className="aspect-[4/5] relative bg-emerald-950/20 overflow-hidden rounded-md border border-emerald-900/20">
-              <img 
+              <Image 
                 src={w.image} 
                 alt={w.title}
+                fill
                 className="absolute inset-0 w-full h-full object-cover opacity-35 group-hover:opacity-15 group-hover:scale-105 transition-all duration-700 blend-luminosity"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-[#011105] via-transparent to-transparent" />
-              <div className="absolute inset-0 p-10 flex flex-col justify-end">
-                <div className="flex items-center justify-between mb-4 opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all duration-500">
-                  <span className="text-emerald-400 text-[10px] font-mono uppercase tracking-[0.25em]">{w.type} · {w.year}</span>
-                  <PlayCircle className="w-5 h-5 text-zinc-300" />
+              <div className="absolute inset-0 p-8 md:p-10 flex flex-col justify-end">
+                <div className="flex items-center justify-between mb-3 md:mb-4 opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all duration-500">
+                  <span className="text-emerald-400 text-[9px] md:text-[10px] font-mono uppercase tracking-[0.25em]">{w.type} · {w.year}</span>
+                  <PlayCircle className="w-4 h-4 md:w-5 md:h-5 text-zinc-300" />
                 </div>
-                <h3 className="font-display text-2xl text-zinc-200 group-hover:text-emerald-400 transition-colors duration-300">{w.title}</h3>
+                <h3 className="font-display text-xl md:text-2xl text-zinc-200 group-hover:text-emerald-400 transition-colors duration-300">{w.title}</h3>
               </div>
             </div>
           </motion.div>
@@ -712,20 +723,20 @@ const services = [
 
 function Services() {
   return (
-    <section id="services" className="relative z-10 py-64 md:py-80 px-8 md:px-16 max-w-[1600px] mx-auto">
-      <div className="mb-32 md:mb-44">
+    <section id="services" className="relative z-10 py-24 md:py-32 lg:py-40 px-6 md:px-12 lg:px-20 max-w-[1600px] mx-auto">
+      <div className="mb-16 md:mb-24">
         <SectionLabel icon={<Zap className="w-3 h-3" />}>Expertise</SectionLabel>
         <motion.h2
           initial={{ opacity: 0, x: -30 }}
           whileInView={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.8 }}
           viewport={{ once: true }}
-          className="font-display text-4xl md:text-7xl text-zinc-100"
+          className="font-display text-4xl sm:text-5xl lg:text-7xl text-zinc-100"
         >
           Post <span className="text-emerald-600/40 italic font-light">Production</span>
         </motion.h2>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 md:gap-16">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12">
         {services.map((s, i) => (
           <motion.div
             key={s.title}
@@ -733,10 +744,10 @@ function Services() {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: i * 0.05 }}
             viewport={{ once: true }}
-            className="p-10 md:p-14 rounded-lg transition-all duration-300 bg-emerald-950/[0.04] border border-emerald-900/20 hover:bg-emerald-900/[0.06] hover:border-emerald-600/30 group"
+            className="p-8 md:p-12 rounded-lg transition-all duration-300 bg-emerald-950/[0.04] border border-emerald-900/20 hover:bg-emerald-900/[0.06] hover:border-emerald-600/30 group"
           >
-            <s.icon className="text-emerald-700 w-5 h-5 mb-10 group-hover:text-emerald-400 transition-colors duration-300" />
-            <h3 className="font-display text-2xl text-zinc-200 mb-5">{s.title}</h3>
+            <s.icon className="text-emerald-700 w-5 h-5 mb-8 md:mb-10 group-hover:text-emerald-400 transition-colors duration-300" />
+            <h3 className="font-display text-xl md:text-2xl text-zinc-200 mb-4 md:mb-5">{s.title}</h3>
             <p className="text-zinc-400 text-sm leading-relaxed font-light tracking-wide">{s.desc}</p>
           </motion.div>
         ))}
@@ -753,25 +764,25 @@ const processSteps = [
   { num: "02", title: "Assembly", icon: Scissors, desc: "Building the narrative frame skeleton, keeping focus entirely on structural pacing." },
   { num: "03", title: "Refinement", icon: Sliders, desc: "Micro-adjustments, L/J cut alignments, and locking structural fluid rhythm." },
   { num: "04", title: "Finishing", icon: Palette, desc: "Applying fine lookup color matrices, spatial mastering, and compositing fixes." },
-  { num: "05", title: "Mastering", icon: Download, desc: "Exporting clean target matrices tailored for web or theatrical pipeline distribution." },
+  { num: "05", title: "Mastering", icon: Download, desc: "Exporting it clean target matrices tailored for web or theatrical pipeline distribution." },
 ];
 
 function Process() {
   return (
-    <section id="process" className="relative z-10 py-64 md:py-80 px-8 md:px-16 max-w-[1600px] mx-auto">
-      <div className="mb-32 md:mb-44">
+    <section id="process" className="relative z-10 py-24 md:py-32 lg:py-40 px-6 md:px-12 lg:px-20 max-w-[1600px] mx-auto">
+      <div className="mb-16 md:mb-24">
         <SectionLabel icon={<Sliders className="w-3 h-3" />}>Workflow</SectionLabel>
         <motion.h2
           initial={{ opacity: 0, x: -30 }}
           whileInView={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.8 }}
           viewport={{ once: true }}
-          className="font-display text-4xl md:text-7xl text-zinc-100"
+          className="font-display text-4xl sm:text-5xl lg:text-7xl text-zinc-100"
         >
           The <span className="text-emerald-600/40 italic font-light">Method</span>
         </motion.h2>
       </div>
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-12 lg:gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 lg:gap-12">
         {processSteps.map((step, i) => (
           <motion.div
             key={step.num}
@@ -779,12 +790,12 @@ function Process() {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: i * 0.1 }}
             viewport={{ once: true }}
-            className="relative p-10 border-l lg:border-l-0 lg:border-t border-emerald-900/20 group"
+            className="relative p-8 lg:p-10 border-l lg:border-l-0 lg:border-t border-emerald-900/20 group"
           >
             <div className="absolute top-0 left-[-1px] lg:left-0 lg:top-[-1px] w-[2px] h-0 lg:h-[2px] lg:w-0 bg-emerald-500 group-hover:h-full lg:group-hover:h-[2px] lg:group-hover:w-full transition-all duration-500" />
-            <span className="text-emerald-500 text-xs font-mono mb-8 block tracking-widest">{step.num}</span>
-            <step.icon className="w-5 h-5 text-zinc-400 mb-8" />
-            <h3 className="font-display text-xl text-zinc-200 mb-4">{step.title}</h3>
+            <span className="text-emerald-500 text-xs font-mono mb-6 md:mb-8 block tracking-widest">{step.num}</span>
+            <step.icon className="w-5 h-5 text-zinc-400 mb-6 md:mb-8" />
+            <h3 className="font-display text-lg md:text-xl text-zinc-200 mb-3 md:mb-4">{step.title}</h3>
             <p className="text-zinc-400 text-xs leading-relaxed tracking-wide">{step.desc}</p>
           </motion.div>
         ))}
@@ -797,42 +808,50 @@ function Process() {
     ARSENAL TOOLS
 ───────────────────────────────────────────── */
 const tools = [
-  { name: "DaVinci Resolve", role: "Primary NLE & Grading", icon: Palette },
-  { name: "Adobe Premiere Pro", role: "Editorial & Agency Work", icon: Video },
-  { name: "After Effects", role: "Compositing & Motion", icon: Layers },
+  { name: "DaVinci Resolve", role: "Primary NLE & Grading", icon: Palette, url: "https://www.blackmagicdesign.com/products/davinciresolve" },
+  { name: "Adobe Premiere Pro", role: "Editorial & Agency Work", icon: Video, url: "https://www.adobe.com/products/premiere.html" },
+  { name: "After Effects", role: "Compositing & Motion", icon: Layers, url: "https://www.adobe.com/products/aftereffects.html" },
+  { name: "CapCut", role: "Social & Short Form", icon: Smartphone, url: "https://www.capcut.com" },
 ];
 
 function Tools() {
   return (
-    <section id="tools" className="relative z-10 py-64 md:py-80 px-8 md:px-16 max-w-[1600px] mx-auto">
-      <div className="mb-32 md:mb-44">
+    <section id="tools" className="relative z-10 py-24 md:py-32 lg:py-40 px-6 md:px-12 lg:px-20 max-w-[1600px] mx-auto">
+      <div className="mb-16 md:mb-24">
         <SectionLabel icon={<Cpu className="w-3 h-3" />}>Arsenal</SectionLabel>
         <motion.h2
           initial={{ opacity: 0, x: -30 }}
           whileInView={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.8 }}
           viewport={{ once: true }}
-          className="font-display text-4xl md:text-7xl text-zinc-100"
+          className="font-display text-4xl sm:text-5xl lg:text-7xl text-zinc-100"
         >
           Industry <span className="text-emerald-600/40 italic font-light">Standard</span>
         </motion.h2>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12 lg:gap-10">
         {tools.map((tool, i) => (
-          <motion.div
+          <motion.a
             key={tool.name}
+            href={tool.url}
+            target="_blank"
+            rel="noopener noreferrer"
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: i * 0.1 }}
             viewport={{ once: true }}
-            className="p-12 border border-emerald-900/20 bg-black/30 backdrop-blur-md rounded-lg flex flex-col justify-between aspect-square group hover:border-emerald-600/30 transition-colors duration-500"
+            className="relative p-10 lg:p-12 border border-emerald-900/20 bg-black/30 backdrop-blur-md rounded-lg flex flex-col justify-between aspect-[4/5] sm:aspect-square group hover:border-emerald-500/40 hover:bg-emerald-950/20 transition-all duration-500 overflow-hidden"
           >
-            <tool.icon className="w-6 h-6 text-emerald-950 group-hover:text-emerald-400 transition-colors duration-500" />
-            <div>
-              <p className="text-emerald-400/50 text-[10px] font-mono uppercase tracking-[0.25em] mb-3">{tool.role}</p>
-              <h3 className="font-display text-3xl text-zinc-300 tracking-wide">{tool.name}</h3>
+            <div className="flex justify-between items-start w-full">
+              <tool.icon className="w-6 h-6 md:w-8 md:h-8 text-emerald-950 group-hover:text-emerald-400 transition-colors duration-500" />
+              <ArrowRight className="w-4 h-4 text-emerald-500/0 group-hover:text-emerald-400/80 -translate-x-4 translate-y-4 -rotate-45 group-hover:translate-x-0 group-hover:translate-y-0 transition-all duration-500" />
             </div>
-          </motion.div>
+            <div className="mt-8 md:mt-0 z-10">
+              <p className="text-emerald-400/50 text-[9px] md:text-[10px] font-mono uppercase tracking-[0.25em] mb-3 md:mb-4">{tool.role}</p>
+              <h3 className="font-display text-2xl md:text-3xl lg:text-2xl xl:text-3xl text-zinc-300 group-hover:text-white transition-colors duration-300 tracking-wide">{tool.name}</h3>
+            </div>
+            <div className="absolute inset-0 bg-gradient-to-t from-emerald-900/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+          </motion.a>
         ))}
       </div>
     </section>
@@ -854,15 +873,15 @@ const projects = [
 
 function WorksFull() {
   return (
-    <section id="all-works" className="relative z-10 py-64 md:py-80 px-8 md:px-16 max-w-[1600px] mx-auto">
-      <div className="mb-32 md:mb-44">
+    <section id="all-works" className="relative z-10 py-24 md:py-32 lg:py-40 px-6 md:px-12 lg:px-20 max-w-[1600px] mx-auto">
+      <div className="mb-16 md:mb-24">
         <SectionLabel icon={<Briefcase className="w-3 h-3" />}>Archive</SectionLabel>
         <motion.h2
           initial={{ opacity: 0, x: -30 }}
           whileInView={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.8 }}
           viewport={{ once: true }}
-          className="font-display text-4xl md:text-7xl text-zinc-100"
+          className="font-display text-4xl sm:text-5xl lg:text-7xl text-zinc-100"
         >
           Complete <span className="text-emerald-600/40 italic font-light">Index</span>
         </motion.h2>
@@ -875,19 +894,19 @@ function WorksFull() {
             whileInView={{ opacity: 1 }}
             transition={{ duration: 0.5 }}
             viewport={{ once: true }}
-            className="flex flex-col md:flex-row md:items-center justify-between py-10 border-b border-emerald-900/10 hover:bg-emerald-950/[0.03] transition-colors duration-300 px-6 cursor-pointer group"
+            className="flex flex-col md:flex-row md:items-center justify-between py-8 md:py-10 border-b border-emerald-900/10 hover:bg-emerald-950/[0.03] transition-colors duration-300 px-4 md:px-6 cursor-pointer group"
           >
-            <div className="flex items-center gap-8 md:w-1/2">
-              <span className="text-emerald-800 font-mono text-xs w-6 hidden md:block">{String(i + 1).padStart(2, "0")}</span>
+            <div className="flex items-center gap-6 md:gap-10 md:w-1/2">
+              <span className="text-emerald-800 font-mono text-xs w-6 hidden sm:block">{String(i + 1).padStart(2, "0")}</span>
               <div>
-                <h4 className="font-display text-2xl text-zinc-300 group-hover:text-emerald-400 transition-colors">{p.title}</h4>
-                <span className="text-zinc-500 text-[11px] font-mono mt-2 block tracking-wide">{p.client}</span>
+                <h4 className="font-display text-xl md:text-2xl lg:text-3xl text-zinc-300 group-hover:text-emerald-400 transition-colors">{p.title}</h4>
+                <span className="text-zinc-500 text-[10px] md:text-[11px] font-mono mt-2 md:mt-3 block tracking-wide">{p.client}</span>
               </div>
             </div>
-            <div className="flex items-center justify-between md:justify-end gap-12 mt-6 md:mt-0 md:w-1/2">
-              <span className="text-zinc-400 text-[10px] font-mono uppercase tracking-[0.2em]">{p.type}</span>
-              <span className="text-zinc-500 text-[11px] font-mono tracking-wide">{p.duration}</span>
-              <ArrowRight className="w-4 h-4 text-emerald-500 opacity-0 group-hover:opacity-100 transition-all transform translate-x-[-4px] group-hover:translate-x-0 hidden md:block" />
+            <div className="flex items-center justify-between md:justify-end gap-8 md:gap-16 mt-6 md:mt-0 md:w-1/2">
+              <span className="text-zinc-400 text-[9px] md:text-[10px] font-mono uppercase tracking-[0.2em]">{p.type}</span>
+              <span className="text-zinc-500 text-[10px] md:text-[11px] font-mono tracking-wide">{p.duration}</span>
+              <ArrowRight className="w-4 h-4 md:w-5 md:h-5 text-emerald-500 opacity-0 group-hover:opacity-100 transition-all transform translate-x-[-8px] group-hover:translate-x-0 hidden md:block" />
             </div>
           </motion.div>
         ))}
@@ -909,7 +928,7 @@ function Contact() {
   };
 
   return (
-    <section id="contact" className="relative z-10 py-64 md:py-80 px-8 md:px-16 max-w-[1600px] mx-auto">
+    <section id="contact" className="relative z-10 py-24 md:py-32 lg:py-40 px-6 md:px-12 lg:px-20 max-w-[1600px] mx-auto">
       <div className="max-w-3xl">
         <SectionLabel icon={<Mail className="w-3 h-3" />}>Inquiries</SectionLabel>
         <motion.h2
@@ -917,7 +936,7 @@ function Contact() {
           whileInView={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.8 }}
           viewport={{ once: true }}
-          className="font-display text-4xl md:text-7xl text-zinc-100 mb-10"
+          className="font-display text-4xl sm:text-5xl lg:text-7xl text-zinc-100 mb-8 md:mb-12"
         >
           Start a <span className="text-emerald-600/40 italic font-light">Project</span>
         </motion.h2>
@@ -926,7 +945,7 @@ function Contact() {
           whileInView={{ opacity: 1 }}
           transition={{ delay: 0.2, duration: 0.8 }}
           viewport={{ once: true }}
-          className="text-zinc-400 mb-20 text-sm leading-relaxed tracking-wide max-w-xl"
+          className="text-zinc-400 mb-12 md:mb-16 text-sm md:text-base leading-relaxed tracking-wide max-w-xl"
         >
           Currently accepting bookings for high-fidelity campaigns. Please provide structural parameters regarding timeline and layout requirements.
         </motion.p>
@@ -935,10 +954,10 @@ function Contact() {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="border border-emerald-900/30 bg-emerald-950/[0.02] p-16 text-center rounded-lg"
+            className="border border-emerald-900/30 bg-emerald-950/[0.02] p-10 md:p-16 lg:p-20 text-center rounded-lg"
           >
-            <h3 className="font-display text-3xl text-zinc-200 mb-3 tracking-wide">Transmission Received</h3>
-            <p className="text-zinc-400 text-sm tracking-wide">Reviewing parameters. Structural response dispatch within 24 operational cycles.</p>
+            <h3 className="font-display text-2xl md:text-3xl text-zinc-200 mb-3 md:mb-4 tracking-wide">Transmission Received</h3>
+            <p className="text-zinc-400 text-xs md:text-sm tracking-wide">Reviewing parameters. Structural response dispatch within 24 operational cycles.</p>
           </motion.div>
         ) : (
           <motion.div
@@ -946,15 +965,15 @@ function Contact() {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
             viewport={{ once: true }}
-            className="space-y-12"
+            className="space-y-8 md:space-y-12"
           >
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
               {[
                 { key: "name", label: "Client Name", type: "text", placeholder: "Jane Doe" },
                 { key: "email", label: "Email Address", type: "email", placeholder: "jane@studio.com" }
               ].map((field) => (
                 <div key={field.key}>
-                  <label className="block text-emerald-400/70 text-[10px] font-mono uppercase tracking-[0.25em] mb-4">
+                  <label className="block text-emerald-400/70 text-[9px] md:text-[10px] font-mono uppercase tracking-[0.25em] mb-4 md:mb-5">
                     {field.label}
                   </label>
                   <input
@@ -962,13 +981,13 @@ function Contact() {
                     placeholder={field.placeholder}
                     value={form[field.key as "name" | "email"]}
                     onChange={(e) => setForm({ ...form, [field.key]: e.target.value })}
-                    className="w-full bg-black/20 border border-emerald-900/30 rounded-none px-5 py-5 text-zinc-200 placeholder-emerald-900/20 focus:outline-none focus:border-emerald-500/50 focus:bg-black/40 transition-all text-sm font-light tracking-wide"
+                    className="w-full bg-black/20 border border-emerald-900/30 rounded-none px-5 py-4 md:px-6 md:py-5 text-zinc-200 placeholder-emerald-900/20 focus:outline-none focus:border-emerald-500/50 focus:bg-black/40 transition-all text-sm font-light tracking-wide"
                   />
                 </div>
               ))}
             </div>
             <div>
-              <label className="block text-emerald-400/70 text-[10px] font-mono uppercase tracking-[0.25em] mb-4">
+              <label className="block text-emerald-400/70 text-[9px] md:text-[10px] font-mono uppercase tracking-[0.25em] mb-4 md:mb-5">
                 Project Brief
               </label>
               <textarea
@@ -976,16 +995,16 @@ function Contact() {
                 placeholder="Describe the footage parameters, baseline deliverables, and visual design layout benchmarks..."
                 value={form.message}
                 onChange={(e) => setForm({ ...form, message: e.target.value })}
-                className="w-full bg-black/20 border border-emerald-900/30 rounded-none px-5 py-5 text-zinc-200 placeholder-emerald-900/20 focus:outline-none focus:border-emerald-500/50 focus:bg-black/40 transition-all text-sm font-light tracking-wide resize-none"
+                className="w-full bg-black/20 border border-emerald-900/30 rounded-none px-5 py-4 md:px-6 md:py-5 text-zinc-200 placeholder-emerald-900/20 focus:outline-none focus:border-emerald-500/50 focus:bg-black/40 transition-all text-sm font-light tracking-wide resize-none"
               />
             </div>
             <motion.button
               whileHover={{ scale: 1.005 }}
               whileTap={{ scale: 0.995 }}
               onClick={handleSubmit}
-              className="px-10 py-5 bg-emerald-950/40 text-emerald-400 border border-emerald-800/40 font-mono text-[11px] uppercase tracking-[0.25em] hover:bg-emerald-900 hover:text-white hover:border-emerald-500 transition-colors flex items-center justify-center gap-3 w-full md:w-auto"
+              className="px-8 py-4 md:px-12 md:py-5 bg-emerald-950/40 text-emerald-400 border border-emerald-800/40 font-mono text-[10px] md:text-[11px] uppercase tracking-[0.25em] hover:bg-emerald-900 hover:text-white hover:border-emerald-500 transition-colors flex items-center justify-center gap-3 md:gap-4 w-full md:w-auto"
             >
-              Submit Inquiry <Send className="w-3 h-3" />
+              Submit Inquiry <Send className="w-3 h-3 md:w-4 md:h-4" />
             </motion.button>
           </motion.div>
         )}
@@ -999,17 +1018,17 @@ function Contact() {
 ───────────────────────────────────────────── */
 function Footer() {
   return (
-    <footer className="relative z-10 py-20 px-8 md:px-16 border-t border-emerald-900/20 flex flex-col md:flex-row items-center justify-between gap-8 text-zinc-500 text-[10px] font-mono uppercase tracking-[0.25em] max-w-[1600px] mx-auto w-full">
+    <footer className="relative z-10 py-16 md:py-20 lg:py-24 px-6 md:px-12 lg:px-20 border-t border-emerald-900/20 flex flex-col md:flex-row items-center justify-between gap-8 md:gap-10 text-zinc-500 text-[9px] md:text-[10px] font-mono uppercase tracking-[0.25em] max-w-[1600px] mx-auto w-full">
       <span className="font-display tracking-[0.25em] text-sm text-zinc-400">V.EDIT</span>
-      <div className="flex gap-8">
+      <div className="flex gap-8 md:gap-10">
         <a href="#" className="hover:text-emerald-400 transition-colors"><CustomTwitter /></a>
         <a href="#" className="hover:text-emerald-400 transition-colors"><CustomInstagram /></a>
         <a href="#" className="hover:text-emerald-400 transition-colors"><CustomGithub /></a>
         <a href="#" className="hover:text-emerald-400 transition-colors"><CustomLinkedin /></a>
       </div>
-      <span className="flex items-center gap-2 text-emerald-800">
-        <MapPin className="w-3 h-3" />
-        Quezon City, PH — {new Date().getFullYear()}
+      <span className="flex items-center gap-2 md:gap-3 text-emerald-800">
+        <MapPin className="w-3 h-3 md:w-4 md:h-4" />
+        Olongapo City, PH — {new Date().getFullYear()}
       </span>
     </footer>
   );
@@ -1036,22 +1055,26 @@ export default function Page() {
           background: rgba(1, 12, 5, 0.94) !important; 
           backdrop-filter: blur(30px) !important; 
           border-bottom: 1px solid rgba(16, 185, 129, 0.1) !important;
-          padding-top: 1.4rem !important; 
-          padding-bottom: 1.4rem !important; 
+          padding-top: 1rem !important; 
+          padding-bottom: 1rem !important; 
         }
-        html { scroll-behavior: smooth; scroll-padding-top: 10rem; }
+        @media (min-width: 768px) {
+          .scrolled {
+            padding-top: 1.4rem !important; 
+            padding-bottom: 1.4rem !important; 
+          }
+        }
+        html { scroll-behavior: smooth; scroll-padding-top: 8rem; }
       `}</style>
       <main className="relative min-h-screen bg-transparent overflow-x-hidden">
         <WaterCanvas />
-        {/* Deep luxurious dark green vignette overlay */}
         <div className="fixed inset-0 z-[1] pointer-events-none" style={{ background: "radial-gradient(circle at center, transparent 10%, rgba(1,12,5,0.92) 100%)" }} />
         
         <div className="relative z-10 w-full">
           <Nav />
           <Hero />
           
-          {/* Section Container Wrap with isolated blur mixing panels & premium deep spacing splits */}
-          <div className="relative bg-[#010c05]/75 backdrop-blur-[12px] border-t border-emerald-900/20 space-y-24">
+          <div className="relative bg-[#010c05]/40 backdrop-blur-[12px] border-t border-emerald-900/20">
             <SelectedWorks />
             <Services />
             <Process />

@@ -37,6 +37,14 @@ export default defineType({
       },
     }),
     defineField({
+      name: 'videoEmbedUrl',
+      title: 'Video Embed URL',
+      type: 'url',
+      description: 'Cloudinary player embed URL for video assets.',
+      initialValue:
+        'https://player.cloudinary.com/embed/?cloud_name=dzbqzsvoi&public_id=blog_33_yulwfs',
+    }),
+    defineField({
       name: 'bio',
       title: 'Short Bio',
       type: 'text',
