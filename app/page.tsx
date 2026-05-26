@@ -551,7 +551,7 @@ export default function MountainLanding() {
   };
 
   return (
-    <>
+    <div>
       {!loaderDone && <TriangleLoader onComplete={handleLoaderComplete} />}
       {loaderDone && <SplashCursor />}
 
@@ -597,12 +597,7 @@ export default function MountainLanding() {
         {/* HERO ON MOUNTAIN */}
         <div ref={heroSpacerRef} className="relative z-10 w-full min-h-[100vh] flex flex-col">
 
-<<<<<<< HEAD
           <div ref={heroSectionRef} className="relative flex-1 flex flex-col items-center justify-center text-center w-full mt-[136px]">
-=======
-          {/* Center content: Title + CTA */}
-          <div ref={heroSectionRef} className="relative flex-1 flex flex-col items-center justify-center text-center w-full px-6">
->>>>>>> 776d1a853f9f39154f511888f98dd1ad47975690
 
 
             {/* Headline */}
@@ -646,11 +641,11 @@ export default function MountainLanding() {
             </a>
           </div>
 
-          {/* Bottom strip: numbered services */}
-<<<<<<< HEAD
+       
+
           <div className="hero-fade-in relative w-full pb-10 pt-16" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.3) 50%, transparent 100%)' }}>
             <div className="grid grid-cols-1 sm:grid-cols-3 mb-12 gap-16 w-full max-w-full mx-auto">
-=======
+
           <div className="hero-fade-in relative w-full pb-10 pt-16 px-6" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.3) 50%, transparent 100%)' }}>
             <div className="grid grid-cols-1 sm:grid-cols-3 mb-32 gap-16 w-full max-w-full mx-auto">
               {[
@@ -1019,6 +1014,6 @@ export default function MountainLanding() {
           </div>
         </footer>
       </div>
-    </>
+    </div>
   );
 }
