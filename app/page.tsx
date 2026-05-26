@@ -643,9 +643,6 @@ export default function MountainLanding() {
 
        
 
-          <div className="hero-fade-in relative w-full pb-10 pt-16" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.3) 50%, transparent 100%)' }}>
-            <div className="grid grid-cols-1 sm:grid-cols-3 mb-12 gap-16 w-full max-w-full mx-auto">
-
           <div className="hero-fade-in relative w-full pb-10 pt-16 px-6" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.3) 50%, transparent 100%)' }}>
             <div className="grid grid-cols-1 sm:grid-cols-3 mb-32 gap-16 w-full max-w-full mx-auto">
               {[
