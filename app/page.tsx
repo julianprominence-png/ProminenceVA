@@ -212,7 +212,6 @@ export default function MountainLanding() {
   const footerRef = useRef<HTMLElement>(null);
   const summitRef = useRef<SVGSVGElement>(null);
 
-  // Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ Page-transition state Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
   const router = useRouter();
   const [transitioning, setTransitioning] = useState(false);
   const [transitionLabel, setTransitionLabel] = useState("");
@@ -244,7 +243,6 @@ export default function MountainLanding() {
       if (res.ok && data.status === "delivered") {
         setSubmitStatus("delivered");
         setFormData({ name: "", email: "", message: "" });
-        // Simulate 'received' confirmation after a short delay
         setTimeout(() => setSubmitStatus("received"), 2200);
         setTimeout(() => setSubmitStatus("idle"), 7000);
       } else {
@@ -259,7 +257,7 @@ export default function MountainLanding() {
     }
   };
 
-  /* --- THREE.JS CLOUD SETUP (unchanged) --- */
+  /* --- THREE.JS CLOUD SETUP --- */
   useEffect(() => {
     if (!showPage || !threeCanvasRef.current) return;
     const scene = new THREE.Scene();
@@ -371,8 +369,6 @@ export default function MountainLanding() {
     };
   }, [showPage]);
 
-
-
   /* --- DOM GSAP SETUP --- */
   useEffect(() => {
     if (!showPage) return;
@@ -386,8 +382,6 @@ export default function MountainLanding() {
         });
       }
 
-      /* Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ HERO SECTION ENTRANCE Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ */
-      /* ─── HERO ENTRANCE (no scroll trigger — visible on load) ──── */
       if (heroSectionRef.current) {
         const heroEls = heroSectionRef.current.querySelectorAll(".hero-fade-in");
         gsap.fromTo(heroEls,
@@ -404,7 +398,6 @@ export default function MountainLanding() {
           }
         );
 
-        /* ─── PARALLAX: each .hero-parallax moves at its own speed ─── */
         const parallaxEls = heroSectionRef.current.querySelectorAll(".hero-parallax");
         parallaxEls.forEach((el) => {
           const speed = parseFloat((el as HTMLElement).dataset.speed || "0.5");
@@ -420,7 +413,6 @@ export default function MountainLanding() {
           });
         });
 
-        /* Fade out entire hero on scroll */
         gsap.to(heroSectionRef.current, {
           opacity: 0,
           ease: "none",
@@ -433,7 +425,6 @@ export default function MountainLanding() {
         });
       }
 
-      /* ─── WORKS SECTION ─────────────────────────────────────── */
       if (worksRef.current) {
         gsap.fromTo(worksRef.current,
           { opacity: 0 },
@@ -441,8 +432,6 @@ export default function MountainLanding() {
         );
       }
 
-
-      /* Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ CONTACT SECTION Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ */
       if (contactRef.current) {
         gsap.fromTo(contactRef.current,
           { opacity: 0, y: 40 },
@@ -450,7 +439,6 @@ export default function MountainLanding() {
         );
       }
 
-      /* Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ CTA Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ */
       if (ctaRef.current) {
         gsap.fromTo(ctaRef.current,
           { opacity: 0, scale: 0.9 },
@@ -458,7 +446,6 @@ export default function MountainLanding() {
         );
       }
 
-      /* Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ FOOTER SUMMIT RISE Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ */
       if (summitRef.current) {
         gsap.fromTo(summitRef.current,
           { yPercent: 60, opacity: 0 },
@@ -476,7 +463,6 @@ export default function MountainLanding() {
         );
       }
 
-      /* Footer content stagger */
       if (footerRef.current) {
         const footerEls = footerRef.current.querySelectorAll(".footer-animate");
         gsap.fromTo(footerEls,
@@ -503,13 +489,6 @@ export default function MountainLanding() {
   /* -------------------------------------------------------------------------- */
   /* STYLE HELPERS                                                              */
   /* -------------------------------------------------------------------------- */
-  const neuOuter = "bg-[#e6eaf0]";
-  const neuInner = "bg-[#e6eaf0]";
-  const neuButton = "bg-[#e6eaf0] transition-all duration-300 text-fuchsia-600 font-bold uppercase tracking-widest";
-  const neuInput = "w-full bg-[#e6eaf0] rounded-xl px-5 py-4 text-sm font-medium text-gray-700 outline-none focus:ring-2 focus:ring-fuchsia-500/30 transition-all border-none placeholder-gray-400";
-
-  /* Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ Dark glass helpers for sections in the dark gradient zone Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ */
-  const darkGlass = "backdrop-blur-2xl border border-white/[0.08]";
   const darkButton = "backdrop-blur-xl border border-purple-500/20 hover:border-purple-400/40 active:scale-[0.98] transition-all duration-300 text-purple-300 font-bold uppercase tracking-widest";
   const darkInput = "w-full rounded-xl px-5 py-4 text-sm font-medium text-white/80 outline-none focus:ring-2 focus:ring-purple-500/30 transition-all border border-white/[0.08] placeholder-white/30";
 
@@ -528,7 +507,6 @@ export default function MountainLanding() {
     const label = overlay.querySelector(".transition-label");
     const arrow = overlay.querySelector(".transition-arrow");
 
-    // "slide left" Ã¢â€ â€™ blobs enter from RIGHT;  "slide right" Ã¢â€ â€™ from LEFT
     const fromX = direction === "left" ? 120 : -120;
     const rotDir = direction === "left" ? 1 : -1;
 
@@ -538,7 +516,6 @@ export default function MountainLanding() {
       onComplete: () => router.push(href),
     });
 
-    // Ã¢â€â‚¬Ã¢â€â‚¬ Sweep each blob with squash-stretch + organic border-radius morph Ã¢â€â‚¬Ã¢â€â‚¬
     blobs.forEach((blob, i) => {
       gsap.set(blob, {
         xPercent: fromX,
@@ -563,36 +540,13 @@ export default function MountainLanding() {
       }, i * 0.09);
     });
 
-    // Ã¢â€â‚¬Ã¢â€â‚¬ Bouncy directional arrow Ã¢â€â‚¬Ã¢â€â‚¬
     if (arrow) {
-      gsap.set(arrow, {
-        opacity: 0,
-        x: rotDir * -80,
-        scale: 0.3,
-        rotation: rotDir * 40,
-      });
-      tl.to(arrow, {
-        opacity: 1,
-        x: 0,
-        scale: 1,
-        rotation: 0,
-        duration: 0.5,
-        ease: "elastic.out(1, 0.55)",
-      }, 0.28);
+      gsap.set(arrow, { opacity: 0, x: rotDir * -80, scale: 0.3, rotation: rotDir * 40 });
+      tl.to(arrow, { opacity: 1, x: 0, scale: 1, rotation: 0, duration: 0.5, ease: "elastic.out(1, 0.55)" }, 0.28);
     }
 
-    // Ã¢â€â‚¬Ã¢â€â‚¬ Label pops in Ã¢â€â‚¬Ã¢â€â‚¬
     if (label) {
-      gsap.set(label, {
-      });
-      tl.to(label, {
-        opacity: 1,
-        y: 0,
-        scale: 1,
-        rotation: 0,
-        duration: 0.55,
-        ease: "back.out(3)",
-      }, 0.38);
+      tl.to(label, { opacity: 1, y: 0, scale: 1, rotation: 0, duration: 0.55, ease: "back.out(3)" }, 0.38);
     }
   };
 
@@ -601,20 +555,17 @@ export default function MountainLanding() {
       {!loaderDone && <TriangleLoader onComplete={handleLoaderComplete} />}
       {loaderDone && <SplashCursor />}
 
-
       {/* MORPH PAGE-TRANSITION OVERLAY */}
       <div
         ref={transitionOverlayRef}
         className="fixed inset-0 z-[250] pointer-events-none"
         style={{ display: "none" }}
       >
-        {/* Blob layers */}
         <div className="morph-blob absolute inset-0" style={{ background: "rgba(192, 132, 252, 0.95)" }} />
         <div className="morph-blob absolute inset-0" style={{ background: "rgba(168, 85, 247, 0.96)" }} />
         <div className="morph-blob absolute inset-0" style={{ background: "rgba(147, 51, 234, 0.97)" }} />
         <div className="morph-blob absolute inset-0" style={{ background: "rgba(124, 58, 237, 1)" }} />
 
-        {/* Centered label + arrow */}
         <div className="absolute inset-0 flex flex-col items-center justify-center z-10 pointer-events-none gap-4">
           <div
             className="transition-arrow w-16 h-16 rounded-full flex items-center justify-center"
@@ -646,17 +597,20 @@ export default function MountainLanding() {
         {/* HERO ON MOUNTAIN */}
         <div ref={heroSpacerRef} className="relative z-10 w-full min-h-[100vh] flex flex-col">
 
+<<<<<<< HEAD
+          <div ref={heroSectionRef} className="relative flex-1 flex flex-col items-center justify-center text-center w-full mt-[136px]">
+=======
           {/* Center content: Title + CTA */}
           <div ref={heroSectionRef} className="relative flex-1 flex flex-col items-center justify-center text-center w-full px-6">
+>>>>>>> 776d1a853f9f39154f511888f98dd1ad47975690
 
 
             {/* Headline */}
             <h1
-              className="hero-parallax mb-8 flex flex-wrap justify-center gap-[1px] sm:gap-[2px] science-gothic-brand"
+              className="hero-parallax mb-8 flex justify-center gap-0 sm:gap-[2px] science-gothic-brand text-[clamp(0.8rem,4.5vw,1.5rem)] sm:text-[clamp(2.5rem,10vw,8.75rem)]"
               data-speed="0.6"
               style={{
-                fontSize: "clamp(1.8rem, 9vw, 8.75rem)",
-                letterSpacing: "0.04em",
+                letterSpacing: "0.02em",
                 lineHeight: 0.9,
                 color: "rgba(255,255,255,0.95)",
                 perspective: "1000px"
@@ -676,9 +630,27 @@ export default function MountainLanding() {
                 </span>
               ))}
             </h1>
+
+            <a
+              href="#contact"
+              className="hero-fade-in hero-parallax group relative inline-flex items-center gap-3 px-10 py-4 rounded-full text-white font-bold text-xs tracking-[0.25em] uppercase transition-all duration-500 hover:scale-105"
+              data-speed="0.5"
+              style={{
+                background: "linear-gradient(135deg, #7c3aed, #9333ea, #a855f7)",
+              }}
+            >
+              <span>Discover Now</span>
+              <span className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center group-hover:bg-white/30 transition-colors">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>
+              </span>
+            </a>
           </div>
 
           {/* Bottom strip: numbered services */}
+<<<<<<< HEAD
+          <div className="hero-fade-in relative w-full pb-10 pt-16" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.3) 50%, transparent 100%)' }}>
+            <div className="grid grid-cols-1 sm:grid-cols-3 mb-12 gap-16 w-full max-w-full mx-auto">
+=======
           <div className="hero-fade-in relative w-full pb-10 pt-16 px-6" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.3) 50%, transparent 100%)' }}>
             <div className="grid grid-cols-1 sm:grid-cols-3 mb-32 gap-16 w-full max-w-full mx-auto">
               {[
@@ -697,49 +669,24 @@ export default function MountainLanding() {
                 </div>
               ))}
             </div>
-
-            {/* CTA button moved to bottom */}
-            <div className="flex justify-center w-full mb-12">
-              <a
-                href="#contact"
-                className="group relative inline-flex items-center gap-3 px-10 py-4 rounded-full text-white font-bold text-xs tracking-[0.25em] uppercase transition-all duration-500 hover:scale-105"
-                style={{
-                  background: "linear-gradient(135deg, #7c3aed, #9333ea, #a855f7)",
-                }}
-              >
-                <span>Discover Now</span>
-                <span className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center group-hover:bg-white/30 transition-colors">
-                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>
-                </span>
-              </a>
-            </div>
-
-            {/* Progress line */}
             <div className="mt-6 ml-6 w-24 h-[2px] bg-gradient-to-r from-white/40 to-transparent" />
           </div>
 
         </div>
+
         <div ref={cloudTriggerRef} className="relative z-20 w-full h-[40vh] translate-y-[20px] pointer-events-none flex items-center justify-center">
           <div ref={threeCanvasRef} className="absolute inset-0 w-full h-[150vh] -top-[50vh]" style={{ pointerEvents: "none", maskImage: "linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.05) 5%, rgba(0,0,0,0.2) 10%, rgba(0,0,0,0.5) 18%, black 28%, black 55%, rgba(0,0,0,0.5) 70%, rgba(0,0,0,0.2) 80%, rgba(0,0,0,0.05) 90%, transparent 100%)", WebkitMaskImage: "linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.05) 5%, rgba(0,0,0,0.2) 10%, rgba(0,0,0,0.5) 18%, black 28%, black 55%, rgba(0,0,0,0.5) 70%, rgba(0,0,0,0.2) 80%, rgba(0,0,0,0.05) 90%, transparent 100%)" }} />
         </div>
 
-        {/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */}
-        {/* MAIN CONTENT                                                        */}
-        {/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */}
+        {/* MAIN CONTENT */}
         <div className="relative z-30 w-full rounded-t-[3rem] -mt-10 pt-24 pb-32 px-6 sm:px-12" style={{ background: 'linear-gradient(180deg, #e6eaf0 0%, #e6eaf0 15%, #ddd8e8 22%, #c4bbd8 28%, #8b7faa 36%, #5a4e80 43%, #3a3060 50%, #262050 56%, #1e1a3a 62%, #161330 70%, #100e24 80%, #0c0a1a 90%, #0a0814 100%)', overflowX: 'clip' }}>
-          {/* Starfield â€” fades in over the dark gradient zone */}
           <div className="starfield" style={{ top: '0', maskImage: 'linear-gradient(to bottom, transparent 0%, transparent 40%, black 70%)', WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, transparent 40%, black 70%)' }} />
 
-
-          {/* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */}
-          {/* WORKS Ã¢â‚¬â€ MASONRY PORTFOLIO                                          */}
-          {/* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */}
-          {/* ── WORKS — INFINITE SCROLLING SHOWCASE ── */}
+          {/* WORKS — INFINITE SCROLLING SHOWCASE */}
           <div className="relative -mx-6 sm:-mx-12">
             <section id="works" className="w-full overflow-hidden" ref={worksRef} style={{ padding: 0, margin: 0, maskImage: 'linear-gradient(to bottom, transparent 0%, black 18%, black 82%, transparent 100%)', WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 18%, black 82%, transparent 100%)' }}>
               <div className="relative w-full" style={{ height: 'clamp(600px, 85vh, 1000px)' }}>
                 <div className="flex gap-1 h-full items-start" style={{ padding: 0 }}>
-                  {/* Column 1 — scrolls up */}
                   <div className="flex-1 overflow-hidden relative h-full">
                     <div className="works-scroll-col works-scroll-up flex flex-col gap-1">
                       {[...portfolioItems.slice(0, 6), ...portfolioItems.slice(0, 6)].map((item, i) => (
@@ -750,8 +697,6 @@ export default function MountainLanding() {
                       ))}
                     </div>
                   </div>
-
-                  {/* Column 2 — scrolls down (reversed) */}
                   <div className="flex-1 overflow-hidden relative h-full">
                     <div className="works-scroll-col works-scroll-down flex flex-col gap-1">
                       {[...portfolioItems.slice(6, 12), ...portfolioItems.slice(6, 12)].map((item, i) => (
@@ -762,8 +707,6 @@ export default function MountainLanding() {
                       ))}
                     </div>
                   </div>
-
-                  {/* Column 3 — scrolls up (slower) */}
                   <div className="flex-1 overflow-hidden relative h-full hidden md:block">
                     <div className="works-scroll-col works-scroll-up-slow flex flex-col gap-1">
                       {[...portfolioItems.slice(12, 18), ...portfolioItems.slice(12, 18)].map((item, i) => (
@@ -779,12 +722,9 @@ export default function MountainLanding() {
             </section>
           </div>
 
-          {/* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */}
-          {/* CONTACT SECTION                                                    */}
-          {/* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */}
+          {/* CONTACT SECTION */}
           <section id="contact" className="max-w-6xl mx-auto py-32 px-4 border-t border-white/[0.06]" ref={contactRef}>
 
-            {/* Ã¢â€â‚¬Ã¢â€â‚¬ Part 1: Services CTA Grid Ã¢â€â‚¬Ã¢â€â‚¬ */}
             <div className="text-center mb-16">
               <p className="text-fuchsia-500 text-[9px] tracking-[0.5em] uppercase font-black mb-6">Ready to Collaborate</p>
               <h2 className="text-3xl md:text-5xl font-black uppercase tracking-[0.08em] text-white/90 mb-4" style={{ textShadow: '0 0 30px rgba(147,51,234,0.2)' }}>
@@ -829,9 +769,7 @@ export default function MountainLanding() {
               ))}
             </div>
 
-            {/* Ã¢â€â‚¬Ã¢â€â‚¬ Part 2: General Contact Ã¢â€â‚¬Ã¢â€â‚¬ */}
             <div className="grid grid-cols-1 lg:grid-cols-5 gap-8" ref={ctaRef}>
-              {/* Contact Form (3/5) */}
               <div className="lg:col-span-3 rounded-[2.5rem] p-8 md:p-12 relative overflow-hidden" style={{ background: 'rgba(15, 10, 35, 0.55)', backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)', border: '1px solid rgba(147,51,234,0.1)', boxShadow: '0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.03)' }}>
                 <div className="flex items-center gap-2 mb-6">
                   <div className="relative">
@@ -853,9 +791,9 @@ export default function MountainLanding() {
                           <span className="text-purple-300/80 text-xs tracking-widest uppercase font-bold">Transmitting...</span>
                         </div>
                       )}
-                      {submitStatus === "delivered" && <p className="text-emerald-400 text-xs tracking-widest uppercase font-bold">Ã¢Å“â€œ Message delivered</p>}
-                      {submitStatus === "received" && <p className="text-emerald-400 text-xs tracking-widest uppercase font-bold">Ã¢Å“â€œÃ¢Å“â€œ Confirmed</p>}
-                      {submitStatus === "error" && <p className="text-red-400 text-xs tracking-widest uppercase font-bold">Ã¢Å“â€¢ {submitError || "Failed"}</p>}
+                      {submitStatus === "delivered" && <p className="text-emerald-400 text-xs tracking-widest uppercase font-bold">✓ Message delivered</p>}
+                      {submitStatus === "received" && <p className="text-emerald-400 text-xs tracking-widest uppercase font-bold">✓✓ Confirmed</p>}
+                      {submitStatus === "error" && <p className="text-red-400 text-xs tracking-widest uppercase font-bold">✕ {submitError || "Failed"}</p>}
                     </div>
                   </div>
                 )}
@@ -881,14 +819,12 @@ export default function MountainLanding() {
                     className={`w-full px-8 py-4 rounded-full ${darkButton} ${submitStatus === "sending" ? "opacity-50 cursor-wait" : ""} ${["delivered", "received"].includes(submitStatus) ? "opacity-40 pointer-events-none" : ""}`}
                     style={{ background: 'rgba(147,51,234,0.15)', boxShadow: '0 0 20px rgba(147,51,234,0.1)' }}
                   >
-                    {submitStatus === "sending" ? "Transmitting..." : submitStatus === "delivered" || submitStatus === "received" ? "Sent Ã¢Å“â€œ" : "Send Message"}
+                    {submitStatus === "sending" ? "Transmitting..." : (submitStatus === "delivered" || submitStatus === "received") ? "Sent ✓" : "Send Message"}
                   </button>
                 </form>
               </div>
 
-              {/* Contact Info (2/5) */}
               <div className="lg:col-span-2 flex flex-col gap-6">
-                {/* Gmail */}
                 <div className="flex-1 rounded-[2rem] p-8 flex flex-col justify-center gap-4" style={{ background: 'rgba(15, 10, 35, 0.5)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)', border: '1px solid rgba(147,51,234,0.08)', boxShadow: '0 4px 20px rgba(0,0,0,0.2)' }}>
                   <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{ background: 'rgba(147,51,234,0.1)' }}>
                     <Mail size={22} className="text-fuchsia-400" />
@@ -899,7 +835,6 @@ export default function MountainLanding() {
                   </div>
                 </div>
 
-                {/* WhatsApp */}
                 <div className="flex-1 rounded-[2rem] p-8 flex flex-col justify-center gap-4" style={{ background: 'rgba(15, 10, 35, 0.5)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)', border: '1px solid rgba(147,51,234,0.08)', boxShadow: '0 4px 20px rgba(0,0,0,0.2)' }}>
                   <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{ background: 'rgba(52,211,153,0.1)' }}>
                     <Phone size={22} className="text-emerald-400" />
@@ -910,7 +845,6 @@ export default function MountainLanding() {
                   </div>
                 </div>
 
-                {/* Response time */}
                 <div className="rounded-[2rem] p-6 text-center" style={{ background: 'rgba(147,51,234,0.06)', border: '1px solid rgba(147,51,234,0.08)' }}>
                   <p className="text-white/25 text-[9px] tracking-widest uppercase font-medium">Average response within 24h</p>
                 </div>
@@ -920,106 +854,87 @@ export default function MountainLanding() {
 
         </div>
 
-        {/* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */}
-        {/* FOOTER Ã¢â‚¬â€ SUMMIT SILHOUETTE                                        */}
-        {/* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */}
+        {/* FOOTER */}
         <footer ref={footerRef} className="relative z-30 overflow-hidden" style={{ background: '#0a0814' }}>
 
-          {/* Ã¢â€â‚¬Ã¢â€â‚¬ Summit Silhouette SVG Ã¢â‚¬â€ rises on scroll Ã¢â€â‚¬Ã¢â€â‚¬ */}
-          <svg
-            ref={summitRef}
-            className="w-full h-auto block"
-            viewBox="0 0 1440 320"
-            preserveAspectRatio="none"
-            style={{ marginBottom: "-4px" }}
-          >
-            <defs>
-              <linearGradient id="summitGrad1" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#7c3aed" stopOpacity="0.15" />
-                <stop offset="100%" stopColor="#1a1a2e" stopOpacity="0.95" />
-              </linearGradient>
-              <linearGradient id="summitGrad2" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#9333ea" stopOpacity="0.08" />
-                <stop offset="100%" stopColor="#0f0f1a" stopOpacity="0.85" />
-              </linearGradient>
-              <linearGradient id="summitGrad3" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#c084fc" stopOpacity="0.06" />
-                <stop offset="60%" stopColor="#1a1a2e" stopOpacity="0.5" />
-                <stop offset="100%" stopColor="#0a0a14" />
-              </linearGradient>
-              <linearGradient id="summitSky" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#0a0814" />
-                <stop offset="40%" stopColor="#0d0b1a" />
-                <stop offset="100%" stopColor="#1a1a2e" stopOpacity="0.3" />
-              </linearGradient>
-            </defs>
-            <style>
-              {`
-                @keyframes pan-clouds {
-                  0% { transform: translateX(0); }
-                  100% { transform: translateX(-1440px); }
-                }
-                .cloud-layer {
-                  animation: pan-clouds 80s linear infinite;
-                }
-              `}
-            </style>
-            {/* Sky gradient backdrop */}
-            <rect width="1440" height="320" fill="url(#summitSky)" />
+          {/* Summit Silhouette — NO Isaiah badge overlay here anymore */}
+          <div className="relative">
+            <svg
+              ref={summitRef}
+              className="w-full h-auto block"
+              viewBox="0 0 1440 320"
+              preserveAspectRatio="none"
+              style={{ marginBottom: "-4px" }}
+            >
+              <defs>
+                <linearGradient id="summitGrad1" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#7c3aed" stopOpacity="0.15" />
+                  <stop offset="100%" stopColor="#1a1a2e" stopOpacity="0.95" />
+                </linearGradient>
+                <linearGradient id="summitGrad2" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#9333ea" stopOpacity="0.08" />
+                  <stop offset="100%" stopColor="#0f0f1a" stopOpacity="0.85" />
+                </linearGradient>
+                <linearGradient id="summitGrad3" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#c084fc" stopOpacity="0.06" />
+                  <stop offset="60%" stopColor="#1a1a2e" stopOpacity="0.5" />
+                  <stop offset="100%" stopColor="#0a0a14" />
+                </linearGradient>
+                <linearGradient id="summitSky" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#0a0814" />
+                  <stop offset="40%" stopColor="#0d0b1a" />
+                  <stop offset="100%" stopColor="#1a1a2e" stopOpacity="0.3" />
+                </linearGradient>
+              </defs>
+              <style>
+                {`
+                  @keyframes pan-clouds {
+                    0% { transform: translateX(0); }
+                    100% { transform: translateX(-1440px); }
+                  }
+                  .cloud-layer {
+                    animation: pan-clouds 80s linear infinite;
+                  }
+                `}
+              </style>
+              <rect width="1440" height="320" fill="url(#summitSky)" />
+              <g className="cloud-layer" fill="rgba(255, 255, 255, 0.04)">
+                <path d="M50,220 L100,180 L150,200 L200,170 L250,210 L300,180 L350,230 Z" />
+                <path d="M400,240 L450,190 L500,210 L550,180 L600,240 Z" />
+                <path d="M700,220 L750,170 L800,200 L850,180 L900,230 Z" />
+                <path d="M1000,250 L1050,210 L1100,230 L1150,190 L1200,250 Z" />
+                <path d="M1300,230 L1340,180 L1380,210 L1420,170 L1460,230 Z" />
+                <path d="M1490,220 L1540,180 L1590,200 L1640,170 L1690,210 L1740,180 L1790,230 Z" />
+                <path d="M1840,240 L1890,190 L1940,210 L1990,180 L2040,240 Z" />
+                <path d="M2140,220 L2190,170 L2240,200 L2290,180 L2340,230 Z" />
+                <path d="M2440,250 L2490,210 L2540,230 L2590,190 L2640,250 Z" />
+                <path d="M2740,230 L2780,180 L2820,210 L2860,170 L2900,230 Z" />
+              </g>
+              <path
+                d="M0,280 L80,240 L160,255 L240,210 L320,230 L400,185 L480,200 L560,160 L640,175 L680,140 L720,120 L760,140 L800,165 L880,190 L960,170 L1040,195 L1120,175 L1200,200 L1280,185 L1360,210 L1440,195 L1440,320 L0,320 Z"
+                fill="url(#summitGrad2)"
+                opacity="0.5"
+              />
+              <path
+                d="M0,290 L60,270 L120,280 L200,245 L280,260 L340,220 L420,235 L480,195 L540,210 L600,175 L660,155 L720,100 L780,155 L820,180 L880,200 L940,185 L1000,210 L1060,195 L1120,215 L1180,200 L1240,225 L1320,210 L1380,230 L1440,220 L1440,320 L0,320 Z"
+                fill="url(#summitGrad1)"
+                opacity="0.75"
+              />
+              <path
+                d="M0,300 L40,290 L100,295 L160,275 L220,285 L280,260 L340,270 L400,245 L440,255 L500,230 L560,240 L620,215 L680,195 L720,160 L760,195 L800,220 L840,235 L900,250 L960,240 L1020,255 L1060,245 L1120,260 L1180,250 L1240,265 L1300,255 L1360,270 L1400,260 L1440,265 L1440,320 L0,320 Z"
+                fill="url(#summitGrad3)"
+              />
+              <path d="M700,170 L720,100 L740,170" fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="1.5" strokeLinejoin="round" />
+              <path d="M710,140 L720,100 L730,140" fill="rgba(255,255,255,0.08)" />
+            </svg>
+          </div>
 
-            {/* Low-poly clouds layer (duplicated for seamless loop) */}
-            <g className="cloud-layer" fill="rgba(255, 255, 255, 0.04)">
-              <path d="M50,220 L100,180 L150,200 L200,170 L250,210 L300,180 L350,230 Z" />
-              <path d="M400,240 L450,190 L500,210 L550,180 L600,240 Z" />
-              <path d="M700,220 L750,170 L800,200 L850,180 L900,230 Z" />
-              <path d="M1000,250 L1050,210 L1100,230 L1150,190 L1200,250 Z" />
-              <path d="M1300,230 L1340,180 L1380,210 L1420,170 L1460,230 Z" />
-
-              <path d="M1490,220 L1540,180 L1590,200 L1640,170 L1690,210 L1740,180 L1790,230 Z" />
-              <path d="M1840,240 L1890,190 L1940,210 L1990,180 L2040,240 Z" />
-              <path d="M2140,220 L2190,170 L2240,200 L2290,180 L2340,230 Z" />
-              <path d="M2440,250 L2490,210 L2540,230 L2590,190 L2640,250 Z" />
-              <path d="M2740,230 L2780,180 L2820,210 L2860,170 L2900,230 Z" />
-            </g>
-
-            {/* Far range Ã¢â‚¬â€ subtle, misty */}
-            <path
-              d="M0,280 L80,240 L160,255 L240,210 L320,230 L400,185 L480,200 L560,160 L640,175 L680,140 L720,120 L760,140 L800,165 L880,190 L960,170 L1040,195 L1120,175 L1200,200 L1280,185 L1360,210 L1440,195 L1440,320 L0,320 Z"
-              fill="url(#summitGrad2)"
-              opacity="0.5"
-            />
-            {/* Mid range Ã¢â‚¬â€ defined peaks */}
-            <path
-              d="M0,290 L60,270 L120,280 L200,245 L280,260 L340,220 L420,235 L480,195 L540,210 L600,175 L660,155 L720,100 L780,155 L820,180 L880,200 L940,185 L1000,210 L1060,195 L1120,215 L1180,200 L1240,225 L1320,210 L1380,230 L1440,220 L1440,320 L0,320 Z"
-              fill="url(#summitGrad1)"
-              opacity="0.75"
-            />
-            {/* Foreground range Ã¢â‚¬â€ sharp, dark */}
-            <path
-              d="M0,300 L40,290 L100,295 L160,275 L220,285 L280,260 L340,270 L400,245 L440,255 L500,230 L560,240 L620,215 L680,195 L720,160 L760,195 L800,220 L840,235 L900,250 L960,240 L1020,255 L1060,245 L1120,260 L1180,250 L1240,265 L1300,255 L1360,270 L1400,260 L1440,265 L1440,320 L0,320 Z"
-              fill="url(#summitGrad3)"
-            />
-            {/* Snow caps accent */}
-            <path
-              d="M700,170 L720,100 L740,170"
-              fill="none"
-              stroke="rgba(255,255,255,0.2)"
-              strokeWidth="1.5"
-              strokeLinejoin="round"
-            />
-            <path
-              d="M710,140 L720,100 L730,140"
-              fill="rgba(255,255,255,0.08)"
-            />
-          </svg>
-
-          {/* Ã¢â€â‚¬Ã¢â€â‚¬ Footer Content Ã¢â€â‚¬Ã¢â€â‚¬ */}
+          {/* Footer Content */}
           <div style={{ background: "linear-gradient(to bottom, #0a0a14, #0d0d1a 40%, #111126)" }} className="relative">
-
             <div className="relative z-10 max-w-6xl mx-auto px-6 sm:px-12 pt-16 pb-10">
 
-              {/* Ã¢â€â‚¬Ã¢â€â‚¬ Top row: Brand + Contact Ã¢â€â‚¬Ã¢â€â‚¬ */}
-              <div className="footer-animate flex flex-col lg:flex-row items-start lg:items-center justify-between gap-12 mb-16">
+              {/* ── Top row: Brand + Isaiah badge (center) + Contact ── */}
+              <div className="footer-animate flex flex-col lg:flex-row items-start lg:items-center justify-between gap-8 mb-16">
 
                 {/* Brand block */}
                 <div className="flex items-center gap-4">
@@ -1037,7 +952,15 @@ export default function MountainLanding() {
                   </div>
                 </div>
 
-                {/* Contact info Ã¢â‚¬â€ display only */}
+                {/* ── Isaiah 60–61 badge — centered between brand and contact ── */}
+                <div className="inline-flex items-center gap-2.5 px-5 py-2 rounded-full border border-white/[0.1]" style={{ background: "rgba(0,0,0,0.3)", backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)" }}>
+                  <span className="w-1.5 h-1.5 rounded-full bg-purple-500 animate-pulse" style={{ boxShadow: '0 0 8px rgba(168,85,247,0.8)' }} />
+                  <span className="text-white/90 text-[11px] tracking-[0.25em] uppercase science-gothic-brand">
+                    Isaiah 60 &mdash; 61
+                  </span>
+                </div>
+
+                {/* Contact info */}
                 <div className="flex items-center gap-5 flex-wrap">
                   <span className="flex items-center gap-2.5 text-white/50 text-xs font-medium tracking-wide">
                     <span className="w-1.5 h-1.5 rounded-full bg-purple-500/50" />
@@ -1051,12 +974,11 @@ export default function MountainLanding() {
                 </div>
               </div>
 
-              {/* Ã¢â€â‚¬Ã¢â€â‚¬ Divider Ã¢â€â‚¬Ã¢â€â‚¬ */}
+              {/* Divider */}
               <div className="footer-animate w-full h-px mb-10" style={{ background: "linear-gradient(to right, transparent, rgba(147,51,234,0.25), rgba(255,255,255,0.06), rgba(147,51,234,0.25), transparent)" }} />
 
-              {/* Ã¢â€â‚¬Ã¢â€â‚¬ Middle row: Quick links + Status Ã¢â€â‚¬Ã¢â€â‚¬ */}
+              {/* Middle row: Quick links + Status */}
               <div className="footer-animate flex flex-col md:flex-row items-start md:items-center justify-between gap-8 mb-10">
-                {/* Quick links */}
                 <nav className="flex flex-wrap items-center gap-6 text-[9px] tracking-[0.25em] uppercase font-bold">
                   {["Services", "Team", "Stack", "Projects", "Contact"].map((link) => (
                     <a
@@ -1069,16 +991,15 @@ export default function MountainLanding() {
                   ))}
                 </nav>
 
-                {/* Status indicator */}
                 <div className="flex items-center gap-3">
                   <div className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_10px_rgba(52,211,153,0.6)] animate-pulse" />
                   <span className="text-[9px] tracking-[0.25em] uppercase text-white/30 font-bold">Systems Operational</span>
                 </div>
               </div>
 
-              {/* Ã¢â€â‚¬Ã¢â€â‚¬ Bottom row: Copyright + Location Ã¢â€â‚¬Ã¢â€â‚¬ */}
+              {/* Bottom row: Copyright + Location */}
               <div className="footer-animate flex flex-col sm:flex-row items-center justify-between gap-4 text-[9px] tracking-[0.3em] uppercase text-white/20 font-medium">
-                <p>Ã‚Â© {new Date().getFullYear()} Prominence. All operational rights reserved.</p>
+                <p>© {new Date().getFullYear()} Prominence. All operational rights reserved.</p>
                 <div className="flex items-center gap-2">
                   <svg className="w-3 h-3 text-purple-500/40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
@@ -1088,19 +1009,9 @@ export default function MountainLanding() {
                 </div>
               </div>
 
-              {/* Isaiah Overline moved to footer */}
-              <div className="footer-animate flex justify-center mt-12">
-                <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-white/[0.02] backdrop-blur-xl border border-white/[0.08] border-t-white/[0.15] border-l-white/[0.12] transition-all duration-300 hover:border-purple-500/35">
-                  <span className="w-1.5 h-1.5 rounded-full bg-purple-500 animate-pulse" style={{ boxShadow: '0 0 8px rgba(168,85,247,0.8)' }} />
-                  <span className="text-white/80 text-[11px] tracking-[0.25em] uppercase science-gothic-brand">
-                    Isaiah 60 &mdash; 61
-                  </span>
-                </div>
-              </div>
-
             </div>
 
-            {/* Ã¢â€â‚¬Ã¢â€â‚¬ Bottom glow accent Ã¢â€â‚¬Ã¢â€â‚¬ */}
+            {/* Bottom glow accent */}
             <div
               className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[600px] h-[2px] pointer-events-none"
               style={{ background: "linear-gradient(to right, transparent, rgba(147,51,234,0.4), transparent)" }}
