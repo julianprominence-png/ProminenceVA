@@ -15,7 +15,7 @@
   position: relative;
   overflow: hidden;
 
-  /* ── Soft gradient edge fades (top + bottom) ── */
+  /* ── Soft gradient edge fades (top + bottom via CSS mask) ── */
   mask-image: linear-gradient(
     to bottom,
     transparent 0%,
@@ -30,6 +30,66 @@
     black 90%,
     transparent 100%
   );
+}
+
+/* ── Left + right edge fades via pseudo-elements ──
+ *  More reliable cross-browser than mask-composite.
+ *  Uses --gallery-bg custom property set on the container.
+ */
+.infinite-gallery-container::before,
+.infinite-gallery-container::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 8%;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.infinite-gallery-container::before {
+  left: 0;
+  background: linear-gradient(
+    to right,
+    var(--gallery-bg, #e6eaf0) 0%,
+    transparent 100%
+  );
+}
+
+.infinite-gallery-container::after {
+  right: 0;
+  background: linear-gradient(
+    to left,
+    var(--gallery-bg, #e6eaf0) 0%,
+    transparent 100%
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════ */
+/* Column layout                                                             */
+/* ═══════════════════════════════════════════════════════════════════════════ */
+
+.gallery-columns {
+  display: flex;
+  gap: 4px;
+  height: 100%;
+}
+
+.gallery-column {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+  height: 100%;
+}
+
+/* ── Card spacing wrapper ──
+ *  Using margin-bottom (not flex gap) ensures the space between
+ *  the LAST card of copy-A and the FIRST card of copy-B is
+ *  identical to every other inter-card gap. This is what makes
+ *  the infinite-scroll loop truly seamless.
+ */
+.gallery-card-spacer {
+  margin-bottom: 4px;
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════ */

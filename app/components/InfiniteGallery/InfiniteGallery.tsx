@@ -26,9 +26,9 @@ interface ColumnConfig {
 }
 
 const COLUMN_PRESETS: ColumnConfig[] = [
-  { direction: "up",   duration: 80 },   /* slow, scrolls up   */
+  { direction: "up", duration: 80 },   /* slow, scrolls up   */
   { direction: "down", duration: 60 },   /* medium, scrolls down (parallax) */
-  { direction: "up",   duration: 90 },   /* slowest, scrolls up */
+  { direction: "up", duration: 90 },   /* slowest, scrolls up */
 ];
 
 /* ── Props ── */
@@ -75,31 +75,37 @@ export default function InfiniteGallery({
     return buckets;
   }, [columnCount]);
 
-  /* ── Render ── */
   return (
     <div
       className={`infinite-gallery-container ${className}`}
-      style={{ height }}
+      style={{
+        height,
+        "--gallery-bg": "#e6eaf0",
+      } as React.CSSProperties}
       role="region"
       aria-label="Portfolio Gallery"
     >
-      <div className="flex gap-1 h-full">
+      <div className="gallery-columns">
         {columns.map((col, colIdx) => {
           const config = COLUMN_PRESETS[colIdx % COLUMN_PRESETS.length];
 
           return (
             <div
               key={colIdx}
-              className="flex-1 overflow-hidden relative h-full"
+              className="gallery-column"
             >
               {/*
                * The scroll track contains the column content TWICE.
                * CSS animation scrolls exactly 50% (one full copy),
                * then loops back — perfectly invisible.
+               *
+               * Spacing uses margin-bottom on each card wrapper
+               * (not flex gap) so the distance between the last
+               * item of copy-A and first item of copy-B is
+               * identical to every other gap → truly seamless.
                */}
               <div
                 className={`
-                  flex flex-col gap-1
                   gallery-scroll-track
                   gallery-scroll-${config.direction}
                 `}
@@ -109,11 +115,15 @@ export default function InfiniteGallery({
               >
                 {/* ── First copy ── */}
                 {col.map((img) => (
-                  <GalleryCard key={`a-${img.id}`} image={img} />
+                  <div key={`a-${img.id}`} className="gallery-card-spacer">
+                    <GalleryCard image={img} />
+                  </div>
                 ))}
                 {/* ── Duplicate copy (seamless loop) ── */}
                 {col.map((img) => (
-                  <GalleryCard key={`b-${img.id}`} image={img} />
+                  <div key={`b-${img.id}`} className="gallery-card-spacer">
+                    <GalleryCard image={img} />
+                  </div>
                 ))}
               </div>
             </div>
