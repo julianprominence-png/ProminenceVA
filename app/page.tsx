@@ -18,6 +18,11 @@ const Masonry = dynamic(
   { ssr: false }
 );
 
+const InfiniteGallery = dynamic(
+  () => import("./components/InfiniteGallery/InfiniteGallery"),
+  { ssr: false }
+);
+
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
 }
@@ -674,43 +679,10 @@ export default function MountainLanding() {
         <div className="relative z-30 w-full rounded-t-[3rem] -mt-10 pt-24 pb-32 px-6 sm:px-12" style={{ background: 'linear-gradient(180deg, #e6eaf0 0%, #e6eaf0 15%, #ddd8e8 22%, #c4bbd8 28%, #8b7faa 36%, #5a4e80 43%, #3a3060 50%, #262050 56%, #1e1a3a 62%, #161330 70%, #100e24 80%, #0c0a1a 90%, #0a0814 100%)', overflowX: 'clip' }}>
           <div className="starfield" style={{ top: '0', maskImage: 'linear-gradient(to bottom, transparent 0%, transparent 40%, black 70%)', WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, transparent 40%, black 70%)' }} />
 
-          {/* WORKS — INFINITE SCROLLING SHOWCASE */}
+          {/* WORKS — SEAMLESS AUTO-LOOPING MASONRY GALLERY */}
           <div className="relative -mx-6 sm:-mx-12">
-            <section id="works" className="w-full overflow-hidden" ref={worksRef} style={{ padding: 0, margin: 0, maskImage: 'linear-gradient(to bottom, transparent 0%, black 18%, black 82%, transparent 100%)', WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 18%, black 82%, transparent 100%)' }}>
-              <div className="relative w-full" style={{ height: 'clamp(600px, 85vh, 1000px)' }}>
-                <div className="flex gap-1 h-full items-start" style={{ padding: 0 }}>
-                  <div className="flex-1 overflow-hidden relative h-full">
-                    <div className="works-scroll-col works-scroll-up flex flex-col gap-1">
-                      {[...portfolioItems.slice(0, 6), ...portfolioItems.slice(0, 6)].map((item, i) => (
-                        <div key={`c1-${i}`} className="works-card relative overflow-hidden group cursor-pointer" style={{ height: item.height }}>
-                          <img src={item.img} alt="" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" loading="lazy" />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="flex-1 overflow-hidden relative h-full">
-                    <div className="works-scroll-col works-scroll-down flex flex-col gap-1">
-                      {[...portfolioItems.slice(6, 12), ...portfolioItems.slice(6, 12)].map((item, i) => (
-                        <div key={`c2-${i}`} className="works-card relative overflow-hidden group cursor-pointer" style={{ height: item.height }}>
-                          <img src={item.img} alt="" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" loading="lazy" />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="flex-1 overflow-hidden relative h-full hidden md:block">
-                    <div className="works-scroll-col works-scroll-up-slow flex flex-col gap-1">
-                      {[...portfolioItems.slice(12, 18), ...portfolioItems.slice(12, 18)].map((item, i) => (
-                        <div key={`c3-${i}`} className="works-card relative overflow-hidden group cursor-pointer" style={{ height: item.height }}>
-                          <img src={item.img} alt="" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" loading="lazy" />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
+            <section id="works" ref={worksRef}>
+              <InfiniteGallery />
             </section>
           </div>
 
