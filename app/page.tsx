@@ -18,6 +18,11 @@ const Masonry = dynamic(
   { ssr: false }
 );
 
+const InfiniteGallery = dynamic(
+  () => import("./components/InfiniteGallery/InfiniteGallery"),
+  { ssr: false }
+);
+
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
 }
@@ -552,7 +557,7 @@ export default function MountainLanding() {
   };
 
   return (
-    <>
+    <div>
       {!loaderDone && <TriangleLoader onComplete={handleLoaderComplete} />}
       {loaderDone && <SplashCursor />}
 
@@ -598,10 +603,10 @@ export default function MountainLanding() {
         {/* HERO ON MOUNTAIN */}
         <div ref={heroSpacerRef} className="relative z-10 w-full min-h-[100vh] flex flex-col">
 
-          <div
-            ref={heroSectionRef}
-            className="relative z-10 flex-1 flex flex-col items-center justify-center pt-32 pb-16 sm:pt-20 sm:pb-0 px-4 md:px-0"
-          >
+          <div ref={heroSectionRef} className="relative flex-1 flex flex-col items-center justify-center text-center w-full mt-[136px]">
+
+
+            {/* Headline */}
             <h1
               className="hero-parallax mb-8 flex justify-center gap-0 sm:gap-[2px] science-gothic-brand text-[clamp(0.8rem,4.5vw,1.5rem)] sm:text-[clamp(2.5rem,10vw,8.75rem)]"
               data-speed="0.6"
@@ -642,6 +647,8 @@ export default function MountainLanding() {
             </a>
           </div>
 
+       
+
           <div className="hero-fade-in relative w-full pb-10 pt-16 px-6" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.3) 50%, transparent 100%)' }}>
             <div className="grid grid-cols-1 sm:grid-cols-3 mb-32 gap-16 w-full max-w-full mx-auto">
               {[
@@ -673,43 +680,10 @@ export default function MountainLanding() {
         <div className="relative z-30 w-full rounded-t-[3rem] -mt-10 pt-24 pb-32 px-6 sm:px-12" style={{ background: 'linear-gradient(180deg, #e6eaf0 0%, #e6eaf0 15%, #ddd8e8 22%, #c4bbd8 28%, #8b7faa 36%, #5a4e80 43%, #3a3060 50%, #262050 56%, #1e1a3a 62%, #161330 70%, #100e24 80%, #0c0a1a 90%, #0a0814 100%)', overflowX: 'clip' }}>
           <div className="starfield" style={{ top: '0', maskImage: 'linear-gradient(to bottom, transparent 0%, transparent 40%, black 70%)', WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, transparent 40%, black 70%)' }} />
 
-          {/* WORKS — INFINITE SCROLLING SHOWCASE */}
+          {/* WORKS — SEAMLESS AUTO-LOOPING MASONRY GALLERY */}
           <div className="relative -mx-6 sm:-mx-12">
-            <section id="works" className="w-full overflow-hidden" ref={worksRef} style={{ padding: 0, margin: 0, maskImage: 'linear-gradient(to bottom, transparent 0%, black 18%, black 82%, transparent 100%)', WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 18%, black 82%, transparent 100%)' }}>
-              <div className="relative w-full" style={{ height: 'clamp(600px, 85vh, 1000px)' }}>
-                <div className="flex gap-1 h-full items-start" style={{ padding: 0 }}>
-                  <div className="flex-1 overflow-hidden relative h-full">
-                    <div className="works-scroll-col works-scroll-up flex flex-col gap-1">
-                      {[...portfolioItems.slice(0, 6), ...portfolioItems.slice(0, 6)].map((item, i) => (
-                        <div key={`c1-${i}`} className="works-card relative overflow-hidden group cursor-pointer" style={{ height: item.height }}>
-                          <img src={item.img} alt="" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" loading="lazy" />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="flex-1 overflow-hidden relative h-full">
-                    <div className="works-scroll-col works-scroll-down flex flex-col gap-1">
-                      {[...portfolioItems.slice(6, 12), ...portfolioItems.slice(6, 12)].map((item, i) => (
-                        <div key={`c2-${i}`} className="works-card relative overflow-hidden group cursor-pointer" style={{ height: item.height }}>
-                          <img src={item.img} alt="" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" loading="lazy" />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="flex-1 overflow-hidden relative h-full hidden md:block">
-                    <div className="works-scroll-col works-scroll-up-slow flex flex-col gap-1">
-                      {[...portfolioItems.slice(12, 18), ...portfolioItems.slice(12, 18)].map((item, i) => (
-                        <div key={`c3-${i}`} className="works-card relative overflow-hidden group cursor-pointer" style={{ height: item.height }}>
-                          <img src={item.img} alt="" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" loading="lazy" />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
+            <section id="works" ref={worksRef}>
+              <InfiniteGallery />
             </section>
           </div>
 
@@ -1014,199 +988,6 @@ export default function MountainLanding() {
           </div>
         </footer>
       </div>
-      {/* ISAIAH MODAL */}
-      {isIsaiahModalOpen && (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-6 bg-black/80 backdrop-blur-md" onClick={() => setIsIsaiahModalOpen(false)}>
-          <div 
-            className="relative w-full max-w-4xl max-h-[85vh] overflow-y-auto rounded-3xl p-8 sm:p-12 border border-purple-500/30 shadow-[0_0_50px_rgba(147,51,234,0.15)]"
-            style={{ background: "linear-gradient(180deg, #111126 0%, #0a0a14 100%)" }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <button 
-              onClick={() => setIsIsaiahModalOpen(false)}
-              className="absolute top-6 right-6 w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white/70 hover:text-white hover:bg-white/20 transition-all z-10"
-            >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-            </button>
-
-            <h2 className="text-2xl sm:text-4xl font-black uppercase tracking-widest text-white mb-8 science-gothic-brand text-center drop-shadow-md">
-              Isaiah 60 &mdash; 61
-            </h2>
-            
-            <div className="text-white/80 font-medium leading-relaxed space-y-6 text-base sm:text-lg text-center" style={{ fontFamily: "'Times New Roman', Times, serif" }}>
-              <p>
-                1 Arise, shine, for your light has come,<br/>
-                and the glory of the Lord has risen upon you.<br/>
-                2 For behold, darkness shall cover the earth,<br/>
-                and thick darkness the peoples;<br/>
-                but the Lord will arise upon you,<br/>
-                and his glory will be seen upon you.<br/>
-                3 And nations shall come to your light,<br/>
-                and kings to the brightness of your rising.
-              </p>
-              <p>
-                4 Lift up your eyes all around, and see;<br/>
-                they all gather together, they come to you;<br/>
-                your sons shall come from afar,<br/>
-                and your daughters shall be carried on the hip.<br/>
-                5 Then you shall see and be radiant;<br/>
-                your heart shall thrill and exult,<br/>
-                because the abundance of the sea shall be turned to you,<br/>
-                the wealth of the nations shall come to you.
-              </p>
-              <p>
-                6 A multitude of camels shall cover you,<br/>
-                the young camels of Midian and Ephah;<br/>
-                all those from Sheba shall come.<br/>
-                They shall bring gold and frankincense,<br/>
-                and shall bring good news, the praises of the Lord.<br/>
-                7 All the flocks of Kedar shall be gathered to you;<br/>
-                the rams of Nebaioth shall minister to you;<br/>
-                they shall come up with acceptance on my altar,<br/>
-                and I will beautify my beautiful house.
-              </p>
-              <p>
-                8 Who are these that fly like a cloud,<br/>
-                and like doves to their windows?<br/>
-                9 For the coastlands shall hope for me,<br/>
-                the ships of Tarshish first,<br/>
-                to bring your children from afar,<br/>
-                their silver and gold with them,<br/>
-                for the name of the Lord your God,<br/>
-                and for the Holy One of Israel,<br/>
-                because he has made you beautiful.
-              </p>
-              <p>
-                10 Foreigners shall build up your walls,<br/>
-                and their kings shall minister to you;<br/>
-                for in my wrath I struck you,<br/>
-                but in my favor I have had mercy on you.<br/>
-                11 Your gates shall be open continually;<br/>
-                day and night they shall not be shut,<br/>
-                that people may bring to you the wealth of the nations,<br/>
-                with their kings led in procession.<br/>
-                12 For the nation and kingdom<br/>
-                that will not serve you shall perish;<br/>
-                those nations shall be utterly laid waste.
-              </p>
-              <p>
-                13 The glory of Lebanon shall come to you,<br/>
-                the cypress, the plane, and the pine,<br/>
-                to beautify the place of my sanctuary,<br/>
-                and I will make the place of my feet glorious.<br/>
-                14 The sons of those who afflicted you<br/>
-                shall come bending low to you,<br/>
-                and all who despised you<br/>
-                shall bow down at your feet;<br/>
-                they shall call you the City of the Lord,<br/>
-                the Zion of the Holy One of Israel.
-              </p>
-              <p>
-                15 Whereas you have been forsaken and hated,<br/>
-                with no one passing through,<br/>
-                I will make you majestic forever,<br/>
-                a joy from age to age.<br/>
-                16 You shall suck the milk of nations;<br/>
-                you shall nurse at the breast of kings;<br/>
-                and you shall know that I, the Lord, am your Savior<br/>
-                and your Redeemer, the Mighty One of Jacob.
-              </p>
-              <p>
-                17 Instead of bronze I will bring gold,<br/>
-                and instead of iron I will bring silver;<br/>
-                instead of wood, bronze,<br/>
-                instead of stones, iron.<br/>
-                I will make your overseers peace<br/>
-                and your taskmasters righteousness.<br/>
-                18 Violence shall no more be heard in your land,<br/>
-                devastation or destruction within your borders;<br/>
-                you shall call your walls Salvation,<br/>
-                and your gates Praise.
-              </p>
-              <p>
-                19 The sun shall be no more<br/>
-                your light by day,<br/>
-                nor for brightness shall the moon<br/>
-                give you light;<br/>
-                but the Lord will be your everlasting light,<br/>
-                and your God will be your glory.<br/>
-                20 Your sun shall no more go down,<br/>
-                nor your moon withdraw itself;<br/>
-                for the Lord will be your everlasting light,<br/>
-                and your days of mourning shall be ended.<br/>
-                21 Your people shall all be righteous;<br/>
-                they shall possess the land forever,<br/>
-                the branch of my planting, the work of my hands,<br/>
-                that I might be glorified.<br/>
-                22 The least one shall become a clan,<br/>
-                and the smallest one a mighty nation;<br/>
-                I am the Lord;<br/>
-                in its time I will hasten it.
-              </p>
-              
-              <div className="w-full h-px bg-white/10 my-12" />
-              
-              <p>
-                1 The Spirit of the Lord God is upon me,<br/>
-                because the Lord has anointed me<br/>
-                to bring good news to the poor;<br/>
-                he has sent me to bind up the brokenhearted,<br/>
-                to proclaim liberty to the captives,<br/>
-                and the opening of the prison to those who are bound;<br/>
-                2 to proclaim the year of the Lord&apos;s favor,<br/>
-                and the day of vengeance of our God;<br/>
-                to comfort all who mourn;<br/>
-                3 to grant to those who mourn in Zion—<br/>
-                to give them a beautiful headdress instead of ashes,<br/>
-                the oil of gladness instead of mourning,<br/>
-                the garment of praise instead of a faint spirit;<br/>
-                that they may be called oaks of righteousness,<br/>
-                the planting of the Lord, that he may be glorified.
-              </p>
-              <p>
-                4 They shall build up the ancient ruins;<br/>
-                they shall raise up the former devastations;<br/>
-                they shall repair the ruined cities,<br/>
-                the devastations of many generations.
-              </p>
-              <p>
-                5 Strangers shall stand and tend your flocks;<br/>
-                foreigners shall be your plowmen and vinedressers;<br/>
-                6 but you shall be called the priests of the Lord;<br/>
-                they shall speak of you as the ministers of our God;<br/>
-                you shall eat the wealth of the nations,<br/>
-                and in their glory you shall boast.<br/>
-                7 Instead of your shame there shall be a double portion;<br/>
-                instead of dishonor they shall rejoice in their lot;<br/>
-                therefore in their land they shall possess a double portion;<br/>
-                they shall have everlasting joy.
-              </p>
-              <p>
-                8 For I the Lord love justice;<br/>
-                I hate robbery and wrong;<br/>
-                I will faithfully give them their recompense,<br/>
-                and I will make an everlasting covenant with them.<br/>
-                9 Their offspring shall be known among the nations,<br/>
-                and their descendants in the midst of the peoples;<br/>
-                all who see them shall acknowledge them,<br/>
-                that they are an offspring the Lord has blessed.
-              </p>
-              <p>
-                10 I will greatly rejoice in the Lord;<br/>
-                my soul shall exult in my God,<br/>
-                for he has clothed me with the garments of salvation;<br/>
-                he has covered me with the robe of righteousness,<br/>
-                as a bridegroom decks himself like a priest with a beautiful headdress,<br/>
-                and as a bride adorns herself with her jewels.<br/>
-                11 For as the earth brings forth its sprouts,<br/>
-                and as a garden causes what is sown in it to sprout up,<br/>
-                so the Lord God will cause righteousness and praise<br/>
-                to sprout up before all the nations.
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
-    </>
+    </div>
   );
 }

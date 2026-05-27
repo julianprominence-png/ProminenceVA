@@ -1,0 +1,161 @@
+/* ═══════════════════════════════════════════════════════════════════════════ */
+/* InfiniteGallery — Seamless auto-looping masonry wall                      */
+/*                                                                           */
+/* Technique:                                                                */
+/*   Each column renders its images TWICE. A CSS keyframe animation scrolls  */
+/*   from translateY(0) to translateY(-50%). Because both halves are         */
+/*   identical, the loop-reset is perfectly invisible. Different columns      */
+/*   scroll at different speeds and directions for a parallax effect.        */
+/*                                                                           */
+/*   Hover on the container pauses ALL columns for a moment of stillness.    */
+/*   GPU-accelerated via transform + will-change + backface-visibility.      */
+/* ═══════════════════════════════════════════════════════════════════════════ */
+
+.infinite-gallery-container {
+  position: relative;
+  overflow: hidden;
+
+  /* ── Soft gradient edge fades (top + bottom via CSS mask) ── */
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    black 10%,
+    black 90%,
+    transparent 100%
+  );
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    black 10%,
+    black 90%,
+    transparent 100%
+  );
+}
+
+/* ── Left + right edge fades via pseudo-elements ──
+ *  More reliable cross-browser than mask-composite.
+ *  Uses --gallery-bg custom property set on the container.
+ */
+.infinite-gallery-container::before,
+.infinite-gallery-container::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 8%;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.infinite-gallery-container::before {
+  left: 0;
+  background: linear-gradient(
+    to right,
+    var(--gallery-bg, #e6eaf0) 0%,
+    transparent 100%
+  );
+}
+
+.infinite-gallery-container::after {
+  right: 0;
+  background: linear-gradient(
+    to left,
+    var(--gallery-bg, #e6eaf0) 0%,
+    transparent 100%
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════ */
+/* Column layout                                                             */
+/* ═══════════════════════════════════════════════════════════════════════════ */
+
+.gallery-columns {
+  display: flex;
+  gap: 4px;
+  height: 100%;
+}
+
+.gallery-column {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+  height: 100%;
+}
+
+/* ── Card spacing wrapper ──
+ *  Using margin-bottom (not flex gap) ensures the space between
+ *  the LAST card of copy-A and the FIRST card of copy-B is
+ *  identical to every other inter-card gap. This is what makes
+ *  the infinite-scroll loop truly seamless.
+ */
+.gallery-card-spacer {
+  margin-bottom: 4px;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════ */
+/* Scroll keyframes                                                          */
+/* ═══════════════════════════════════════════════════════════════════════════ */
+
+@keyframes gallery-scroll-up {
+  0%   { transform: translateY(0); }
+  100% { transform: translateY(-50%); }
+}
+
+@keyframes gallery-scroll-down {
+  0%   { transform: translateY(-50%); }
+  100% { transform: translateY(0); }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════ */
+/* Scroll track — GPU-accelerated                                            */
+/* ═══════════════════════════════════════════════════════════════════════════ */
+
+.gallery-scroll-track {
+  will-change: transform;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform: translateZ(0); /* Force GPU layer */
+}
+
+.gallery-scroll-up {
+  animation: gallery-scroll-up var(--scroll-duration, 80s) linear infinite;
+}
+
+.gallery-scroll-down {
+  animation: gallery-scroll-down var(--scroll-duration, 60s) linear infinite;
+}
+
+/* ── Hover pauses ALL columns at once ── */
+.infinite-gallery-container:hover .gallery-scroll-track {
+  animation-play-state: paused;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════ */
+/* Skeleton shimmer                                                          */
+/* ═══════════════════════════════════════════════════════════════════════════ */
+
+@keyframes gallery-shimmer {
+  0%   { background-position: -600px 0; }
+  100% { background-position: 600px 0; }
+}
+
+.gallery-skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(147, 51, 234, 0.04) 0%,
+    rgba(147, 51, 234, 0.12) 40%,
+    rgba(147, 51, 234, 0.04) 80%
+  );
+  background-size: 600px 100%;
+  animation: gallery-shimmer 2s ease-in-out infinite;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════ */
+/* Card focus ring (accessibility)                                           */
+/* ═══════════════════════════════════════════════════════════════════════════ */
+
+.gallery-card:focus-visible {
+  outline: 2px solid rgba(147, 51, 234, 0.6);
+  outline-offset: 2px;
+  border-radius: 0.5rem;
+}
