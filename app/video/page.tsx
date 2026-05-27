@@ -709,6 +709,56 @@ function SelectedWorks() {
   );
 }
 
+function FeaturedVideo() {
+  return (
+    <section id="showcase" className="relative z-10 py-24 md:py-32 lg:py-40 px-6 md:px-12 lg:px-20 max-w-[1600px] mx-auto">
+      <div className="mb-16 md:mb-24">
+        <SectionLabel icon={<Film className="w-3 h-3" />}>Featured Asset</SectionLabel>
+        <motion.h2
+          initial={{ opacity: 0, x: -30 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.8 }}
+          viewport={{ once: true }}
+          className="font-display text-4xl sm:text-5xl lg:text-7xl text-zinc-100"
+        >
+          Cloudinary <span className="text-emerald-600/40 italic font-light">Video</span>
+        </motion.h2>
+      </div>
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8 }}
+        viewport={{ once: true }}
+        className="rounded-[2rem] overflow-hidden border border-emerald-900/20 bg-[#020f08]/80 shadow-2xl"
+      >
+        <div className="aspect-[16/9] relative bg-black">
+          <video
+            src="https://res.cloudinary.com/dzbqzsvoi/video/upload/q_auto/f_auto/v1779809144/blog_33_yulwfs.mp4"
+            autoPlay
+            loop
+            muted
+            playsInline
+            controls
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
+        </div>
+        <div className="p-8 md:p-10">
+          <p className="text-emerald-400 text-[9px] uppercase tracking-[0.35em] mb-4 font-mono">
+            Prominence VA • Routed Asset
+          </p>
+          <h3 className="font-display text-3xl sm:text-4xl text-zinc-100 mb-4">
+            Blog Production Preview
+          </h3>
+          <p className="max-w-3xl text-zinc-400 text-sm leading-relaxed tracking-wide">
+            This clip is loaded directly from Cloudinary and displayed on the /video page as the main video asset.
+          </p>
+        </div>
+      </motion.div>
+    </section>
+  );
+}
+
 /* ─────────────────────────────────────────────
     SERVICES
 ───────────────────────────────────────────── */
@@ -1073,7 +1123,7 @@ export default function Page() {
         <div className="relative z-10 w-full">
           <Nav />
           <Hero />
-          
+          <FeaturedVideo />
           <div className="relative bg-[#010c05]/40 backdrop-blur-[12px] border-t border-emerald-900/20">
             <SelectedWorks />
             <Services />
