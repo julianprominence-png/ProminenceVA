@@ -198,11 +198,11 @@ export default function VideoPage() {
               return (
                 <div
                   key={card.num}
-                  className={`hero-card relative overflow-hidden cursor-pointer flex-shrink-0 transition-all duration-500 ${isActive ? 'pointer-events-none' : 'group'} h-full lg:w-full border-r lg:border-r-0 lg:border-b border-white/15`}
-                  style={{
-                    width: typeof window !== "undefined" && window.innerWidth >= 1024 ? "100%" : isActive ? "280px" : "220px",
-                    height: typeof window !== "undefined" && window.innerWidth >= 1024 ? (isActive ? '160px' : '130px') : "100%",
-                  }}
+                  className={`hero-card relative overflow-hidden cursor-pointer flex-shrink-0 transition-all duration-500 ${
+                    isActive
+                      ? 'pointer-events-none w-[280px] lg:w-full h-full lg:h-[160px]'
+                      : 'group w-[220px] lg:w-full h-full lg:h-[130px]'
+                  } border-r lg:border-r-0 lg:border-b border-white/15`}
                   onClick={() => !isActive && setFeaturedIndex(index)}
                 >
                   <img

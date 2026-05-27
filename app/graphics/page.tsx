@@ -38,10 +38,7 @@ const SERVICES = [
   { icon: Award,              title:"Packaging",        desc:"Packaging that turns an unboxing into a luxury ritual your clients remember." },
 ];
 
-const CARD_W = 340; // px
-const GAP = 0; // px
 const TOTAL_CARDS = WORKS.length;
-const TRACK_W = (CARD_W + GAP) * TOTAL_CARDS;
 
 export default function GraphicsPage() {
   const [formData, setFormData] = useState({ name: "", email: "", message: "" });
@@ -109,9 +106,18 @@ export default function GraphicsPage() {
   return (
     <main className="relative min-h-screen bg-[#07061A] text-white overflow-x-hidden selection:bg-purple-500/30">
       <style>{`
+        :root {
+          --card-w: 260px;
+          --gap: 0px;
+        }
+        @media (min-width: 640px) {
+          :root {
+            --card-w: 340px;
+          }
+        }
         @keyframes carousel-scroll {
           0% { transform: translateX(0); }
-          100% { transform: translateX(-${TRACK_W}px); }
+          100% { transform: translateX(calc(-1 * (var(--card-w) + var(--gap)) * ${TOTAL_CARDS})); }
         }
         .animate-carousel-scroll {
           animation: carousel-scroll 45s linear infinite;
@@ -136,7 +142,7 @@ export default function GraphicsPage() {
       {/* ══════════════════════════════════════════════════════════════ */}
       {/* HERO                                                         */}
       {/* ══════════════════════════════════════════════════════════════ */}
-      <section id="home" className="relative h-screen min-h-[850px] flex flex-col justify-center">
+      <section id="home" className="relative min-h-[100dvh] lg:h-screen lg:min-h-[850px] flex flex-col justify-center pb-12 lg:pb-0 pt-20 lg:pt-0">
         
         {/* Aurora Background */}
         <div className="absolute inset-0 z-0 pointer-events-none opacity-50">
@@ -147,16 +153,16 @@ export default function GraphicsPage() {
         <div className="absolute inset-0 z-0 bg-gradient-to-b from-[#07061A]/40 via-[#07061A]/60 to-[#07061A] pointer-events-none" />
 
         {/* Hero Content — Left Aligned with Right Preview */}
-        <div className="relative z-10 w-full max-w-7xl mx-auto px-6 sm:px-12 flex flex-col lg:flex-row items-center justify-between gap-12 -mt-32">
+        <div className="relative z-10 w-full max-w-7xl mx-auto px-6 sm:px-12 flex flex-col lg:flex-row items-center justify-between gap-8 lg:gap-12 mt-8 lg:-mt-20">
           
           {/* LEFT: Text */}
-          <div className="flex-1 max-w-2xl">
-            <div className="hero-elem inline-flex items-center gap-3 px-5 py-2 mb-8 rounded-full border border-purple-500/20 bg-purple-500/10 backdrop-blur-md">
+          <div className="flex-1 max-w-2xl flex flex-col items-center lg:items-start text-center lg:text-left mt-16 lg:mt-0">
+            <div className="hero-elem inline-flex items-center gap-3 px-5 py-2 mb-6 lg:mb-8 rounded-full border border-purple-500/20 bg-purple-500/10 backdrop-blur-md">
               <div className="w-2 h-2 rounded-full bg-purple-400 animate-pulse" />
               <span className="text-[11px] tracking-[0.3em] uppercase text-purple-200 font-bold">Creative Studio</span>
             </div>
 
-            <h1 className="hero-elem text-[clamp(1.8rem,4vw,3.2rem)] tracking-tight leading-[1] mb-6 drop-shadow-2xl science-gothic-brand">
+            <h1 className="hero-elem text-[clamp(1.2rem,6vw,2.5rem)] md:text-[3rem] lg:text-[2.5rem] xl:text-[3.2rem] tracking-tight leading-[1] mb-4 lg:mb-6 drop-shadow-2xl science-gothic-brand px-4 lg:px-0">
               <span className="text-white">PROMINENCE</span>
               <br />
               <span className="bg-gradient-to-br from-purple-400 to-purple-100 bg-clip-text text-transparent">
@@ -164,14 +170,14 @@ export default function GraphicsPage() {
               </span>
             </h1>
 
-            <p className="hero-elem text-white/60 text-sm sm:text-base lg:text-lg leading-relaxed mb-10 font-medium max-w-xl">
+            <p className="hero-elem text-white/60 text-sm sm:text-base lg:text-lg leading-relaxed mb-8 lg:mb-10 font-medium max-w-xl px-4 sm:px-0">
               We create visual identities so compelling, your audience can&apos;t look away. Precision design for founders who refuse average.
             </p>
 
-            <div className="hero-elem">
+            <div className="hero-elem flex justify-center lg:justify-start">
               <button 
                 onClick={() => document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" })} 
-                className="group relative overflow-hidden bg-white text-black font-bold text-xs tracking-[0.2em] uppercase px-10 py-5 rounded-full flex items-center gap-4 transition-transform hover:scale-105"
+                className="group relative overflow-hidden bg-white text-black font-bold text-xs tracking-[0.2em] uppercase px-8 py-4 lg:px-10 lg:py-5 rounded-full flex items-center gap-4 transition-transform hover:scale-105"
               >
                 <span className="relative z-10">Start a Project</span>
                 <ArrowRight size={16} className="relative z-10 group-hover:translate-x-1 transition-transform" />
@@ -181,7 +187,7 @@ export default function GraphicsPage() {
           </div>
 
           {/* RIGHT: Preview Container */}
-          <div className="hero-elem flex-shrink-0 w-full max-w-[340px] xl:max-w-[420px]">
+          <div className="hero-elem flex-shrink-0 w-full max-w-[260px] sm:max-w-[340px] xl:max-w-[420px] mx-auto lg:mx-0 mt-8 lg:mt-0">
             <div className="relative w-full aspect-[4/5] rounded-2xl overflow-hidden border border-white/10 bg-black/40 shadow-[0_20px_60px_-15px_rgba(124,58,237,0.3)] backdrop-blur-sm flex items-center justify-center group">
               {selectedCard === null ? (
                 <div className="flex flex-col items-center gap-3 text-white/30">
@@ -228,8 +234,8 @@ export default function GraphicsPage() {
 
         {/* Bottom: Infinite Carousel — Polaroid Style */}
         {/* Positioned to overlap the boundary between Hero and Contact sections */}
-        <div className="absolute -bottom-32 left-0 right-0 z-30 overflow-visible pt-6">
-          <div className="flex w-max animate-carousel-scroll hover:[animation-play-state:paused]" style={{ gap: `${GAP}px` }}>
+        <div className="relative w-full z-30 overflow-visible mt-4 lg:mt-8 -mb-16 lg:-mb-32 pt-6">
+          <div className="flex w-max animate-carousel-scroll hover:[animation-play-state:paused]" style={{ gap: 'var(--gap)' }}>
             {carouselCards.map((card, index) => {
               const actualIndex = index % TOTAL_CARDS;
               const isActive = actualIndex === selectedCard;
@@ -238,8 +244,8 @@ export default function GraphicsPage() {
                 <div
                   key={`${card.title}-${index}`}
                   onClick={() => setSelectedCard(actualIndex)}
-                  className={`group relative flex-shrink-0 cursor-pointer transition-all duration-500 hover:-translate-y-6 hover:z-40 ${isActive ? '-translate-y-4 z-30' : ''}`}
-                  style={{ width: `${CARD_W}px` }}
+                  className={`group relative flex-shrink-0 cursor-pointer transition-all duration-500 hover:-translate-y-4 lg:hover:-translate-y-6 hover:z-40 ${isActive ? '-translate-y-2 lg:-translate-y-4 z-30' : ''}`}
+                  style={{ width: 'var(--card-w)' }}
                 >
                   {/* Polaroid Frame */}
                   <div className={`relative w-full bg-[#f8f9fa] p-3 pb-14 shadow-2xl transition-all duration-500 ${isActive ? 'shadow-[0_20px_50px_rgba(168,85,247,0.4)] z-10' : ''}`}>
@@ -274,12 +280,12 @@ export default function GraphicsPage() {
       {/* ══════════════════════════════════════════════════════════════ */}
       {/* CONTACT + SERVICES                                             */}
       {/* ══════════════════════════════════════════════════════════════ */}
-      <section ref={contactRef} id="contact" className="relative z-10 pt-48 pb-32 px-6 sm:px-12 bg-transparent">
+      <section ref={contactRef} id="contact" className="relative z-10 pt-24 lg:pt-48 pb-20 lg:pb-32 px-6 sm:px-12 bg-transparent">
         <div className="max-w-7xl mx-auto">
 
           {/* Section header */}
-          <div className="mb-16">
-            <p className="text-purple-300/80 text-[10px] tracking-[0.4em] uppercase font-black mb-4 drop-shadow-md">Get In Touch</p>
+          <div className="mb-12 lg:mb-16 text-center lg:text-left">
+            <p className="text-purple-300/80 text-[10px] tracking-[0.4em] uppercase font-black mb-2 lg:mb-4 drop-shadow-md">Get In Touch</p>
             <h2 className="text-3xl md:text-5xl font-black uppercase tracking-[0.06em] text-white/90 drop-shadow-sm">
               Start a <span className="text-purple-300">Project</span>
             </h2>
@@ -289,8 +295,8 @@ export default function GraphicsPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-start">
 
             {/* ── LEFT: Contact Form ── */}
-            <div className="bg-white/[0.02] backdrop-blur-xl p-8 sm:p-10 rounded-3xl border border-white/10 shadow-2xl">
-              <p className="text-white/60 text-sm leading-relaxed mb-8 max-w-md">
+            <div className="bg-white/[0.02] backdrop-blur-xl p-6 sm:p-10 rounded-3xl border border-white/10 shadow-2xl">
+              <p className="text-white/60 text-sm leading-relaxed mb-8 max-w-md text-center sm:text-left mx-auto sm:mx-0">
                 Currently accepting bookings for cinematic campaigns. Provide your timeline and vision — we&apos;ll craft the rest.
               </p>
 
@@ -336,7 +342,7 @@ export default function GraphicsPage() {
                   <button
                     type="submit"
                     disabled={submitStatus === "sending"}
-                    className="inline-flex items-center gap-3 px-10 py-4 rounded-full border border-purple-400/40 hover:border-purple-300 bg-purple-600/30 hover:bg-purple-500/40 text-white font-bold text-[10px] tracking-[0.2em] uppercase transition-all duration-300 shadow-xl"
+                    className="w-full sm:w-auto justify-center inline-flex items-center gap-3 px-10 py-4 rounded-full border border-purple-400/40 hover:border-purple-300 bg-purple-600/30 hover:bg-purple-500/40 text-white font-bold text-[10px] tracking-[0.2em] uppercase transition-all duration-300 shadow-xl"
                   >
                     {submitStatus === "sending" ? "Sending..." : "Send Message"}
                     <Send className="w-3.5 h-3.5" />
@@ -346,8 +352,8 @@ export default function GraphicsPage() {
             </div>
 
             {/* ── RIGHT: Services ── */}
-            <div>
-              <p className="text-purple-300/80 text-[10px] tracking-[0.4em] uppercase font-black mb-6 drop-shadow-md">Expertise</p>
+            <div className="mt-12 lg:mt-0">
+              <p className="text-purple-300/80 text-[10px] tracking-[0.4em] uppercase font-black mb-6 drop-shadow-md text-center lg:text-left">Expertise</p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {SERVICES.map((s, i) => (
                   <motion.div
@@ -406,8 +412,8 @@ export default function GraphicsPage() {
         <div style={{ background: "linear-gradient(to bottom, #0a0a14, #0d0d1a 40%, #111126)" }} className="relative border-t border-white/5">
           <div className="relative z-10 max-w-6xl mx-auto px-6 sm:px-12 pt-16 pb-10">
             {/* Brand + Contact */}
-            <div className="footer-animate flex flex-col lg:flex-row items-start lg:items-center justify-between gap-12 mb-16">
-              <div className="flex items-center gap-4">
+            <div className="footer-animate flex flex-col lg:flex-row items-center lg:items-center justify-between gap-8 lg:gap-12 mb-12 lg:mb-16">
+              <div className="flex flex-col sm:flex-row items-center gap-4 text-center sm:text-left">
                 <div className="w-12 h-12 rounded-xl overflow-hidden flex items-center justify-center relative" style={{ background: "rgba(147,51,234,0.12)", boxShadow: "0 0 30px rgba(147,51,234,0.15), inset 0 1px 1px rgba(255,255,255,0.05)" }}>
                   <img src="/images/icon-logo.png" alt="Prominence" className="w-full h-full object-cover" onError={(e) => ((e.target as HTMLImageElement).style.display = "none")} />
                 </div>
@@ -416,7 +422,7 @@ export default function GraphicsPage() {
                   <p className="text-[9px] tracking-[0.3em] uppercase text-purple-400/60 font-semibold mt-0.5">Virtual Assistance</p>
                 </div>
               </div>
-              <div className="flex items-center gap-5 flex-wrap">
+              <div className="flex justify-center items-center gap-5 flex-wrap">
                 <span className="flex items-center gap-2.5 text-white/50 text-xs font-medium tracking-wide">
                   <span className="w-1.5 h-1.5 rounded-full bg-purple-500/50" />
                   prominence.va@gmail.com
