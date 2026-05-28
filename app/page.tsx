@@ -216,6 +216,7 @@ export default function MountainLanding() {
   const ctaRef = useRef<HTMLDivElement>(null);
   const footerRef = useRef<HTMLElement>(null);
   const summitRef = useRef<SVGSVGElement>(null);
+  const peakMaskRef = useRef<HTMLDivElement>(null);
 
   const router = useRouter();
   const [transitioning, setTransitioning] = useState(false);
@@ -385,6 +386,26 @@ export default function MountainLanding() {
         gsap.fromTo(mountainBgRef.current, { scale: 1.4 }, {
           scale: 1.0, ease: "power2.out",
           scrollTrigger: { trigger: heroSpacerRef.current, start: "top top", end: "bottom top", scrub: 1.8 },
+        });
+      }
+
+      if (peakMaskRef.current) {
+        const peakInner = peakMaskRef.current.querySelector('.peak-mask-inner') as HTMLElement;
+        if (peakInner) {
+          gsap.fromTo(peakInner, { scale: 1.4 }, {
+            scale: 1.0, ease: "power2.out",
+            scrollTrigger: { trigger: heroSpacerRef.current, start: "top top", end: "bottom top", scrub: 1.8 },
+          });
+        }
+        gsap.to(peakMaskRef.current, {
+          opacity: 0,
+          ease: "none",
+          scrollTrigger: {
+            trigger: heroSpacerRef.current,
+            start: "60% top",
+            end: "bottom top",
+            scrub: 1,
+          },
         });
       }
 
@@ -600,11 +621,60 @@ export default function MountainLanding() {
           <div className="absolute inset-0 pointer-events-none opacity-60" style={{ background: "linear-gradient(to bottom, rgba(2,1,4,0.3) 0%, transparent 20%, transparent 70%, rgba(230,234,240,0.3) 82%, rgba(230,234,240,0.6) 90%, #e6eaf0 100%)" }} />
         </div>
 
+        {/* MOUNTAIN PEAK FOREGROUND MASK — 3D depth overlapping text */}
+        <div ref={peakMaskRef} className="fixed inset-0 z-[15] pointer-events-none">
+          <div className="peak-mask-inner absolute inset-0 will-change-transform" style={{
+            backgroundImage: "url('/images/mountain.jpg')",
+            backgroundSize: 'cover',
+            backgroundPosition: 'center center',
+            transform: 'scale(1.4)',
+            maskImage: 'radial-gradient(ellipse 20% 14% at 50% 32%, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.2) 45%, transparent 70%)',
+            WebkitMaskImage: 'radial-gradient(ellipse 20% 14% at 50% 32%, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.2) 45%, transparent 70%)',
+          }} />
+        </div>
+
         {/* HERO ON MOUNTAIN */}
         <div ref={heroSpacerRef} className="relative z-10 w-full min-h-[100vh] flex flex-col">
 
           <div ref={heroSectionRef} className="relative flex-1 flex flex-col items-center justify-center text-center w-full mt-[136px]">
 
+
+
+
+            {/* Iridescent light flares — screen blend for additive color */}
+            <div className="absolute inset-0 pointer-events-none overflow-hidden" style={{ zIndex: 5, mixBlendMode: 'screen' as const }}>
+              {/* Warm golden flare */}
+              <div className="absolute hero-flare-1" style={{
+                width: '500px', height: '400px',
+                top: '10%', left: '20%',
+                background: 'radial-gradient(ellipse at center, rgba(255,200,120,0.35) 0%, rgba(255,160,80,0.15) 35%, transparent 70%)',
+                filter: 'blur(30px)',
+              }} />
+              {/* Cool purple flare */}
+              <div className="absolute hero-flare-2" style={{
+                width: '450px', height: '500px',
+                top: '5%', right: '15%',
+                background: 'radial-gradient(ellipse at center, rgba(180,120,255,0.3) 0%, rgba(147,51,234,0.12) 40%, transparent 70%)',
+                filter: 'blur(25px)',
+              }} />
+              {/* Cyan accent flare */}
+              <div className="absolute hero-flare-3" style={{
+                width: '350px', height: '300px',
+                top: '25%', left: '38%',
+                background: 'radial-gradient(ellipse at center, rgba(120,220,255,0.25) 0%, rgba(100,180,255,0.1) 35%, transparent 65%)',
+                filter: 'blur(35px)',
+              }} />
+            </div>
+
+            {/* Color-dodge accent — intense light leak hotspot */}
+            <div className="absolute hero-flare-1 pointer-events-none" style={{
+              width: '300px', height: '250px',
+              top: '15%', left: '40%',
+              zIndex: 5,
+              background: 'radial-gradient(ellipse at center, rgba(255,220,180,0.2) 0%, transparent 60%)',
+              filter: 'blur(20px)',
+              mixBlendMode: 'color-dodge' as const,
+            }} />
 
             {/* Headline */}
             <h1
@@ -614,7 +684,9 @@ export default function MountainLanding() {
                 letterSpacing: "0.02em",
                 lineHeight: 0.9,
                 color: "rgba(255,255,255,0.95)",
-                perspective: "1000px"
+                perspective: "1000px",
+                position: "relative" as const,
+                zIndex: 2,
               }}
             >
               {"PROMINENCE".split("").map((letter, i) => (
@@ -624,7 +696,7 @@ export default function MountainLanding() {
                   style={{
                     display: "inline-block",
                     willChange: "transform, filter, opacity",
-                    textShadow: "0 0 30px rgba(147,51,234,0.5), 0 0 60px rgba(147,51,234,0.25), 0 4px 20px rgba(0,0,0,0.5)"
+                    textShadow: "0 0 40px rgba(147,51,234,0.5), 0 0 80px rgba(147,51,234,0.25), 0 0 120px rgba(168,85,247,0.15), 0 4px 20px rgba(0,0,0,0.5)"
                   }}
                 >
                   {letter}
@@ -634,15 +706,20 @@ export default function MountainLanding() {
 
             <a
               href="#contact"
-              className="hero-fade-in hero-parallax group relative inline-flex items-center gap-3 px-10 py-4 rounded-full text-white font-bold text-xs tracking-[0.25em] uppercase transition-all duration-500 hover:scale-105"
+              className="hero-fade-in hero-parallax group relative inline-flex items-center gap-3 px-12 py-5 rounded-full text-white font-bold text-sm tracking-[0.25em] uppercase transition-all duration-500 hover:scale-105"
               data-speed="0.5"
               style={{
-                background: "linear-gradient(135deg, #7c3aed, #9333ea, #a855f7)",
+                background: "rgba(168, 85, 247, 0.3)",
+                backdropFilter: "blur(24px)",
+                WebkitBackdropFilter: "blur(24px)",
+                border: "1px solid rgba(255,255,255,0.35)",
+                boxShadow: "0 0 18px rgba(255,255,255,0.12), 0 0 40px rgba(168,85,247,0.18), inset 0 1px 0 rgba(255,255,255,0.18)",
+                animation: "cta-border-glow 4s ease-in-out infinite",
               }}
             >
               <span>Discover Now</span>
-              <span className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center group-hover:bg-white/30 transition-colors">
-                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>
+              <span className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center group-hover:bg-white/30 transition-colors">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>
               </span>
             </a>
           </div>
