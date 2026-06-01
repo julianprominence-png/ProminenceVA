@@ -8,6 +8,11 @@ import * as THREE from "three";
 import dynamic from "next/dynamic";
 import { Globe, Monitor, Clapperboard, Paintbrush, Mail, Phone } from "lucide-react";
 
+const QuoteModal = dynamic(
+  () => import("./components/QuoteModal/QuoteModal"),
+  { ssr: false }
+);
+
 const SplashCursor = dynamic(
   () => import("./components/SplashCursor/SplashCursor"),
   { ssr: false }
@@ -223,12 +228,17 @@ export default function MountainLanding() {
   const [transitionLabel, setTransitionLabel] = useState("");
   const transitionOverlayRef = useRef<HTMLDivElement>(null);
   const [isIsaiahModalOpen, setIsIsaiahModalOpen] = useState(false);
+  const [quoteModalOpen, setQuoteModalOpen] = useState(false);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
       window.history.scrollRestoration = "manual";
       window.scrollTo(0, 0);
     }
+
+    const handleOpenQuote = () => setQuoteModalOpen(true);
+    window.addEventListener('open-quote-modal', handleOpenQuote);
+    return () => window.removeEventListener('open-quote-modal', handleOpenQuote);
   }, []);
 
   const handleLoaderComplete = () => {
@@ -722,6 +732,24 @@ export default function MountainLanding() {
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>
               </span>
             </a>
+
+            <button
+              onClick={() => setQuoteModalOpen(true)}
+              className="hero-fade-in hero-parallax group relative inline-flex items-center gap-3 px-12 py-5 rounded-full text-white font-bold text-sm tracking-[0.25em] uppercase transition-all duration-500 hover:scale-105 cursor-pointer"
+              data-speed="0.5"
+              style={{
+                background: "linear-gradient(135deg, rgba(124, 58, 237, 0.5), rgba(168, 85, 247, 0.4))",
+                backdropFilter: "blur(24px)",
+                WebkitBackdropFilter: "blur(24px)",
+                border: "1px solid rgba(168,85,247,0.5)",
+                boxShadow: "0 0 25px rgba(168,85,247,0.25), 0 0 50px rgba(147,51,234,0.15), inset 0 1px 0 rgba(255,255,255,0.15)",
+              }}
+            >
+              <span>Get a Quote</span>
+              <span className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center group-hover:bg-white/30 transition-colors">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
+              </span>
+            </button>
           </div>
 
        
@@ -772,9 +800,16 @@ export default function MountainLanding() {
               <h2 className="text-3xl md:text-5xl font-black uppercase tracking-[0.08em] text-white/90 mb-4" style={{ textShadow: '0 0 30px rgba(147,51,234,0.2)' }}>
                 Start a Project
               </h2>
-              <p className="text-white/30 text-sm font-medium max-w-lg mx-auto leading-relaxed">
+              <p className="text-white/30 text-sm font-medium max-w-lg mx-auto leading-relaxed mb-8">
                 Choose a service below or send us a general inquiry.
               </p>
+              <button
+                onClick={() => setQuoteModalOpen(true)}
+                className={`px-10 py-4 rounded-full text-sm cursor-pointer ${darkButton}`}
+                style={{ background: 'linear-gradient(135deg, rgba(124,58,237,0.3), rgba(168,85,247,0.2))', boxShadow: '0 0 30px rgba(147,51,234,0.15)' }}
+              >
+                Get a Quote →
+              </button>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-24">
@@ -1258,6 +1293,9 @@ export default function MountainLanding() {
           </div>
         </div>
       )}
+
+      {/* QUOTE MODAL */}
+      <QuoteModal isOpen={quoteModalOpen} onClose={() => setQuoteModalOpen(false)} />
     </div>
   );
 }

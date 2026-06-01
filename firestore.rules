@@ -1,0 +1,22 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Quotes: anyone can create, only admin can read/update
+    match /quotes/{quoteId} {
+      allow create: if true;
+      allow read, update, delete: if request.auth != null;
+      
+      // Conversation messages subcollection
+      match /messages/{messageId} {
+        allow create: if true;
+        allow read, update, delete: if request.auth != null;
+      }
+    }
+    
+    // Existing contacts rules
+    match /contacts/{contactId} {
+      allow create: if true;
+      allow read, update, delete: if request.auth != null;
+    }
+  }
+}

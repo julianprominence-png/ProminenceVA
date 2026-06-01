@@ -22,6 +22,11 @@ export default function Navbar() {
   const mobileDrawerRef = useRef<HTMLDivElement>(null);
   const navRef = useRef<HTMLDivElement>(null);
 
+  // Hide Navbar completely on admin routes
+  if (pathname?.startsWith('/admin')) {
+    return null;
+  }
+
   /* ── Scroll detection ── */
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
@@ -147,12 +152,18 @@ export default function Navbar() {
           </div>
 
           {/* Contact CTA */}
-          <a
-            href={pathname === '/' ? '#contact' : '/#contact'}
+          <button
+            onClick={() => {
+              if (pathname === '/') {
+                window.dispatchEvent(new CustomEvent('open-quote-modal'));
+              } else {
+                window.location.href = '/#contact';
+              }
+            }}
             className="navbar-cta"
           >
-            Contact Us
-          </a>
+            Get a Quote
+          </button>
 
           {/* Mobile hamburger */}
           <button
@@ -189,13 +200,19 @@ export default function Navbar() {
               About Us
             </Link>
             <div className="navbar-mobile-divider" />
-            <a
-              href={pathname === '/' ? '#contact' : '/#contact'}
+            <button
               className="navbar-mobile-cta"
-              onClick={() => setMobileOpen(false)}
+              onClick={() => {
+                setMobileOpen(false);
+                if (pathname === '/') {
+                  window.dispatchEvent(new CustomEvent('open-quote-modal'));
+                } else {
+                  window.location.href = '/#contact';
+                }
+              }}
             >
-              Contact Us
-            </a>
+              Get a Quote
+            </button>
           </div>
         </div>
       </div>

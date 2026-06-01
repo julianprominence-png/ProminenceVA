@@ -223,6 +223,32 @@ export default function AdminDashboard() {
           ))}
         </div>
 
+        {/* Quick Navigation — Quotes */}
+        <div className="mb-8">
+          <button
+            onClick={() => router.push("/admin/quotes")}
+            className="w-full relative overflow-hidden bg-gradient-to-r from-purple-500/[0.08] to-fuchsia-500/[0.05] backdrop-blur-[60px] border border-purple-500/15 rounded-2xl p-6 md:p-8 group hover:-translate-y-0.5 transition-all duration-500 text-left cursor-pointer"
+          >
+            <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full blur-[60px] opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" style={{ background: "radial-gradient(circle, rgba(168,85,247,0.3), transparent)" }} />
+            <div className="flex items-center justify-between relative z-10">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-xl bg-purple-500/[0.12] border border-purple-500/15 flex items-center justify-center">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-purple-300">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" /><line x1="16" y1="13" x2="8" y2="13" /><line x1="16" y1="17" x2="8" y2="17" />
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="text-white/90 font-medium text-base">Quote Management</h3>
+                  <p className="text-white/30 text-xs mt-0.5">View, reply, and manage client quote requests</p>
+                </div>
+              </div>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white/20 group-hover:text-white/50 group-hover:translate-x-1 transition-all">
+                <polyline points="9 18 15 12 9 6" />
+              </svg>
+            </div>
+          </button>
+        </div>
+
         {/* Contacts Table */}
         <div className="relative overflow-hidden bg-gradient-to-b from-white/[0.03] to-[#020104]/90 backdrop-blur-[60px] border border-white/10 border-b-black/80 rounded-3xl">
           {/* Table header */}
