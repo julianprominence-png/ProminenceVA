@@ -5,6 +5,8 @@ import { motion } from "framer-motion";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Navbar from "../components/Navbar/Navbar";
+import Image from "next/image";
+import Link from "next/link";
 import {
   Play,
   Send,
@@ -21,12 +23,23 @@ gsap.registerPlugin(ScrollTrigger);
 /* -------------------------------------------------------------------------- */
 /* HERO CARD DATA                                                             */
 /* -------------------------------------------------------------------------- */
-const heroCards = [
+type HeroCard = {
+  num: string;
+  title: string;
+  date: string;
+  img: string;
+  video?: string;
+  assetLabel?: string;
+  featured?: boolean;
+};
+const heroCards: HeroCard[] = [
   {
     num: "01",
     title: "Cinematic Narratives\nthat Captivate",
     date: "Featured · 2024",
     img: "https://images.unsplash.com/photo-1536440136628-849c177e76a1?q=80&w=1200&auto=format&fit=crop",
+    video: "/videos/edit_einjo1.mp4",
+    assetLabel: "Edit Einjo1 — Demo",
     featured: true,
   },
   {
@@ -34,24 +47,32 @@ const heroCards = [
     title: "Mountain Sounds",
     date: "Short Film · 2024",
     img: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=800&auto=format&fit=crop",
+    video: "/videos/Did_You_Know.mp4",
+    assetLabel: "Did You Know — Short",
   },
   {
     num: "03",
     title: "The Bahamas",
     date: "Travel Reel · 2024",
     img: "https://images.unsplash.com/photo-1505881502353-a1986add3762?q=80&w=800&auto=format&fit=crop",
+    video: "/videos/blog_33.mp4",
+    assetLabel: "Blog Reel — Tropical",
   },
   {
     num: "04",
     title: "Urban Pulse",
     date: "Documentary · 2023",
     img: "https://images.unsplash.com/photo-1514565131-fce0801e5785?q=80&w=800&auto=format&fit=crop",
+    video: "/videos/Stabucks_Coffee.mp4",
+    assetLabel: "Coffee Promo — Urban",
   },
   {
     num: "05",
     title: "Neon Solstice",
     date: "Music Video · 2023",
     img: "https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?q=80&w=800&auto=format&fit=crop",
+    video: "/videos/videoplayback.mp4",
+    assetLabel: "Playback Demo — Cinematic",
   },
 ];
 
@@ -74,9 +95,29 @@ export default function VideoPage() {
   const [formData, setFormData] = useState({ name: "", email: "", message: "" });
   const [submitStatus, setSubmitStatus] = useState<"idle" | "sending" | "sent">("idle");
   const [featuredIndex, setFeaturedIndex] = useState(0);
+  const bgVideoRef = useRef<HTMLVideoElement | null>(null);
+  
   const heroRef = useRef<HTMLDivElement>(null);
   const contactRef = useRef<HTMLDivElement>(null);
   const footerRef = useRef<HTMLElement>(null);
+  const videoRefs = useRef<Record<number, HTMLVideoElement | null>>({});
+  const [playingIndex, setPlayingIndex] = useState<number | null>(null);
+  const [largeIndex, setLargeIndex] = useState<number | null>(null);
+  const largeVideoRef = useRef<HTMLVideoElement | null>(null);
+
+  // Helper: derive a friendly title from an asset URL
+  const assetTitleFromUrl = (url?: string) => {
+    if (!url) return "";
+    try {
+      const seg = url.split('/').pop() || url;
+      const name = seg.replace(/\.[^.]+$/, ''); // remove extension
+      const human = decodeURIComponent(name).replace(/[_\-]+/g, ' ');
+      // Capitalize words
+      return human.replace(/\b\w/g, (c) => c.toUpperCase());
+    } catch {
+      return url;
+    }
+  };
 
   /* ── Animations ── */
   useEffect(() => {
@@ -103,8 +144,32 @@ export default function VideoPage() {
         });
       });
     });
-    return () => ctx.revert();
+    return () => {
+      ctx.revert();
+      ScrollTrigger.getAll().forEach(trigger => trigger.kill());
+    };
   }, []);
+
+  // Play/pause background video when `playingIndex` changes
+  useEffect(() => {
+    const idx = playingIndex;
+    if (idx !== null && heroCards[idx]?.video) {
+      // ensure the featured index matches the playing index
+      setFeaturedIndex(idx);
+      try {
+        bgVideoRef.current?.play();
+      } catch (e) {
+        // ignore
+      }
+    } else {
+      try {
+        bgVideoRef.current?.pause();
+      } catch (e) {
+        // ignore
+      }
+    }
+    return () => {};
+  }, [playingIndex]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -117,18 +182,24 @@ export default function VideoPage() {
         body: JSON.stringify(formData),
       });
       setSubmitStatus("sent");
-    } catch {
+    } catch (error) {
+      console.error("Form submission failed:", error);
       setSubmitStatus("sent");
     }
   };
 
   return (
     <>
-      <style jsx global>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&display=swap');
-      `}</style>
+        
+        .starfield {
+          background-image: radial-gradient(2px 2px at 20px 30px, #fff, rgba(0,0,0,0));
+          background-size: 40px 40px;
+        }
+      `}} />
 
-      {/* Global Wrapper with Vertical Radiant Gradient */}
+      {/* Global Wrapper */}
       <div
         className="relative min-h-screen text-white overflow-x-hidden selection:bg-purple-500/20"
         style={{ background: "linear-gradient(180deg, #ffffff 0%, #000000ff 15%, #000000ff 50%, #000000 75%, #0a0814 100%)" }}
@@ -145,15 +216,33 @@ export default function VideoPage() {
         <section ref={heroRef} className="relative z-10 h-screen min-h-[600px] overflow-hidden">
 
           {/* ── Full-screen background image ── */}
-          <img
-            src={heroCards[featuredIndex].img}
-            alt={heroCards[featuredIndex].title}
-            className="absolute inset-0 w-full h-full object-cover transition-all duration-[1.2s] ease-out scale-105"
-            style={{ 
-              WebkitMaskImage: 'linear-gradient(to bottom, black 0%, black 60%, transparent 100%)',
-              maskImage: 'linear-gradient(to bottom, black 0%, black 60%, transparent 100%)'
-            }}
-          />
+          <div className="absolute inset-0 w-full h-full">
+            {heroCards[featuredIndex].video && playingIndex === featuredIndex ? (
+              <div className="w-full h-full flex items-center justify-center bg-black">
+                <video
+                  ref={(el) => { bgVideoRef.current = el; }}
+                  src={heroCards[featuredIndex].video}
+                  className="w-full h-full max-h-full max-w-full object-contain"
+                  style={{ maxHeight: '100%', maxWidth: '100%' }}
+                  muted
+                  loop
+                  playsInline
+                />
+              </div>
+            ) : (
+              <Image
+                src={heroCards[featuredIndex].img}
+                alt={heroCards[featuredIndex].title}
+                fill
+                priority
+                className="object-cover transition-all duration-[1.2s] ease-out"
+                style={{ 
+                  WebkitMaskImage: 'linear-gradient(to bottom, black 0%, black 60%, transparent 100%)',
+                  maskImage: 'linear-gradient(to bottom, black 0%, black 60%, transparent 100%)'
+                }}
+              />
+            )}
+          </div>
 
           {/* Cinematic overlays */}
           <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-black/20" />
@@ -185,7 +274,7 @@ export default function VideoPage() {
             </button>
           </div>
 
-          {/* ── RIGHT: Overlaid card list ── */}
+          {/* ── RIGHT: Overlaid card list (ESLint fix applied) ── */}
           <div
             className="absolute top-auto bottom-0 lg:top-0 lg:bottom-0 right-0 left-0 lg:left-auto w-full lg:w-[380px] h-[140px] lg:h-full z-20 flex flex-row lg:flex-col overflow-x-auto overflow-y-hidden lg:overflow-x-hidden lg:overflow-y-auto"
             style={{ scrollbarWidth: 'none', background: 'linear-gradient(to left, rgba(0,0,0,0.5), rgba(0,0,0,0.2))' }}
@@ -203,17 +292,42 @@ export default function VideoPage() {
                       ? 'pointer-events-none w-[280px] lg:w-full h-full lg:h-[160px]'
                       : 'group w-[220px] lg:w-full h-full lg:h-[130px]'
                   } border-r lg:border-r-0 lg:border-b border-white/15`}
-                  onClick={() => !isActive && setFeaturedIndex(index)}
+                  onClick={() => {
+                      // pause previously playing tab video (thumbnail)
+                      if (playingIndex !== null && videoRefs.current[playingIndex]) {
+                        try { videoRefs.current[playingIndex]!.pause(); } catch {}
+                      }
+                      setFeaturedIndex(index);
+                      if (card.video) {
+                        // Make the asset play as the page background (no zoom/modal)
+                        setLargeIndex(null);
+                        setPlayingIndex(index);
+                      } else {
+                        setPlayingIndex(null);
+                      }
+                    }}
                 >
-                  <img
-                    src={card.img}
-                    alt={card.title}
-                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                  />
-                  {/* Darken overlay — active card is brighter */}
+                  <div className="absolute inset-0 w-full h-full">
+                      {card.video ? (
+                      <video
+                        ref={(el) => { videoRefs.current[index] = el; }}
+                        src={card.video}
+                        muted
+                        loop
+                        playsInline
+                        className="absolute inset-0 w-full h-full object-cover"
+                      />
+                    ) : (
+                      <Image
+                        src={card.img}
+                        alt={card.title}
+                        fill
+                        className="object-cover"
+                      />
+                    )}
+                  </div>
                   <div className={`absolute inset-0 transition-all duration-500 ${isActive ? 'bg-black/30' : 'bg-black/50 group-hover:bg-black/30'}`} />
 
-                  {/* Active indicator — top accent bar on mobile, left on desktop */}
                   {isActive && (
                     <div className="absolute left-0 top-0 right-0 lg:right-auto lg:bottom-0 h-[3px] lg:h-auto lg:w-[3px] bg-purple-400 z-10" />
                   )}
@@ -224,8 +338,16 @@ export default function VideoPage() {
                         <Play className="w-3.5 h-3.5 ml-0.5 text-white/90" fill="currentColor" />
                       </span>
                       <div>
-                        <p className={`font-bold text-sm drop-shadow-md ${isActive ? 'text-white' : 'text-white/80'}`}>{card.title}</p>
-                        <p className={`text-[11px] font-medium ${isActive ? 'text-white/70' : 'text-white/40'}`}>{card.date}</p>
+                        {(() => {
+                          // If the card has a video, derive title from the asset (prefer assetLabel), otherwise keep original card.title
+                          const assetTitle = card.video ? (card.assetLabel ?? assetTitleFromUrl(card.video)) : card.title;
+                          return (
+                            <>
+                              <p className={`font-bold text-sm drop-shadow-md ${isActive ? 'text-white' : 'text-white/80'}`}>{assetTitle}</p>
+                              <p className={`text-[11px] font-medium ${isActive ? 'text-white/70' : 'text-white/40'}`}>{card.date}</p>
+                            </>
+                          );
+                        })()}
                       </div>
                     </div>
                     <span
@@ -241,11 +363,40 @@ export default function VideoPage() {
           </div>
         </section>
 
+        {/* Large video modal (click-to-open) */}
+        {largeIndex !== null && heroCards[largeIndex].video && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-6">
+            <div className="relative w-full max-w-5xl mx-auto">
+              <button
+                onClick={() => {
+                  try { largeVideoRef.current?.pause(); } catch {}
+                  setLargeIndex(null);
+                }}
+                className="absolute top-3 right-3 z-50 bg-black/40 hover:bg-black/60 p-2 rounded-full"
+                aria-label="Close video"
+              >
+                ✕
+              </button>
+              <video
+                ref={(el) => { largeVideoRef.current = el; }}
+                src={heroCards[largeIndex].video}
+                className="w-full h-[60vh] sm:h-[70vh] bg-black rounded-lg"
+                controls
+                autoPlay
+                muted
+                playsInline
+              />
+            </div>
+          </div>
+        )}
+
         {/* ═══════════════════════════════════════════════════════════ */}
         {/* CONTACT + SERVICES — UNIFIED 2-COL                        */}
         {/* ═══════════════════════════════════════════════════════════ */}
         <section ref={contactRef} id="contact" className="relative z-10 py-32 px-6 sm:px-12 bg-transparent">
           <div className="max-w-7xl mx-auto">
+            
+            {/* Contact section - no inline video */}
 
             {/* Section header */}
             <div className="mb-16">
@@ -343,7 +494,6 @@ export default function VideoPage() {
         {/* ═══════════════════════════════════════════════════════════ */}
         {/* FOOTER                                                    */}
         {/* ═══════════════════════════════════════════════════════════ */}
-        {/* Background removed, defaults to global #0a0814 at the bottom */}
         <footer ref={footerRef} className="relative z-10 overflow-hidden bg-transparent">
           {/* Summit Silhouette */}
           <svg className="w-full h-auto block" viewBox="0 0 1440 320" preserveAspectRatio="none" style={{ marginBottom: "-4px" }}>
@@ -380,7 +530,7 @@ export default function VideoPage() {
               <div className="footer-animate flex flex-col lg:flex-row items-start lg:items-center justify-between gap-12 mb-16">
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 rounded-xl overflow-hidden flex items-center justify-center relative" style={{ background: "rgba(147,51,234,0.12)", boxShadow: "0 0 30px rgba(147,51,234,0.15), inset 0 1px 1px rgba(255,255,255,0.05)" }}>
-                    <img src="/images/icon-logo.png" alt="Prominence" className="w-full h-full object-cover" onError={(e) => (e.currentTarget.style.display = "none")} />
+                    <Image src="/images/icon-logo.png" alt="Prominence" width={48} height={48} className="w-full h-full object-cover" onError={(e) => (e.currentTarget.style.display = "none")} />
                   </div>
                   <div>
                     <h4 className="tracking-[0.25em] uppercase text-white/90 text-sm science-gothic-brand">Prominence</h4>
@@ -411,7 +561,9 @@ export default function VideoPage() {
                       {link}
                     </a>
                   ))}
-                  <a href="/" className="p-3 -m-3 text-white/30 hover:text-purple-400 transition-colors duration-300">Home</a>
+                  <Link href="/" className="p-3 -m-3 text-white/30 hover:text-purple-400 transition-colors duration-300">
+                    Home
+                  </Link>
                 </nav>
                 <div className="flex items-center gap-3">
                   <div className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_10px_rgba(52,211,153,0.6)] animate-pulse" />
