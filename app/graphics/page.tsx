@@ -16,15 +16,15 @@ if (typeof window !== "undefined") gsap.registerPlugin(ScrollTrigger);
 
 // ─── DATA ───────────────────────────────────────────────────────────────────
 const WORKS = [
-  { title:"Aero Dynamics",  cat:"3D Visualization",img:"https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&q=90" },
-  { title:"Vanguard Motors",  cat:"Digital Campaign",img:"https://images.unsplash.com/photo-1603584173870-7f23fdae1b7a?w=800&q=90" },
-  { title:"Kroma Architecture",cat:"Spatial Design", img:"https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&q=90" },
-  { title:"Maison Velour",    cat:"Brand Identity",  img:"https://images.unsplash.com/photo-1634942537034-2531766767d1?w=800&q=90" },
-  { title:"Luxe Collective",  cat:"Visual Strategy", img:"https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=90" },
-  { title:"Nova Robotics",    cat:"Motion Graphics", img:"https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=800&q=90" },
-  { title:"Atelier & Co.",    cat:"Print Design",    img:"https://images.unsplash.com/photo-1612872087720-bb876e2e67d1?w=800&q=90" },
-  { title:"Aura Skincare",    cat:"Web Development", img:"https://images.unsplash.com/photo-1617897903246-719242758050?w=800&q=90" },
-  { title:"Quantum Interface",cat:"UI/UX Design",    img:"https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=800&q=90" },
+  { title:"Aero Dynamics",    cat:"3D Visualization", img:"https://res.cloudinary.com/dzbqzsvoi/image/upload/q_auto/f_auto/v1779809312/SYC6_ziwiy4.jpg" },
+  { title:"Vanguard Motors",  cat:"Digital Campaign", img:"https://res.cloudinary.com/dzbqzsvoi/image/upload/q_auto/f_auto/v1780411420/TASK_1_-_WHAT_IS_EMTONE_1_egwrrw.jpg" },
+  { title:"Kroma Architecture",cat:"Spatial Design",    img:"https://res.cloudinary.com/dzbqzsvoi/image/upload/q_auto/f_auto/v1780413198/Screenshot_2026-06-02_231248_apfvz5.png" },
+  { title:"Maison Velour",    cat:"Brand Identity",    img:"https://res.cloudinary.com/dzbqzsvoi/image/upload/q_auto/f_auto/v1780405902/TASK8_w8yoby.png" },
+  { title:"Luxe Collective",  cat:"Visual Strategy",   img:"https://res.cloudinary.com/dzbqzsvoi/image/upload/q_auto/f_auto/v1780411857/BROOMES_3_llpwkl.png" },
+  { title:"Nova Robotics",    cat:"Motion Graphics",   img:"https://res.cloudinary.com/dzbqzsvoi/image/upload/q_auto/f_auto/v1780413365/BROOMES_4_lcee8t.png" },
+  { title:"Atelier & Co.",    cat:"Print Design",      img:"https://res.cloudinary.com/dzbqzsvoi/image/upload/q_auto/f_auto/v1780411392/TASK_2_-_TAUT_TONED_2_vv7pko.jpg" },
+  { title:"Aura Skincare",    cat:"Web Development",   img:"https://res.cloudinary.com/dzbqzsvoi/image/upload/q_auto/f_auto/v1780413697/Screenshot_2026-06-02_232114_a4micc.png" },
+  { title:"Quantum Interface",cat:"UI/UX Design",      img:"https://res.cloudinary.com/dzbqzsvoi/image/upload/q_auto/f_auto/v1780411803/truckimage_c7x1kp.png" },
 ];
 
 const SERVICES = [
