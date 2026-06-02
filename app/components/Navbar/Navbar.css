@@ -28,15 +28,19 @@
   max-width: 56rem;
   padding: 0.65rem 0.75rem 0.65rem 1.25rem;
   border-radius: 9999px;
-  background: rgba(230, 234, 240, 0.85);
-  backdrop-filter: blur(24px) saturate(1.8);
-  -webkit-backdrop-filter: blur(24px) saturate(1.8);
-  border: 1px solid rgba(255, 255, 255, 0.6);
+  background: #e6e9ef;
+  box-shadow: 
+    8px 8px 16px rgba(163,177,198,0.5), 
+    -8px -8px 16px rgba(255,255,255,0.7);
+  border: 1px solid rgba(255,255,255,0.4);
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .navbar-wrapper.navbar-scrolled .navbar-inner {
-  background: rgba(230, 234, 240, 0.92);
+  background: #e6e9ef;
+  box-shadow: 
+    12px 12px 24px rgba(163,177,198,0.6), 
+    -12px -12px 24px rgba(255,255,255,0.8);
 }
 
 /* ── Brand ── */

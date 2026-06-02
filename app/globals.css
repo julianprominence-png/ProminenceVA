@@ -18,7 +18,7 @@
 @font-face {
   font-family: 'Astrona';
   src: url('/fonts/astrona.woff2') format('woff2'),
-       url('/fonts/astrona.woff') format('woff');
+    url('/fonts/astrona.woff') format('woff');
   font-weight: normal;
   font-style: normal;
   font-display: swap;
@@ -46,7 +46,8 @@ body {
   position: relative;
 }
 
-body, #__next {
+body,
+#__next {
   max-width: 100vw;
   overflow-x: hidden;
 }
@@ -69,8 +70,15 @@ body, #__next {
 }
 
 @keyframes pulse-glow {
-  0%, 100% { opacity: 0.4; }
-  50% { opacity: 0.7; }
+
+  0%,
+  100% {
+    opacity: 0.4;
+  }
+
+  50% {
+    opacity: 0.7;
+  }
 }
 
 @utility animate-glow {
@@ -78,8 +86,15 @@ body, #__next {
 }
 
 @keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
+
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
 }
 
 @utility animate-float {
@@ -87,9 +102,17 @@ body, #__next {
 }
 
 @keyframes shimmer {
-  0% { opacity: 0.5; }
-  50% { opacity: 1; }
-  100% { opacity: 0.5; }
+  0% {
+    opacity: 0.5;
+  }
+
+  50% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0.5;
+  }
 }
 
 @utility animate-shimmer {
@@ -97,8 +120,15 @@ body, #__next {
 }
 
 @keyframes cinematic-fade {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @utility animate-cinematic-fade {
@@ -139,76 +169,134 @@ body, #__next {
 
 .starfield::before {
   background-image:
-    radial-gradient(1px 1px at 47px 78px, rgba(255,255,255,0.5), transparent),
-    radial-gradient(1px 1px at 132px 210px, rgba(255,255,255,0.35), transparent),
-    radial-gradient(1.2px 1.2px at 265px 55px, rgba(255,255,255,0.55), transparent),
-    radial-gradient(0.8px 0.8px at 310px 340px, rgba(255,255,255,0.3), transparent),
-    radial-gradient(1px 1px at 90px 400px, rgba(255,255,255,0.4), transparent),
-    radial-gradient(1.5px 1.5px at 420px 120px, rgba(255,255,255,0.65), transparent),
-    radial-gradient(0.7px 0.7px at 180px 290px, rgba(255,255,255,0.25), transparent),
-    radial-gradient(1px 1px at 380px 450px, rgba(255,255,255,0.45), transparent),
-    radial-gradient(0.9px 0.9px at 230px 160px, rgba(255,255,255,0.3), transparent),
-    radial-gradient(1.2px 1.2px at 470px 280px, rgba(255,255,255,0.5), transparent),
-    radial-gradient(1px 1px at 55px 490px, rgba(255,255,255,0.35), transparent),
-    radial-gradient(0.8px 0.8px at 340px 35px, rgba(255,255,255,0.4), transparent),
-    radial-gradient(1.3px 1.3px at 150px 440px, rgba(255,255,255,0.55), transparent),
-    radial-gradient(1px 1px at 490px 380px, rgba(255,255,255,0.3), transparent),
-    radial-gradient(0.6px 0.6px at 280px 500px, rgba(255,255,255,0.2), transparent);
+    radial-gradient(1px 1px at 47px 78px, rgba(255, 255, 255, 0.5), transparent),
+    radial-gradient(1px 1px at 132px 210px, rgba(255, 255, 255, 0.35), transparent),
+    radial-gradient(1.2px 1.2px at 265px 55px, rgba(255, 255, 255, 0.55), transparent),
+    radial-gradient(0.8px 0.8px at 310px 340px, rgba(255, 255, 255, 0.3), transparent),
+    radial-gradient(1px 1px at 90px 400px, rgba(255, 255, 255, 0.4), transparent),
+    radial-gradient(1.5px 1.5px at 420px 120px, rgba(255, 255, 255, 0.65), transparent),
+    radial-gradient(0.7px 0.7px at 180px 290px, rgba(255, 255, 255, 0.25), transparent),
+    radial-gradient(1px 1px at 380px 450px, rgba(255, 255, 255, 0.45), transparent),
+    radial-gradient(0.9px 0.9px at 230px 160px, rgba(255, 255, 255, 0.3), transparent),
+    radial-gradient(1.2px 1.2px at 470px 280px, rgba(255, 255, 255, 0.5), transparent),
+    radial-gradient(1px 1px at 55px 490px, rgba(255, 255, 255, 0.35), transparent),
+    radial-gradient(0.8px 0.8px at 340px 35px, rgba(255, 255, 255, 0.4), transparent),
+    radial-gradient(1.3px 1.3px at 150px 440px, rgba(255, 255, 255, 0.55), transparent),
+    radial-gradient(1px 1px at 490px 380px, rgba(255, 255, 255, 0.3), transparent),
+    radial-gradient(0.6px 0.6px at 280px 500px, rgba(255, 255, 255, 0.2), transparent);
   background-size: 520px 540px;
 }
 
 .starfield::after {
   background-image:
-    radial-gradient(1px 1px at 67px 148px, rgba(255,255,255,0.4), transparent),
-    radial-gradient(0.8px 0.8px at 220px 80px, rgba(255,255,255,0.3), transparent),
-    radial-gradient(1.4px 1.4px at 350px 230px, rgba(255,255,255,0.55), transparent),
-    radial-gradient(0.9px 0.9px at 110px 350px, rgba(255,255,255,0.35), transparent),
-    radial-gradient(1px 1px at 450px 60px, rgba(255,255,255,0.45), transparent),
-    radial-gradient(1.1px 1.1px at 30px 260px, rgba(255,255,255,0.5), transparent),
-    radial-gradient(0.7px 0.7px at 400px 420px, rgba(255,255,255,0.25), transparent),
-    radial-gradient(1.3px 1.3px at 175px 15px, rgba(255,255,255,0.6), transparent),
-    radial-gradient(1px 1px at 500px 310px, rgba(255,255,255,0.35), transparent),
-    radial-gradient(0.8px 0.8px at 70px 470px, rgba(255,255,255,0.3), transparent),
-    radial-gradient(1.5px 1.5px at 300px 150px, rgba(255,255,255,0.5), transparent),
-    radial-gradient(0.6px 0.6px at 440px 490px, rgba(255,255,255,0.2), transparent);
+    radial-gradient(1px 1px at 67px 148px, rgba(255, 255, 255, 0.4), transparent),
+    radial-gradient(0.8px 0.8px at 220px 80px, rgba(255, 255, 255, 0.3), transparent),
+    radial-gradient(1.4px 1.4px at 350px 230px, rgba(255, 255, 255, 0.55), transparent),
+    radial-gradient(0.9px 0.9px at 110px 350px, rgba(255, 255, 255, 0.35), transparent),
+    radial-gradient(1px 1px at 450px 60px, rgba(255, 255, 255, 0.45), transparent),
+    radial-gradient(1.1px 1.1px at 30px 260px, rgba(255, 255, 255, 0.5), transparent),
+    radial-gradient(0.7px 0.7px at 400px 420px, rgba(255, 255, 255, 0.25), transparent),
+    radial-gradient(1.3px 1.3px at 175px 15px, rgba(255, 255, 255, 0.6), transparent),
+    radial-gradient(1px 1px at 500px 310px, rgba(255, 255, 255, 0.35), transparent),
+    radial-gradient(0.8px 0.8px at 70px 470px, rgba(255, 255, 255, 0.3), transparent),
+    radial-gradient(1.5px 1.5px at 300px 150px, rgba(255, 255, 255, 0.5), transparent),
+    radial-gradient(0.6px 0.6px at 440px 490px, rgba(255, 255, 255, 0.2), transparent);
   background-size: 580px 500px;
   animation: twinkle-stars 6s ease-in-out infinite alternate;
 }
 
 @keyframes twinkle-stars {
-  0% { opacity: 0.6; }
-  50% { opacity: 1; }
-  100% { opacity: 0.7; }
+  0% {
+    opacity: 0.6;
+  }
+
+  50% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0.7;
+  }
 }
 
 /* ─── Hero Premium Visual Effects ─── */
 
 /* Light flare drift animations */
 @keyframes flare-drift-1 {
-  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.6; }
-  33% { transform: translate(18px, -12px) scale(1.12); opacity: 0.85; }
-  66% { transform: translate(-10px, 6px) scale(0.95); opacity: 0.5; }
+
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.6;
+  }
+
+  33% {
+    transform: translate(18px, -12px) scale(1.12);
+    opacity: 0.85;
+  }
+
+  66% {
+    transform: translate(-10px, 6px) scale(0.95);
+    opacity: 0.5;
+  }
 }
 
 @keyframes flare-drift-2 {
-  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.5; }
-  50% { transform: translate(-15px, 10px) scale(1.18); opacity: 0.75; }
+
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.5;
+  }
+
+  50% {
+    transform: translate(-15px, 10px) scale(1.18);
+    opacity: 0.75;
+  }
 }
 
 @keyframes flare-drift-3 {
-  0%, 100% { transform: translate(0, 0) scale(1) rotate(0deg); opacity: 0.4; }
-  40% { transform: translate(12px, -18px) scale(1.22) rotate(5deg); opacity: 0.7; }
-  80% { transform: translate(-6px, 12px) scale(0.88) rotate(-3deg); opacity: 0.35; }
+
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1) rotate(0deg);
+    opacity: 0.4;
+  }
+
+  40% {
+    transform: translate(12px, -18px) scale(1.22) rotate(5deg);
+    opacity: 0.7;
+  }
+
+  80% {
+    transform: translate(-6px, 12px) scale(0.88) rotate(-3deg);
+    opacity: 0.35;
+  }
 }
 
-.hero-flare-1 { animation: flare-drift-1 8s ease-in-out infinite; }
-.hero-flare-2 { animation: flare-drift-2 10s ease-in-out infinite; }
-.hero-flare-3 { animation: flare-drift-3 12s ease-in-out infinite; }
+.hero-flare-1 {
+  animation: flare-drift-1 8s ease-in-out infinite;
+}
+
+.hero-flare-2 {
+  animation: flare-drift-2 10s ease-in-out infinite;
+}
+
+.hero-flare-3 {
+  animation: flare-drift-3 12s ease-in-out infinite;
+}
 
 /* Glassmorphism CTA glow pulse */
 @keyframes cta-border-glow {
-  0%, 100% { box-shadow: 0 0 18px rgba(255,255,255,0.12), 0 0 40px rgba(168,85,247,0.18), inset 0 1px 0 rgba(255,255,255,0.18); }
-  50% { box-shadow: 0 0 28px rgba(255,255,255,0.2), 0 0 55px rgba(168,85,247,0.28), inset 0 1px 0 rgba(255,255,255,0.25); }
+
+  0%,
+  100% {
+    box-shadow: 0 0 18px rgba(255, 255, 255, 0.12), 0 0 40px rgba(168, 85, 247, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  }
+
+  50% {
+    box-shadow: 0 0 28px rgba(255, 255, 255, 0.2), 0 0 55px rgba(168, 85, 247, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  }
 }
 
 /* ─── 3D Tool Cards ─── */
@@ -248,12 +336,10 @@ body, #__next {
 
 .tool-velocity-text {
   color: rgba(255, 255, 255, 0.08);
-  background: linear-gradient(
-    90deg,
-    rgba(168, 85, 247, 0.18) 0%,
-    rgba(255, 255, 255, 0.12) 50%,
-    rgba(168, 85, 247, 0.18) 100%
-  );
+  background: linear-gradient(90deg,
+      rgba(168, 85, 247, 0.18) 0%,
+      rgba(255, 255, 255, 0.12) 50%,
+      rgba(168, 85, 247, 0.18) 100%);
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -276,9 +362,11 @@ body, #__next {
     transform: translate(-50%, -50%) scale(0.3);
     opacity: 0.6;
   }
+
   70% {
     opacity: 0.15;
   }
+
   100% {
     transform: translate(-50%, -50%) scale(2.5);
     opacity: 0;
@@ -310,16 +398,21 @@ body, #__next {
 
 /* ── Floating particles ── */
 @keyframes loader-particle-float {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translateY(0px) translateX(0px) scale(1);
     opacity: 0;
   }
+
   10% {
     opacity: 1;
   }
+
   90% {
     opacity: 0.6;
   }
+
   50% {
     transform: translateY(-40px) translateX(15px) scale(1.5);
     opacity: 0.8;
@@ -342,9 +435,11 @@ body, #__next {
     transform: translate(-50%, -50%) scale(0);
     opacity: 0;
   }
+
   30% {
     opacity: 1;
   }
+
   100% {
     transform: translate(-50%, -50%) scale(8);
     opacity: 0;
@@ -366,80 +461,96 @@ body, #__next {
   width: 120vmax;
   height: 120vmax;
   transform: translate(-50%, -50%) scale(0);
-  background: conic-gradient(
-    from 0deg,
-    transparent 0deg,
-    rgba(168, 85, 247, 0.15) 8deg,
-    transparent 16deg,
-    transparent 30deg,
-    rgba(255, 255, 255, 0.08) 36deg,
-    transparent 42deg,
-    transparent 60deg,
-    rgba(147, 51, 234, 0.12) 66deg,
-    transparent 72deg,
-    transparent 90deg,
-    rgba(192, 132, 252, 0.10) 96deg,
-    transparent 102deg,
-    transparent 120deg,
-    rgba(255, 255, 255, 0.06) 126deg,
-    transparent 132deg,
-    transparent 150deg,
-    rgba(168, 85, 247, 0.14) 156deg,
-    transparent 162deg,
-    transparent 180deg,
-    rgba(255, 255, 255, 0.07) 186deg,
-    transparent 192deg,
-    transparent 210deg,
-    rgba(147, 51, 234, 0.11) 216deg,
-    transparent 222deg,
-    transparent 240deg,
-    rgba(192, 132, 252, 0.09) 246deg,
-    transparent 252deg,
-    transparent 270deg,
-    rgba(255, 255, 255, 0.05) 276deg,
-    transparent 282deg,
-    transparent 300deg,
-    rgba(168, 85, 247, 0.13) 306deg,
-    transparent 312deg,
-    transparent 330deg,
-    rgba(147, 51, 234, 0.08) 336deg,
-    transparent 342deg,
-    transparent 360deg
-  );
+  background: conic-gradient(from 0deg,
+      transparent 0deg,
+      rgba(168, 85, 247, 0.15) 8deg,
+      transparent 16deg,
+      transparent 30deg,
+      rgba(255, 255, 255, 0.08) 36deg,
+      transparent 42deg,
+      transparent 60deg,
+      rgba(147, 51, 234, 0.12) 66deg,
+      transparent 72deg,
+      transparent 90deg,
+      rgba(192, 132, 252, 0.10) 96deg,
+      transparent 102deg,
+      transparent 120deg,
+      rgba(255, 255, 255, 0.06) 126deg,
+      transparent 132deg,
+      transparent 150deg,
+      rgba(168, 85, 247, 0.14) 156deg,
+      transparent 162deg,
+      transparent 180deg,
+      rgba(255, 255, 255, 0.07) 186deg,
+      transparent 192deg,
+      transparent 210deg,
+      rgba(147, 51, 234, 0.11) 216deg,
+      transparent 222deg,
+      transparent 240deg,
+      rgba(192, 132, 252, 0.09) 246deg,
+      transparent 252deg,
+      transparent 270deg,
+      rgba(255, 255, 255, 0.05) 276deg,
+      transparent 282deg,
+      transparent 300deg,
+      rgba(168, 85, 247, 0.13) 306deg,
+      transparent 312deg,
+      transparent 330deg,
+      rgba(147, 51, 234, 0.08) 336deg,
+      transparent 342deg,
+      transparent 360deg);
   border-radius: 50%;
   pointer-events: none;
 }
 
 /* ── Progress text glow ── */
-.loader-progress-glow {
-}
+.loader-progress-glow {}
 
 /* ── Flash overlay for warp climax ── */
 @keyframes warp-flash {
-  0% { opacity: 0; }
-  50% { opacity: 1; }
-  100% { opacity: 0; }
+  0% {
+    opacity: 0;
+  }
+
+  50% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
 }
 
 .loader-flash {
   position: absolute;
   inset: 0;
-  background: radial-gradient(
-    ellipse 60% 60% at 50% 50%,
-    rgba(255, 255, 255, 0.95),
-    rgba(192, 132, 252, 0.3) 40%,
-    transparent 70%
-  );
+  background: radial-gradient(ellipse 60% 60% at 50% 50%,
+      rgba(255, 255, 255, 0.95),
+      rgba(192, 132, 252, 0.3) 40%,
+      transparent 70%);
   pointer-events: none;
   opacity: 0;
 }
 
 /* ── Ambient scanner line ── */
 @keyframes scanner-sweep {
-  0% { top: 20%; opacity: 0; }
-  10% { opacity: 0.6; }
-  90% { opacity: 0.6; }
-  100% { top: 80%; opacity: 0; }
+  0% {
+    top: 20%;
+    opacity: 0;
+  }
+
+  10% {
+    opacity: 0.6;
+  }
+
+  90% {
+    opacity: 0.6;
+  }
+
+  100% {
+    top: 80%;
+    opacity: 0;
+  }
 }
 
 .loader-scanner {
@@ -448,17 +559,16 @@ body, #__next {
   transform: translateX(-50%);
   width: 200px;
   height: 1px;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(168, 85, 247, 0.5),
-    rgba(255, 255, 255, 0.8),
-    rgba(168, 85, 247, 0.5),
-    transparent
-  );
+  background: linear-gradient(90deg,
+      transparent,
+      rgba(168, 85, 247, 0.5),
+      rgba(255, 255, 255, 0.8),
+      rgba(168, 85, 247, 0.5),
+      transparent);
   animation: scanner-sweep 2.5s ease-in-out infinite;
   pointer-events: none;
 }
+
 /* -------------------------------------------------------------------------- */
 /* WORKS CAROUSEL — INFINITE HORIZONTAL + CARTRIDGE HOVER                     */
 /* -------------------------------------------------------------------------- */
@@ -507,6 +617,60 @@ body, #__next {
   pointer-events: none;
 }
 
+.btn-neumorphic-glow:active {
+    transform: translateY(1px);
+    box-shadow:
+        inset 0 4px 8px rgba(0,0,0,0.6),
+        inset 0 -2px 2px rgba(255,255,255,0.05);
+}
+
+/* -------------------------------------------------------------------------- */
+/* LIGHT NEUMORPHIC BUTTON                                                    */
+/* -------------------------------------------------------------------------- */
+
+.btn-light-neumorphic {
+    /* Responsive sizing handled by padding */
+    border: none;
+    cursor: pointer;
+    border-radius: 999px;
+    background: #e6e9ef;
+    
+    color: #4a5568;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 20px 48px;
+    z-index: 1;
+
+    /* Light neumorphism drop shadows */
+    box-shadow: 
+        8px 8px 16px rgba(163,177,198,0.5), 
+        -8px -8px 16px rgba(255,255,255,0.8);
+    border: 1px solid rgba(255,255,255,0.2);
+    transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.btn-light-neumorphic:hover {
+    transform: translateY(-4px);
+    box-shadow: 
+        12px 12px 20px rgba(163,177,198,0.6), 
+        -12px -12px 20px rgba(255,255,255,0.9);
+}
+
+.btn-light-neumorphic:active {
+    transform: translateY(1px);
+    box-shadow: 
+        inset 4px 4px 8px rgba(163,177,198,0.5), 
+        inset -4px -4px 8px rgba(255,255,255,0.8);
+}
+
 .carousel-card:hover {
   transform: translateY(-55px) scale(1.05);
   box-shadow:
@@ -527,12 +691,10 @@ body, #__next {
 .carousel-card-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    to top,
-    rgba(0, 0, 0, 0.88) 0%,
-    rgba(0, 0, 0, 0.4) 35%,
-    transparent 60%
-  );
+  background: linear-gradient(to top,
+      rgba(0, 0, 0, 0.88) 0%,
+      rgba(0, 0, 0, 0.4) 35%,
+      transparent 60%);
   opacity: 0;
   transition: opacity 0.4s ease;
   display: flex;
@@ -598,6 +760,7 @@ body, #__next {
   0% {
     transform: translateX(0);
   }
+
   100% {
     transform: translateX(-50%);
   }
@@ -608,6 +771,7 @@ body, #__next {
     width: 220px;
     height: 300px;
   }
+
   .carousel-card:hover {
     transform: translateY(-35px) scale(1.03);
   }
@@ -684,8 +848,13 @@ body, #__next {
 }
 
 @keyframes preview-fade-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes preview-scale-in {
@@ -693,6 +862,7 @@ body, #__next {
     transform: scale(0.85) translateY(25px);
     opacity: 0;
   }
+
   to {
     transform: scale(1) translateY(0);
     opacity: 1;
@@ -705,6 +875,7 @@ body, #__next {
     max-height: 70vh;
     border-radius: 14px;
   }
+
   .preview-overlay {
     padding: 20px;
   }

@@ -160,7 +160,7 @@ export default function Navbar() {
                 window.location.href = '/#contact';
               }
             }}
-            className="navbar-cta"
+            className="btn-light-neumorphic !px-6 !py-2.5 !text-[0.6rem] !hidden md:!inline-flex !text-[#E36EFF]"
           >
             Get a Quote
           </button>
@@ -182,7 +182,7 @@ export default function Navbar() {
           {/* Close */}
           <button className="navbar-mobile-close" onClick={() => setMobileOpen(false)} aria-label="Close menu">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+              <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
             </svg>
           </button>
 
@@ -201,7 +201,7 @@ export default function Navbar() {
             </Link>
             <div className="navbar-mobile-divider" />
             <button
-              className="navbar-mobile-cta"
+              className="btn-light-neumorphic !px-6 !py-3 !text-[0.7rem] !w-full mt-2 !text-[#E36EFF]"
               onClick={() => {
                 setMobileOpen(false);
                 if (pathname === '/') {
