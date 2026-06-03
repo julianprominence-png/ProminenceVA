@@ -37,7 +37,7 @@ const GalleryCard = memo(function GalleryCard({ image }: GalleryCardProps) {
       if (v.paused) {
         // assign src on demand to avoid preloading remote videos
         try {
-          if (!v.src || v.src !== image.src) {
+          if (!v.currentSrc || !v.currentSrc.includes(image.src)) {
             // prefer adding a <source> element — some browsers give clearer errors this way
             try {
               // clear existing sources
@@ -161,7 +161,8 @@ const GalleryCard = memo(function GalleryCard({ image }: GalleryCardProps) {
             <video
               ref={videoRef}
               poster={image.poster}
-              preload="none"
+              preload={!image.poster ? "metadata" : "none"}
+              src={!image.poster ? `${image.src}#t=0.001` : undefined}
               onLoadedData={() => setLoaded(true)}
               onClick={(e) => handleActivate(e)}
               onError={(e) => {
@@ -183,7 +184,7 @@ const GalleryCard = memo(function GalleryCard({ image }: GalleryCardProps) {
                 setPlaying(false);
               }}
               className={`absolute inset-0 w-full h-full object-cover transition-all duration-700 ease-out will-change-transform ${
-                playing ? "opacity-100 scale-100" : "opacity-0"
+                loaded && (playing || !image.poster) ? "opacity-100 scale-100" : "opacity-0 scale-[1.03]"
               } group-hover:scale-[1.08]`}
               playsInline
               // start muted to maximize playback success on browsers, then unmute after play
