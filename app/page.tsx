@@ -6,7 +6,8 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import * as THREE from "three";
 import dynamic from "next/dynamic";
-import { Globe, Monitor, Clapperboard, Paintbrush, Mail, Phone } from "lucide-react";
+import { Globe, Clapperboard, Paintbrush, Mail, Phone } from "lucide-react";
+import Image from "next/image";
 
 const QuoteModal = dynamic(
   () => import("./components/QuoteModal/QuoteModal"),
@@ -18,10 +19,7 @@ const SplashCursor = dynamic(
   { ssr: false }
 );
 
-const Masonry = dynamic(
-  () => import("./components/Masonry/Masonry"),
-  { ssr: false }
-);
+// Masonry component removed — not used on this page
 
 const InfiniteGallery = dynamic(
   () => import("./components/InfiniteGallery/InfiniteGallery"),
@@ -35,26 +33,7 @@ if (typeof window !== "undefined") {
 /* -------------------------------------------------------------------------- */
 /* PORTFOLIO DATA — mixed website & video layouts                             */
 /* -------------------------------------------------------------------------- */
-const portfolioItems = [
-  { id: "1", img: "https://picsum.photos/id/1015/600/900", url: "#", height: 500 },
-  { id: "2", img: "https://picsum.photos/id/1011/600/400", url: "#", height: 250 },
-  { id: "3", img: "https://picsum.photos/id/1020/600/800", url: "#", height: 450 },
-  { id: "4", img: "https://picsum.photos/id/1025/600/350", url: "#", height: 220 },
-  { id: "5", img: "https://picsum.photos/id/1035/600/950", url: "#", height: 550 },
-  { id: "6", img: "https://picsum.photos/id/1040/600/400", url: "#", height: 260 },
-  { id: "7", img: "https://picsum.photos/id/1043/600/850", url: "#", height: 480 },
-  { id: "8", img: "https://picsum.photos/id/1050/600/350", url: "#", height: 230 },
-  { id: "9", img: "https://picsum.photos/id/1060/600/750", url: "#", height: 420 },
-  { id: "10", img: "https://picsum.photos/id/1069/600/400", url: "#", height: 270 },
-  { id: "11", img: "https://picsum.photos/id/1074/600/900", url: "#", height: 520 },
-  { id: "12", img: "https://picsum.photos/id/1080/600/350", url: "#", height: 240 },
-  { id: "13", img: "https://picsum.photos/id/119/600/800", url: "#", height: 460 },
-  { id: "14", img: "https://picsum.photos/id/137/600/400", url: "#", height: 250 },
-  { id: "15", img: "https://picsum.photos/id/142/600/950", url: "#", height: 540 },
-  { id: "16", img: "https://picsum.photos/id/152/600/350", url: "#", height: 230 },
-  { id: "17", img: "https://picsum.photos/id/160/600/850", url: "#", height: 470 },
-  { id: "18", img: "https://picsum.photos/id/167/600/400", url: "#", height: 260 },
-];
+// portfolioItems removed — not used in current page
 
 /* -------------------------------------------------------------------------- */
 /* PROCEDURAL CLOUD DENSITY MAP                                               */
@@ -209,7 +188,7 @@ export default function MountainLanding() {
   const [submitError, setSubmitError] = useState("");
 
   const mountainBgRef = useRef<HTMLDivElement>(null);
-  const uiWrapperRef = useRef<HTMLDivElement>(null);
+  // uiWrapperRef removed (unused)
   const heroSectionRef = useRef<HTMLDivElement>(null);
 
   const heroSpacerRef = useRef<HTMLDivElement>(null);
@@ -277,13 +256,14 @@ export default function MountainLanding() {
   /* --- THREE.JS CLOUD SETUP --- */
   useEffect(() => {
     if (!showPage || !threeCanvasRef.current) return;
+    const canvasEl = threeCanvasRef.current;
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
     camera.position.set(0, 5, 70);
     const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
-    threeCanvasRef.current.appendChild(renderer.domElement);
+    canvasEl.appendChild(renderer.domElement);
     const cloudTexture = createProceduralCloudTexture();
     const makeUniforms = (base: number, sun: number, shadow: number, opacity: number, light: number) => ({
       uMap: { value: cloudTexture },
@@ -321,7 +301,14 @@ export default function MountainLanding() {
     const rightFg = createCloudCluster(materialFg, 20, 180, 20, 20, 60, 95);
     const leftWisp = createCloudCluster(materialWisp, 10, 240, 15, 30, 50, 100);
     const rightWisp = createCloudCluster(materialWisp, 10, 240, 15, 30, 50, 100);
-    [leftWisp, rightWisp].forEach(g => g.children.forEach((m: any) => { m.scale.y *= (Math.random() * 0.25 + 0.25); }));
+    type CloudUserData = {
+      rotationSpeed: number;
+      floatSpeed: number;
+      floatOffset: number;
+      floatAmplitude: number;
+    };
+    type CloudMesh = THREE.Mesh & { userData: CloudUserData };
+    [leftWisp, rightWisp].forEach(g => g.children.forEach((child) => { const m = child as CloudMesh; m.scale.y *= (Math.random() * 0.25 + 0.25); }));
     leftBg.position.set(-100, -17, -15); rightBg.position.set(100, -17, -15);
     leftFg.position.set(-80, -20, 8); rightFg.position.set(80, -20, 8);
     leftWisp.position.set(-120, -12, 15); rightWisp.position.set(120, -12, 15);
@@ -346,7 +333,8 @@ export default function MountainLanding() {
       leftWisp.position.x += 0.008; rightWisp.position.x -= 0.008;
       leftWisp.position.y += Math.sin(time * 0.0001) * 0.004;
       rightWisp.position.y += Math.cos(time * 0.0001) * 0.004;
-      [leftBg, rightBg, leftFg, rightFg, leftWisp, rightWisp].forEach(g => g.children.forEach((m: any) => {
+      [leftBg, rightBg, leftFg, rightFg, leftWisp, rightWisp].forEach(g => g.children.forEach((child) => {
+        const m = child as CloudMesh;
         m.rotation.z += m.userData.rotationSpeed;
         m.position.y += Math.sin(time * m.userData.floatSpeed + m.userData.floatOffset) * m.userData.floatAmplitude;
       }));
@@ -382,7 +370,7 @@ export default function MountainLanding() {
       renderer.dispose();
       materialBg.dispose(); materialFg.dispose(); materialWisp.dispose();
       geometry.dispose(); cloudTexture.dispose();
-      if (threeCanvasRef.current) threeCanvasRef.current.innerHTML = "";
+      if (canvasEl) canvasEl.innerHTML = "";
     };
   }, [showPage]);
 
@@ -529,63 +517,7 @@ export default function MountainLanding() {
   const darkButton = "backdrop-blur-xl border border-purple-500/20 hover:border-purple-400/40 active:scale-[0.98] transition-all duration-300 text-purple-300 font-bold uppercase tracking-widest";
   const darkInput = "w-full rounded-xl px-5 py-4 text-sm font-medium text-white/80 outline-none focus:ring-2 focus:ring-purple-500/30 transition-all border border-white/[0.08] placeholder-white/30";
 
-  /* -------------------------------------------------------------------------- */
-  /* MORPH PAGE TRANSITION                                                      */
-  /* -------------------------------------------------------------------------- */
-  const triggerTransition = (href: string, direction: "left" | "right") => {
-    if (transitioning) return;
-    setTransitioning(true);
-    setTransitionLabel(direction === "left" ? "Graphics" : "Video");
-
-    const overlay = transitionOverlayRef.current;
-    if (!overlay) { router.push(href); return; }
-
-    const blobs = gsap.utils.toArray(".morph-blob") as HTMLElement[];
-    const label = overlay.querySelector(".transition-label");
-    const arrow = overlay.querySelector(".transition-arrow");
-
-    const fromX = direction === "left" ? 120 : -120;
-    const rotDir = direction === "left" ? 1 : -1;
-
-    gsap.set(overlay, { display: "block", pointerEvents: "all" });
-
-    const tl = gsap.timeline({
-      onComplete: () => router.push(href),
-    });
-
-    blobs.forEach((blob, i) => {
-      gsap.set(blob, {
-        xPercent: fromX,
-        yPercent: (i % 2 === 0 ? -1 : 1) * 6,
-        scaleY: 0.35 + i * 0.08,
-        scaleX: 1.6,
-        rotation: rotDir * (18 - i * 5),
-        borderRadius: "30% 70% 60% 40% / 55% 35% 65% 45%",
-        opacity: 0,
-      });
-
-      tl.to(blob, {
-        xPercent: 0,
-        yPercent: 0,
-        scaleY: 1,
-        scaleX: 1,
-        rotation: 0,
-        borderRadius: "0%",
-        opacity: 1,
-        duration: 0.65,
-        ease: "back.out(1.4)",
-      }, i * 0.09);
-    });
-
-    if (arrow) {
-      gsap.set(arrow, { opacity: 0, x: rotDir * -80, scale: 0.3, rotation: rotDir * 40 });
-      tl.to(arrow, { opacity: 1, x: 0, scale: 1, rotation: 0, duration: 0.5, ease: "elastic.out(1, 0.55)" }, 0.28);
-    }
-
-    if (label) {
-      tl.to(label, { opacity: 1, y: 0, scale: 1, rotation: 0, duration: 0.55, ease: "back.out(3)" }, 0.38);
-    }
-  };
+  /* Morph page transition removed (unused). Keep overlay markup for future use. */
 
   return (
     <div>
@@ -1003,11 +935,12 @@ export default function MountainLanding() {
                 {/* Brand block */}
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 rounded-xl overflow-hidden flex items-center justify-center relative" style={{ background: "rgba(147,51,234,0.12)", boxShadow: "0 0 30px rgba(147,51,234,0.15), inset 0 1px 1px rgba(255,255,255,0.05)" }}>
-                    <img
+                    <Image
                       src="/images/icon-logo.png"
                       alt="Prominence"
-                      className="w-full h-full object-cover"
-                      onError={(e) => (e.currentTarget.style.display = "none")}
+                      fill
+                      sizes="48px"
+                      className="object-cover"
                     />
                   </div>
                   <div>

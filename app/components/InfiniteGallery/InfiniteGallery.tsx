@@ -14,7 +14,7 @@
 /* ═══════════════════════════════════════════════════════════════════════════ */
 
 import { useMemo, useState, useEffect } from "react";
-import { galleryImages, type GalleryImage } from "./mockApi";
+import { getGalleryImagesRandomized, type GalleryImage } from "./mockApi";
 import GalleryCard from "./GalleryCard";
 import "./InfiniteGallery.css";
 
@@ -66,7 +66,10 @@ export default function InfiniteGallery({
     );
     const heights = new Array(columnCount).fill(0);
 
-    galleryImages.forEach((img) => {
+    // Use a randomized image pool (special asset inserted at a random index)
+    const images = getGalleryImagesRandomized();
+
+    images.forEach((img) => {
       const shortest = heights.indexOf(Math.min(...heights));
       buckets[shortest].push(img);
       heights[shortest] += img.height / img.width; // accumulate aspect ratio

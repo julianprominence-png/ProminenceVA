@@ -205,6 +205,7 @@ export default function GraphicsPage() {
                     src={WORKS[selectedCard].img}
                     alt={WORKS[selectedCard].title}
                     fill
+                    sizes="420px"
                     style={{ objectFit: "cover" }}
                     className="transition-transform duration-700 group-hover:scale-105"
                     unoptimized
@@ -255,6 +256,7 @@ export default function GraphicsPage() {
                         src={card.img} 
                         alt={card.title} 
                         fill 
+                        sizes="260px"
                         style={{ objectFit: "cover" }} 
                         className={`transition-transform duration-700 ${isActive ? 'scale-105' : 'group-hover:scale-105'}`} 
                         unoptimized 

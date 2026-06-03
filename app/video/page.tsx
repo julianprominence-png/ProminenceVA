@@ -234,6 +234,7 @@ export default function VideoPage() {
                 src={heroCards[featuredIndex].img}
                 alt={heroCards[featuredIndex].title}
                 fill
+                sizes="100vw"
                 priority
                 className="object-cover transition-all duration-[1.2s] ease-out"
                 style={{ 
@@ -322,6 +323,7 @@ export default function VideoPage() {
                         src={card.img}
                         alt={card.title}
                         fill
+                        sizes="50vw"
                         className="object-cover"
                       />
                     )}

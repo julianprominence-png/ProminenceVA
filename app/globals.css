@@ -15,14 +15,10 @@
 }
 
 /* ── Custom Font: Astrona ── */
-@font-face {
-  font-family: 'Astrona';
-  src: url('/fonts/astrona.woff2') format('woff2'),
-    url('/fonts/astrona.woff') format('woff');
-  font-weight: normal;
-  font-style: normal;
-  font-display: swap;
-}
+/* Astrona font files are not present in `public/fonts` by default.
+   To avoid 404s, either add `astrona.woff2/woff` to `public/fonts/` or
+   remove references to 'Astrona' in styles. We'll fall back to other
+   available fonts (Orbitron / Science Gothic) until the files are added. */
 
 
 :root {
