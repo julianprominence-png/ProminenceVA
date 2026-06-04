@@ -16,103 +16,100 @@ const GalleryCard = memo(function GalleryCard({ image }: GalleryCardProps) {
   const [loaded, setLoaded] = useState(false);
   const [playing, setPlaying] = useState(false);
   const videoRef = useRef<HTMLVideoElement | null>(null);
+  const isHovered = useRef(false);
+
+  const playVideo = async () => {
+    isHovered.current = true;
+    if (image.type !== "video" || !videoRef.current) return;
+    const v = videoRef.current;
+    
+    try {
+      if (!v.currentSrc || !v.currentSrc.includes(image.src)) {
+        try {
+          while (v.firstChild) v.removeChild(v.firstChild);
+          const srcEl = document.createElement('source');
+          srcEl.src = image.src;
+          srcEl.type = 'video/mp4';
+          (v as any).crossOrigin = 'anonymous';
+          (srcEl as any).crossOrigin = 'anonymous';
+          v.appendChild(srcEl);
+          v.load();
+        } catch (e) {
+          v.src = image.src;
+          try { v.load(); } catch (ee) {}
+        }
+      }
+
+      const canPlay = v.canPlayType && v.canPlayType('video/mp4');
+      if (!canPlay) return;
+
+      v.muted = true;
+      const canPlayPromise = new Promise<void>((resolve) => {
+        if (v.readyState >= 3) return resolve();
+        const onCan = () => {
+          v.removeEventListener('canplay', onCan);
+          resolve();
+        };
+        v.addEventListener('canplay', onCan);
+        setTimeout(() => {
+          try { v.removeEventListener('canplay', onCan); } catch (e) {}
+          resolve();
+        }, 1500);
+      });
+      await canPlayPromise;
+
+      if (!isHovered.current) return; // Prevent playing if hovered out during load
+
+      try {
+        await v.play();
+      } catch (err: any) {
+        if (err.name !== 'AbortError') {
+          try {
+            v.pause();
+            while (v.firstChild) v.removeChild(v.firstChild);
+            v.removeAttribute('src');
+            v.load();
+          } catch (e) {}
+        }
+        return;
+      }
+      
+      if (!isHovered.current) {
+        v.pause();
+        return;
+      }
+      
+      setTimeout(() => {
+        try { v.muted = false; } catch (e) {}
+      }, 250);
+    } catch (err) {
+      console.error("GalleryCard: playback failed", image.id, err);
+    }
+  };
+
+  const pauseVideo = () => {
+    isHovered.current = false;
+    if (image.type !== "video" || !videoRef.current) return;
+    const v = videoRef.current;
+    if (!v.paused) {
+      v.pause();
+    }
+  };
 
   const handleActivate = async (e?: MouseEvent | PointerEvent) => {
-    // If this is a mouse/pointer event and it's not a primary (left) button,
-    // ignore. Allow keyboard activation (no event) and touch (pointerType === 'touch').
     if (e && 'button' in e) {
-      // pointer events may include pointerType
-      // @ts-ignore
       const pointerType = (e as any).pointerType;
       const btn = (e as any).button;
-      if (pointerType === 'mouse' && btn !== 0) return; // only left mouse
+      if (pointerType === 'mouse' && btn !== 0) return;
       if (pointerType === 'pen' && btn !== 0) return;
-      // if pointerType is touch, allow (but user requested left click; keep touch disabled)
-      if (!pointerType && btn !== 0) return; // mouse fallback
+      if (!pointerType && btn !== 0) return;
     }
 
     if (image.type === "video" && videoRef.current) {
-      const v = videoRef.current;
-      console.debug("GalleryCard: activate", image.id, { paused: v.paused, muted: v.muted });
-      if (v.paused) {
-        // assign src on demand to avoid preloading remote videos
-        try {
-          if (!v.currentSrc || !v.currentSrc.includes(image.src)) {
-            // prefer adding a <source> element — some browsers give clearer errors this way
-            try {
-              // clear existing sources
-              while (v.firstChild) v.removeChild(v.firstChild);
-              const srcEl = document.createElement('source');
-              srcEl.src = image.src;
-              srcEl.type = 'video/mp4';
-              // set CORS to help remote hosts that allow cross-origin fetches
-              // (Cloudinary typically permits this, but set as a safety net)
-              (v as any).crossOrigin = 'anonymous';
-              (srcEl as any).crossOrigin = 'anonymous';
-              v.appendChild(srcEl);
-              v.load();
-            } catch (e) {
-              // fallback to direct assignment
-              v.src = image.src;
-              try { v.load(); } catch (ee) { /* ignore */ }
-            }
-          }
-
-          // simple capability check
-          const canPlay = v.canPlayType && v.canPlayType('video/mp4');
-          if (!canPlay) {
-            console.warn('GalleryCard: video may not be playable in this client (canPlayType):', image.id, canPlay);
-            // bail early to avoid NotSupportedError
-            return;
-          }
-
-          // Start muted first to maximize success across browsers, then unmute.
-          v.muted = true;
-
-          // Wait for 'canplay' event (or timeout) before attempting to play to reduce AbortError.
-          const canPlayPromise = new Promise<void>((resolve) => {
-            if (v.readyState >= 3) return resolve();
-            const onCan = () => {
-              v.removeEventListener('canplay', onCan);
-              resolve();
-            };
-            v.addEventListener('canplay', onCan);
-            // safety timeout
-            setTimeout(() => {
-              try { v.removeEventListener('canplay', onCan); } catch (e) {}
-              resolve();
-            }, 1500);
-          });
-          await canPlayPromise;
-
-          try {
-            await v.play();
-            console.debug('GalleryCard: muted play started', image.id);
-          } catch (err) {
-            console.error('GalleryCard: playback failed (muted fallback)', image.id, err);
-            // restore poster and leave video unloaded — avoids repeated failing requests
-            try {
-              v.pause();
-              // remove sources to prevent further network attempts
-              while (v.firstChild) v.removeChild(v.firstChild);
-              v.removeAttribute('src');
-              v.load();
-            } catch (e) { /* ignore */ }
-            return;
-          }
-          // attempt to unmute shortly after playback begins (user intended gesture)
-          setTimeout(() => {
-            try {
-              v.muted = false;
-            } catch (e) {
-              /* ignore */
-            }
-          }, 250);
-        } catch (err) {
-          console.error("GalleryCard: playback failed (muted fallback)", image.id, err);
-        }
+      if (videoRef.current.paused) {
+        playVideo();
       } else {
-        v.pause();
+        pauseVideo();
       }
     }
   };
@@ -123,6 +120,8 @@ const GalleryCard = memo(function GalleryCard({ image }: GalleryCardProps) {
       role="figure"
       aria-label={`${image.title} — ${image.category}`}
       tabIndex={0}
+      onMouseEnter={playVideo}
+      onMouseLeave={pauseVideo}
     >
       {/*
        * aspect-ratio locks the card dimensions BEFORE the image loads,

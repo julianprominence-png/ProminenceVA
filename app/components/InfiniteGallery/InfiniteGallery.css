@@ -125,10 +125,12 @@
   animation: gallery-scroll-down var(--scroll-duration, 60s) linear infinite;
 }
 
-/* ── Hover pauses ALL columns at once ── */
+/* ── Hover pauses ALL columns at once (Disabled as per request) ── */
+/*
 .infinite-gallery-container:hover .gallery-scroll-track {
   animation-play-state: paused;
 }
+*/
 
 /* ═══════════════════════════════════════════════════════════════════════════ */
 /* Skeleton shimmer                                                          */
