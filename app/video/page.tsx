@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Navbar from "../components/Navbar/Navbar";
+import SplashCursor from "../components/SplashCursor"; // Adjust path if necessary
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -206,6 +207,16 @@ export default function VideoPage() {
       >
         {/* Starfield */}
         <div className="starfield fixed inset-0 z-0 opacity-40 mix-blend-screen" />
+
+        {/* ── Fluid Cursor Effect ── */}
+        <SplashCursor 
+          RAINBOW_MODE={false} 
+          COLOR="#9333ea" 
+          SPLAT_RADIUS={0.1} 
+          SPLAT_FORCE={4000} 
+          VELOCITY_DISSIPATION={3} 
+          CURL={5} 
+        />
 
         {/* Navbar */}
         <Navbar />
