@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, Suspense } from "react";
 import { useRouter } from "next/navigation";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -19,8 +19,6 @@ const SplashCursor = dynamic(
   { ssr: false }
 );
 
-// Masonry component removed — not used on this page
-
 const InfiniteGallery = dynamic(
   () => import("./components/InfiniteGallery/InfiniteGallery"),
   { ssr: false }
@@ -29,11 +27,6 @@ const InfiniteGallery = dynamic(
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
 }
-
-/* -------------------------------------------------------------------------- */
-/* PORTFOLIO DATA — mixed website & video layouts                             */
-/* -------------------------------------------------------------------------- */
-// portfolioItems removed — not used in current page
 
 /* -------------------------------------------------------------------------- */
 /* PROCEDURAL CLOUD DENSITY MAP                                               */
@@ -188,7 +181,6 @@ export default function MountainLanding() {
   const [submitError, setSubmitError] = useState("");
 
   const mountainBgRef = useRef<HTMLDivElement>(null);
-  // uiWrapperRef removed (unused)
   const heroSectionRef = useRef<HTMLDivElement>(null);
 
   const heroSpacerRef = useRef<HTMLDivElement>(null);
@@ -402,7 +394,7 @@ export default function MountainLanding() {
             trigger: heroSpacerRef.current,
             start: "60% top",
             end: "bottom top",
-            scrub: 1,
+             scrub: 1,
           },
         });
       }
@@ -517,8 +509,6 @@ export default function MountainLanding() {
   const darkButton = "backdrop-blur-xl border border-purple-500/20 hover:border-purple-400/40 active:scale-[0.98] transition-all duration-300 text-purple-300 font-bold uppercase tracking-widest";
   const darkInput = "w-full rounded-xl px-5 py-4 text-sm font-medium text-white/80 outline-none focus:ring-2 focus:ring-purple-500/30 transition-all border border-white/[0.08] placeholder-white/30";
 
-  /* Morph page transition removed (unused). Keep overlay markup for future use. */
-
   return (
     <div>
       {!loaderDone && <TriangleLoader onComplete={handleLoaderComplete} />}
@@ -579,9 +569,6 @@ export default function MountainLanding() {
         <div ref={heroSpacerRef} className="relative z-10 w-full min-h-[100vh] flex flex-col">
 
           <div ref={heroSectionRef} className="relative flex-1 flex flex-col items-center justify-center text-center w-full mt-[136px]">
-
-
-
 
             {/* Iridescent light flares — screen blend for additive color */}
             <div className="absolute inset-0 pointer-events-none overflow-hidden" style={{ zIndex: 5, mixBlendMode: 'screen' as const }}>
@@ -671,8 +658,6 @@ export default function MountainLanding() {
             </div>
           </div>
 
-
-
           <div className="hero-fade-in relative w-full pb-10 pt-16 px-6" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.3) 50%, transparent 100%)' }}>
             <div className="grid grid-cols-1 sm:grid-cols-3 mb-32 gap-16 w-full max-w-full mx-auto">
               {[
@@ -707,7 +692,9 @@ export default function MountainLanding() {
           {/* WORKS — SEAMLESS AUTO-LOOPING MASONRY GALLERY */}
           <div className="relative -mx-6 sm:-mx-12">
             <section id="works" ref={worksRef}>
-              <InfiniteGallery />
+              <Suspense fallback={<div className="h-[400px] w-full flex items-center justify-center text-white/50">Loading Gallery...</div>}>
+                <InfiniteGallery />
+              </Suspense>
             </section>
           </div>
 
@@ -852,8 +839,6 @@ export default function MountainLanding() {
 
         {/* FOOTER */}
         <footer ref={footerRef} className="relative z-30 overflow-hidden" style={{ background: '#0a0814' }}>
-
-          {/* Summit Silhouette — NO Isaiah badge overlay here anymore */}
           <div className="relative">
             <svg
               ref={summitRef}
@@ -929,10 +914,7 @@ export default function MountainLanding() {
           <div style={{ background: "linear-gradient(to bottom, #0a0a14, #0d0d1a 40%, #111126)" }} className="relative">
             <div className="relative z-10 max-w-6xl mx-auto px-6 sm:px-12 pt-16 pb-10">
 
-              {/* ── Top row: Brand + Isaiah badge (center) + Contact ── */}
               <div className="footer-animate flex flex-col lg:flex-row items-start lg:items-center justify-between gap-8 mb-16">
-
-                {/* Brand block */}
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 rounded-xl overflow-hidden flex items-center justify-center relative" style={{ background: "rgba(147,51,234,0.12)", boxShadow: "0 0 30px rgba(147,51,234,0.15), inset 0 1px 1px rgba(255,255,255,0.05)" }}>
                     <Image
@@ -949,7 +931,6 @@ export default function MountainLanding() {
                   </div>
                 </div>
 
-                {/* ── Isaiah 60–61 badge — centered between brand and contact ── */}
                 <button
                   onClick={() => setIsIsaiahModalOpen(true)}
                   className="inline-flex items-center gap-2.5 px-5 py-2 rounded-full border border-white/[0.1] hover:bg-white/10 transition-colors duration-300 cursor-pointer"
@@ -961,7 +942,6 @@ export default function MountainLanding() {
                   </span>
                 </button>
 
-                {/* Contact info */}
                 <div className="flex items-center gap-5 flex-wrap">
                   <span className="flex items-center gap-2.5 text-white/50 text-xs font-medium tracking-wide">
                     <span className="w-1.5 h-1.5 rounded-full bg-purple-500/50" />
@@ -975,10 +955,8 @@ export default function MountainLanding() {
                 </div>
               </div>
 
-              {/* Divider */}
               <div className="footer-animate w-full h-px mb-10" style={{ background: "linear-gradient(to right, transparent, rgba(147,51,234,0.25), rgba(255,255,255,0.06), rgba(147,51,234,0.25), transparent)" }} />
 
-              {/* Middle row: Quick links + Status */}
               <div className="footer-animate flex flex-col md:flex-row items-start md:items-center justify-between gap-8 mb-10">
                 <nav className="flex flex-wrap items-center gap-6 text-[9px] tracking-[0.25em] uppercase font-bold">
                   {["Services", "Team", "Stack", "Projects", "Contact"].map((link) => (
@@ -998,7 +976,6 @@ export default function MountainLanding() {
                 </div>
               </div>
 
-              {/* Bottom row: Copyright + Location */}
               <div className="footer-animate flex flex-col sm:flex-row items-center justify-between gap-4 text-[9px] tracking-[0.3em] uppercase text-white/20 font-medium">
                 <p>© {new Date().getFullYear()} Prominence. All operational rights reserved.</p>
                 <div className="flex items-center gap-2">
@@ -1012,7 +989,6 @@ export default function MountainLanding() {
 
             </div>
 
-            {/* Bottom glow accent */}
             <div
               className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[600px] h-[2px] pointer-events-none"
               style={{ background: "linear-gradient(to right, transparent, rgba(147,51,234,0.4), transparent)" }}
@@ -1020,6 +996,7 @@ export default function MountainLanding() {
           </div>
         </footer>
       </div>
+
       {/* ISAIAH MODAL */}
       {isIsaiahModalOpen && (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-6 bg-black/80 backdrop-blur-md" onClick={() => setIsIsaiahModalOpen(false)}>
