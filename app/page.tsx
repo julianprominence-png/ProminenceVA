@@ -257,7 +257,7 @@ export default function MountainLanding() {
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.25));
     canvasEl.appendChild(renderer.domElement);
     const cloudTexture = createProceduralCloudTexture();
-    const makeUniforms = (base: number, sun: number, shadow: number, opacity: number, light: number) => ({
+    const makeUniforms = (base: number, sun: number, shadow: number, opacity: number, light: number): Record<string, { value: any }> => ({
       uMap: { value: cloudTexture },
       uTime: { value: 0 },
       uBaseColor: { value: new THREE.Color(base) },

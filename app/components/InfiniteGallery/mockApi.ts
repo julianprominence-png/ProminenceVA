@@ -24,11 +24,11 @@ export interface GalleryImage {
  */
 export const galleryImages: GalleryImage[] = [
     // Hero videos as gallery items (video type)
-    { id: "v01_vid", src: "/videos/edit_einjo1.mp4", width: 1280, height: 720, title: "Edit Einjo1", category: "Video", type: "video" },
-    { id: "v02_vid", src: "/videos/Did_You_Know.mp4", width: 1280, height: 720, title: "Did You Know", category: "Video", type: "video" },
-    { id: "v03_vid", src: "/videos/blog_33.mp4", width: 1280, height: 720, title: "Blog Reel", category: "Video", type: "video" },
-    { id: "v04_vid", src: "/videos/Stabucks_Coffee.mp4", width: 1280, height: 720, title: "Coffee Promo", category: "Video", type: "video" },
-    { id: "v05_vid", src: "/videos/videoplayback.mp4", width: 1280, height: 720, title: "Playback Demo", category: "Video", type: "video" },
+    { id: "v01_vid", src: "/videos/edit_einjo1.mp4", poster: "/videos/posters/edit_einjo.png", width: 1280, height: 720, title: "Edit Einjo1", category: "Video", type: "video" },
+    { id: "v02_vid", src: "/videos/Did_You_Know.mp4", poster: "/videos/posters/did_you_know.png", width: 1280, height: 720, title: "Did You Know", category: "Video", type: "video" },
+    { id: "v03_vid", src: "/videos/blog_33.mp4", poster: "/videos/posters/blog_reel.png", width: 1280, height: 720, title: "Blog Reel", category: "Video", type: "video" },
+    { id: "v04_vid", src: "/videos/Stabucks_Coffee.mp4", poster: "/videos/posters/starbucks.png", width: 1280, height: 720, title: "Coffee Promo", category: "Video", type: "video" },
+    { id: "v05_vid", src: "/videos/videoplayback.mp4", poster: "/videos/posters/playback.png", width: 1280, height: 720, title: "Playback Demo", category: "Video", type: "video" },
     // Graphics page WORKS assets
     { id: "gfx01", src: "https://res.cloudinary.com/dzbqzsvoi/image/upload/q_auto/f_auto/v1779809312/SYC6_ziwiy4.jpg", width: 1200, height: 800, title: "Aero Dynamics", category: "Graphics" },
     { id: "gfx02", src: "https://res.cloudinary.com/dzbqzsvoi/image/upload/q_auto/f_auto/v1780411420/TASK_1_-_WHAT_IS_EMTONE_1_egwrrw.jpg", width: 1200, height: 800, title: "Vanguard Motors", category: "Graphics" },
