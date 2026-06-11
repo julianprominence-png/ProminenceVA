@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Navbar from "../components/Navbar/Navbar";
-import SplashCursor from "../components/SplashCursor"; // Adjust path if necessary
+import SplashCursor from "../components/SplashCursor/SplashCursor"; // Adjust path if necessary
 import Image from "next/image";
 import Link from "next/link";
 import {

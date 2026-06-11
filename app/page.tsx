@@ -252,9 +252,9 @@ export default function MountainLanding() {
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
     camera.position.set(0, 5, 70);
-    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: false });
     renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.25));
     canvasEl.appendChild(renderer.domElement);
     const cloudTexture = createProceduralCloudTexture();
     const makeUniforms = (base: number, sun: number, shadow: number, opacity: number, light: number) => ({
@@ -305,11 +305,18 @@ export default function MountainLanding() {
     leftFg.position.set(-80, -20, 8); rightFg.position.set(80, -20, 8);
     leftWisp.position.set(-120, -12, 15); rightWisp.position.set(120, -12, 15);
     scene.add(leftBg, rightBg, leftFg, rightFg, leftWisp, rightWisp);
+    let isVisible = true;
+    const observer = new IntersectionObserver(([entry]) => {
+      isVisible = entry.isIntersecting;
+    });
+    if (canvasEl) observer.observe(canvasEl);
+
     let cft = 0;
     const cBZ = camera.position.z, cBY = camera.position.y, cBX = camera.position.x;
     let animId: number;
     const animate = () => {
       animId = requestAnimationFrame(animate);
+      if (!isVisible) return; // Skip heavy work and render if not visible
       const time = Date.now();
       cft += 0.016;
       camera.position.x = cBX + Math.sin(cft * 0.3) * 0.08 + Math.sin(cft * 2.1) * 0.015;
@@ -356,6 +363,7 @@ export default function MountainLanding() {
     };
     window.addEventListener("resize", handleResize);
     return () => {
+      observer.disconnect();
       window.removeEventListener("resize", handleResize);
       cancelAnimationFrame(animId);
       ctx.revert();

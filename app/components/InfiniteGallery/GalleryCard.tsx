@@ -151,7 +151,7 @@ const GalleryCard = memo(function GalleryCard({ image }: GalleryCardProps) {
                 decoding="async"
                 loading="lazy"
                 onLoad={() => setLoaded(true)}
-                className={`w-full h-full object-cover transition-all duration-700 ease-out will-change-transform ${
+                className={`w-full h-full object-cover transition-all duration-700 ease-out ${
                   loaded ? "opacity-100 scale-100" : "opacity-0 scale-[1.03]"
                 } group-hover:scale-[1.08]`}
               />
@@ -182,7 +182,7 @@ const GalleryCard = memo(function GalleryCard({ image }: GalleryCardProps) {
               onPause={() => {
                 setPlaying(false);
               }}
-              className={`absolute inset-0 w-full h-full object-cover transition-all duration-700 ease-out will-change-transform ${
+              className={`absolute inset-0 w-full h-full object-cover transition-all duration-700 ease-out ${
                 loaded && (playing || !image.poster) ? "opacity-100 scale-100" : "opacity-0 scale-[1.03]"
               } group-hover:scale-[1.08]`}
               playsInline
@@ -202,7 +202,7 @@ const GalleryCard = memo(function GalleryCard({ image }: GalleryCardProps) {
             onLoad={() => setLoaded(true)}
             className={`
               w-full h-full object-cover
-              transition-all duration-700 ease-out will-change-transform
+              transition-all duration-700 ease-out
               ${loaded ? "opacity-100 scale-100" : "opacity-0 scale-[1.03]"}
               group-hover:scale-[1.08]
             `}
